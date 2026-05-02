@@ -26,7 +26,6 @@ extension EnvironmentValues {
 final class AnalysisService: AnalysisServiceProtocol, Sendable {
     func analyze(image: UIImage) async throws -> AnalysisResult {
         guard let cgImage = image.cgImage else { return .fallback }
-        // Vision はバックグラウンドスレッドで実行（メインスレッドブロック防止）
         return try await Task.detached(priority: .userInitiated) {
             try await withCheckedThrowingContinuation { continuation in
                 let request = VNDetectFaceLandmarksRequest { request, error in
@@ -44,49 +43,38 @@ final class AnalysisService: AnalysisServiceProtocol, Sendable {
         }.value
     }
 
-    // Compute AnalysisResult from detected face + landmarks.
-    // Scores are approximated from landmark geometry with small random variance
-    // to reflect real-world measurement noise.
     private static func buildResult(
         from face: VNFaceObservation,
         landmarks: VNFaceLandmarks2D
     ) -> AnalysisResult {
         let box = face.boundingBox
 
-        // 骨格バランス: aspect ratio of bounding box (ideal ~0.75)
         let aspectRatio = box.width > 0 ? box.height / box.width : 1.0
         let balanceScore = scoreFromRatio(value: aspectRatio, ideal: 0.75, tolerance: 0.15)
-
-        // 顔形を aspect ratio から判定
         let faceShape = determineFaceShape(aspectRatio: aspectRatio, balanceScore: balanceScore)
 
-        // 三分割比率: y positions of eyebrows, nose tip, chin relative to face
         let thirdScore: Int
         if let allPoints = landmarks.allPoints {
             let ys = allPoints.normalizedPoints.map { $0.y }
             let minY = ys.min() ?? 0
             let maxY = ys.max() ?? 1
             let range = maxY - minY
-            // rough thirds boundary check
             let thirdsDeviation = range > 0 ? abs(range - 0.33 * 3) / (0.33 * 3) : 0.5
             thirdScore = clampScore(Int(Double(85) * (1.0 - thirdsDeviation)) + jitter(7))
         } else {
             thirdScore = clampScore(68 + jitter(10))
         }
 
-        // 五分割比率: inter-eye distance vs face width
         let fifthScore: Int
         if let leftEye = landmarks.leftEye, let rightEye = landmarks.rightEye {
             let leftCenter = center(of: leftEye.normalizedPoints)
             let rightCenter = center(of: rightEye.normalizedPoints)
             let eyeDist = abs(rightCenter.x - leftCenter.x)
-            // ideal: each eye width ~ 1/5 of face width => eye gap ~ 1/5 as well
             fifthScore = clampScore(scoreFromRatio(value: eyeDist, ideal: 0.20, tolerance: 0.06) + jitter(6))
         } else {
             fifthScore = clampScore(70 + jitter(10))
         }
 
-        // 目の比率: eye height/width (ideal ~0.33)
         let eyeRatioScore: Int
         if let leftEye = landmarks.leftEye {
             let pts = leftEye.normalizedPoints
@@ -100,7 +88,6 @@ final class AnalysisService: AnalysisServiceProtocol, Sendable {
             eyeRatioScore = clampScore(72 + jitter(10))
         }
 
-        // 鼻のバランス: nose width / inter-eye distance (ideal ~1.0)
         let noseScore: Int
         if let nose = landmarks.nose,
            let leftEye = landmarks.leftEye,
@@ -116,7 +103,6 @@ final class AnalysisService: AnalysisServiceProtocol, Sendable {
             noseScore = clampScore(69 + jitter(10))
         }
 
-        // 口の比率: mouth width / inter-eye distance (ideal ~1.5)
         let mouthScore: Int
         if let outerLips = landmarks.outerLips,
            let leftEye = landmarks.leftEye,
@@ -132,7 +118,6 @@ final class AnalysisService: AnalysisServiceProtocol, Sendable {
             mouthScore = clampScore(66 + jitter(10))
         }
 
-        // 左右対称性: average x-deviation between mirrored landmark pairs
         let symmetryScore: Int = computeSymmetryScore(landmarks: landmarks)
 
         let names = ["骨格バランス", "三分割比率", "五分割比率", "目の比率", "鼻のバランス", "口の比率", "左右対称性"]
@@ -144,7 +129,6 @@ final class AnalysisService: AnalysisServiceProtocol, Sendable {
         return AnalysisResult(faceShape: faceShape, scores: scores)
     }
 
-    // Map a measured ratio to a 40–95 score. Closer to ideal => higher score.
     private static func scoreFromRatio(value: Double, ideal: Double, tolerance: Double) -> Int {
         let deviation = abs(value - ideal) / tolerance
         let normalized = max(0.0, 1.0 - deviation)

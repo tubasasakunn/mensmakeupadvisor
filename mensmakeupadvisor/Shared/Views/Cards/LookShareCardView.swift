@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 // 320×400 = 4:5 ルックシェアカード (scale×3 → 960×1200px)
@@ -135,4 +136,5 @@ struct LookShareCardView: View {
             base: 35, highlight: 40, shadow: 28, eye: 42, eyebrow: 55
         )
     )
+    .modelContainer(for: [SavedLook.self], inMemory: true)
 }
