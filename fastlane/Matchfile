@@ -1,0 +1,5 @@
+git_url ENV.fetch("MATCH_GIT_URL", "")
+storage_mode "git"
+type "appstore"
+app_identifier "com.tubasasakun.mensmakeupadvisor"
+team_id "7NN5KD3TSU"
