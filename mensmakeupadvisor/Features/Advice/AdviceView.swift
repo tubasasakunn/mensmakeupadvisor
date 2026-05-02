@@ -32,7 +32,7 @@ struct AdviceView: View {
                             .padding(.top, 16)
                             .padding(.horizontal, 24)
 
-                        viewfinderArea
+                        AdviceViewfinderArea()
                             .padding(.top, 28)
                             .padding(.horizontal, 24)
 
@@ -118,103 +118,15 @@ struct AdviceView: View {
             .lineSpacing(6)
     }
 
-    // MARK: - Viewfinder
-
-    private var viewfinderArea: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Color.white.opacity(0.03))
-                .frame(height: 280)
-
-            // ダッシュ枠（楕円）
-            Ellipse()
-                .stroke(
-                    style: StrokeStyle(lineWidth: 1, dash: [6, 4])
-                )
-                .foregroundStyle(Color.ivory.opacity(0.3))
-                .padding(32)
-
-            // 四隅コーナーマーク
-            viewfinderCorners
-
-            // ライブラベル
-            VStack {
-                Spacer()
-                HStack {
-                    Circle()
-                        .fill(Color.brandPrimary)
-                        .frame(width: 6, height: 6)
-                    Text("LIVE")
-                        .font(.system(size: 9, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Color.brandPrimary)
-                        .kerning(2)
-                }
-                .padding(.bottom, 16)
-            }
-
-            // 中央ガイドテキスト
-            Text("顔を枠内に合わせてください")
-                .font(.system(size: 11, weight: .regular, design: .monospaced))
-                .foregroundStyle(Color.inkSecondary)
-        }
-        .frame(height: 280)
-        .clipShape(RoundedRectangle(cornerRadius: 4))
-        .overlay(
-            RoundedRectangle(cornerRadius: 4)
-                .stroke(Color.lineColor, lineWidth: 1)
-        )
-    }
-
-    private var viewfinderCorners: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let h = geo.size.height
-            let arm: CGFloat = 16
-            let thick: CGFloat = 1.5
-
-            ZStack {
-                // 左上
-                Path { p in
-                    p.move(to: CGPoint(x: 8, y: 8 + arm))
-                    p.addLine(to: CGPoint(x: 8, y: 8))
-                    p.addLine(to: CGPoint(x: 8 + arm, y: 8))
-                }
-                .stroke(Color.ivory.opacity(0.6), lineWidth: thick)
-
-                // 右上
-                Path { p in
-                    p.move(to: CGPoint(x: w - 8 - arm, y: 8))
-                    p.addLine(to: CGPoint(x: w - 8, y: 8))
-                    p.addLine(to: CGPoint(x: w - 8, y: 8 + arm))
-                }
-                .stroke(Color.ivory.opacity(0.6), lineWidth: thick)
-
-                // 左下
-                Path { p in
-                    p.move(to: CGPoint(x: 8, y: h - 8 - arm))
-                    p.addLine(to: CGPoint(x: 8, y: h - 8))
-                    p.addLine(to: CGPoint(x: 8 + arm, y: h - 8))
-                }
-                .stroke(Color.ivory.opacity(0.6), lineWidth: thick)
-
-                // 右下
-                Path { p in
-                    p.move(to: CGPoint(x: w - 8 - arm, y: h - 8))
-                    p.addLine(to: CGPoint(x: w - 8, y: h - 8))
-                    p.addLine(to: CGPoint(x: w - 8, y: h - 8 - arm))
-                }
-                .stroke(Color.ivory.opacity(0.6), lineWidth: thick)
-            }
-        }
-    }
-
     // MARK: - Action Buttons
 
     @ViewBuilder
     private var actionButtons: some View {
         VStack(spacing: 12) {
             if AppEnvironment.useMockImagePicker {
-                mockImagePickerButtons
+                AdviceMockImagePicker { image in
+                    viewModel.selectImage(image, appState: appState)
+                }
             } else {
                 primaryButton
             }
@@ -258,42 +170,6 @@ struct AdviceView: View {
                 )
         }
         .aid("advice_sample_button")
-    }
-
-    // モックモード時のボタン群
-    private var mockImagePickerButtons: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 8) {
-                ForEach(0..<3, id: \.self) { index in
-                    Button("画像\(index + 1)") {
-                        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 300, height: 400))
-                        let image = renderer.image { ctx in
-                            let hue = CGFloat(index) / 3.0
-                            UIColor(hue: hue, saturation: 0.3, brightness: 0.4, alpha: 1).setFill()
-                            ctx.fill(CGRect(x: 0, y: 0, width: 300, height: 400))
-                        }
-                        viewModel.selectImage(image, appState: appState)
-                    }
-                    .font(.system(size: 13, weight: .regular, design: .monospaced))
-                    .foregroundStyle(Color.ivory)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.white.opacity(0.08))
-                    .clipShape(RoundedRectangle(cornerRadius: 2))
-                    .aid("advice_mock_image_\(index)")
-                }
-            }
-
-            Text("[MOCK] 画像ピッカー")
-                .font(.system(size: 10, design: .monospaced))
-                .foregroundStyle(Color.orange.opacity(0.8))
-        }
-        .padding(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 4)
-                .stroke(Color.orange.opacity(0.4), lineWidth: 1)
-        )
-        .aid("advice_mock_image_picker")
     }
 
     // MARK: - Privacy Caption

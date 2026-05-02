@@ -90,12 +90,6 @@ struct StudioSlider: View {
     }
 }
 
-private extension Comparable {
-    func clamped(to range: ClosedRange<Self>) -> Self {
-        Swift.max(range.lowerBound, Swift.min(range.upperBound, self))
-    }
-}
-
 #Preview {
     FineTunePanelView()
         .environment(AppState())

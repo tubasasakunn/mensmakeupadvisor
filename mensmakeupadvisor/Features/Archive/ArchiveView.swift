@@ -50,6 +50,7 @@ struct ArchiveView: View {
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(1.5)
             }
+            .aid("archive_back_button")
 
             Spacer()
 

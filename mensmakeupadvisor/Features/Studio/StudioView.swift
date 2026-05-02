@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct StudioView: View {
     @Environment(AppState.self) private var appState
@@ -15,7 +15,7 @@ struct StudioView: View {
                 headerBar
                     .padding(.top, 8)
 
-                imagePlate
+                StudioImagePlate(viewModel: viewModel)
                     .padding(.horizontal, 28)
                     .padding(.top, 12)
 
@@ -34,7 +34,6 @@ struct StudioView: View {
                     .padding(.bottom, 32)
             }
 
-            // 保存通知オーバーレイ
             if viewModel.showSavedNotification {
                 savedNotification
             }
@@ -54,6 +53,7 @@ struct StudioView: View {
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(1.5)
             }
+            .aid("studio_back_button")
 
             Spacer()
 
@@ -75,172 +75,6 @@ struct StudioView: View {
             .aid("studio_header_saved_button")
         }
         .padding(.horizontal, 28)
-    }
-
-    private var imagePlate: some View {
-        GeometryReader { geo in
-            let width = geo.size.width
-            let height = width * (5.0 / 4.0)
-
-            ZStack {
-                if viewModel.displayMode == .compare {
-                    compareView(width: width, height: height)
-                } else {
-                    afterView(width: width, height: height)
-                }
-
-                // スコア表示（右上 — BEFORE/AFTERラベルと重複しない位置）
-                if let result = appState.analysisResult {
-                    VStack {
-                        HStack {
-                            Spacer()
-                            scoreChip(result: result)
-                                .padding(10)
-                        }
-                        Spacer()
-                    }
-                }
-            }
-            .frame(width: width, height: height)
-            .clipped()
-        }
-        .aspectRatio(4.0 / 5.0, contentMode: .fit)
-    }
-
-    private func compareView(width: CGFloat, height: CGFloat) -> some View {
-        ZStack(alignment: .leading) {
-            // After（右側）
-            afterLayer(width: width, height: height)
-
-            // Before（左側クリップ）
-            if let img = appState.capturedImage {
-                Image(uiImage: img)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: width, height: height)
-                    .clipped()
-                    .mask(
-                        HStack(spacing: 0) {
-                            Rectangle()
-                                .frame(width: viewModel.comparePosition * width)
-                            Spacer()
-                        }
-                    )
-
-                // 区切りライン
-                Rectangle()
-                    .fill(Color.ivory.opacity(0.8))
-                    .frame(width: 1, height: height)
-                    .offset(x: viewModel.comparePosition * width - 0.5)
-            } else {
-                placeholderHalf(width: width * viewModel.comparePosition, height: height)
-            }
-
-            // Before / After ラベル
-            VStack {
-                Spacer()
-                HStack {
-                    Text("FIG. A — BEFORE")
-                        .font(.system(size: 8, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Color.ivory.opacity(0.7))
-                        .kerning(1.2)
-                        .padding(.horizontal, 10)
-                        .padding(.bottom, 10)
-                    Spacer()
-                }
-            }
-
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    Text("FIG. B — AFTER")
-                        .font(.system(size: 8, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Color.ivory.opacity(0.7))
-                        .kerning(1.2)
-                        .padding(.horizontal, 10)
-                        .padding(.bottom, 10)
-                }
-            }
-        }
-        .frame(width: width, height: height)
-        .gesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { drag in
-                    let fraction = (drag.location.x / width).clamped(to: 0.05...0.95)
-                    viewModel.comparePosition = fraction
-                }
-        )
-    }
-
-    private func afterLayer(width: CGFloat, height: CGFloat) -> some View {
-        afterView(width: width, height: height)
-    }
-
-    private func afterView(width: CGFloat, height: CGFloat) -> some View {
-        ZStack {
-            Color.black
-
-            if let img = appState.capturedImage {
-                Image(uiImage: img)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: width, height: height)
-                    .clipped()
-            } else {
-                ZStack {
-                    Color(white: 0.10)
-                    VStack(spacing: 8) {
-                        Ellipse()
-                            .stroke(Color.ivory.opacity(0.25), lineWidth: 1)
-                            .frame(width: width * 0.55, height: height * 0.68)
-                        Text("FIG. B · AFTER")
-                            .font(.system(size: 8, weight: .light, design: .monospaced))
-                            .foregroundStyle(Color.inkSecondary)
-                            .kerning(2)
-                    }
-                }
-                .frame(width: width, height: height)
-            }
-
-            // メイク強度を可視化するグラデーションオーバーレイ
-            makeupCompositeOverlay
-        }
-    }
-
-    private var makeupCompositeOverlay: some View {
-        let intensity = appState.intensity
-        return ZStack {
-            // ハイライト
-            LinearGradient(
-                colors: [Color.clear, Color.ivory.opacity(intensity.highlight / 250)],
-                startPoint: .bottom,
-                endPoint: .top
-            )
-            // シャドウ
-            LinearGradient(
-                colors: [Color.clear, Color(white: 0.05).opacity(intensity.shadow / 200)],
-                startPoint: .center,
-                endPoint: .leading
-            )
-        }
-    }
-
-    private func placeholderHalf(width: CGFloat, height: CGFloat) -> some View {
-        Color(white: 0.06).frame(width: width, height: height)
-    }
-
-    private func scoreChip(result: AnalysisResult) -> some View {
-        Text("SCORE \(result.totalScore)")
-            .font(.system(size: 9, weight: .medium, design: .monospaced))
-            .foregroundStyle(Color.ivory)
-            .kerning(1.5)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(Color.appBackground.opacity(0.7))
-            .overlay(
-                Rectangle().stroke(Color.lineColor, lineWidth: 1)
-            )
     }
 
     private var modeSegment: some View {
@@ -342,27 +176,18 @@ struct StudioView: View {
     private var savedNotification: some View {
         VStack {
             Spacer()
-            HStack {
-                Spacer()
-                Text("✓ LOOK ARCHIVED")
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(Color.appBackground)
-                    .kerning(2)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
-                    .background(Color.ivory)
-                Spacer()
-            }
-            .padding(.bottom, 100)
+            Text("✓ LOOK ARCHIVED")
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .foregroundStyle(Color.appBackground)
+                .kerning(2)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color.ivory)
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 100)
         }
         .aid("studio_saved_notification")
         .transition(.opacity.combined(with: .move(edge: .bottom)))
-    }
-}
-
-private extension Comparable {
-    func clamped(to range: ClosedRange<Self>) -> Self {
-        Swift.max(range.lowerBound, Swift.min(range.upperBound, self))
     }
 }
 
