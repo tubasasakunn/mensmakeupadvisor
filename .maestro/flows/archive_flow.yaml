@@ -1,0 +1,44 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# Navigate to archive after saving a look
+
+- launchApp:
+    arguments:
+      - "--mock-mode"
+
+- waitForAnimationToEnd:
+    timeout: 3000
+
+- tapOn:
+    id: "onboarding_skip_button"
+    optional: true
+
+- tapOn:
+    id: "advice_sample_button"
+
+- waitForAnimationToEnd:
+    timeout: 10000
+
+- tapOn:
+    id: "diagnosis_skip_button"
+
+- assertVisible:
+    id: "studio_view"
+
+- tapOn:
+    id: "studio_save_button"
+
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# SAVED → ボタンでアーカイブ画面へ
+- tapOn:
+    id: "studio_header_saved_button"
+
+- assertVisible:
+    id: "archive_view"
+
+# 空状態の場合はそのまま確認（看守したルックがあれば looksGrid を確認）
+- assertVisible:
+    id: "archive_empty_state"
+    optional: true

@@ -1,0 +1,73 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# シェア機能 E2E フロー
+# 診断結果のシェアボタンをテストする
+
+- launchApp:
+    arguments:
+      - "--mock-mode"
+      - "--mock-image-picker"
+
+- waitForAnimationToEnd:
+    timeout: 3000
+
+- tapOn:
+    id: "onboarding_skip_button"
+    optional: true
+
+# キャプチャ画面でモック画像を選択
+- assertVisible:
+    id: "advice_capture_view"
+
+- tapOn:
+    id: "advice_mock_image_0"
+
+# 分析完了まで待機
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# 診断結果画面
+- assertVisible:
+    id: "diagnosis_view"
+
+- assertVisible:
+    id: "diagnosis_score_ring"
+
+# スクロールしてシェアボタンまで移動
+- scrollDown:
+    on:
+      id: "diagnosis_view"
+
+- assertVisible:
+    id: "diagnosis_share_button"
+
+# シェアボタンをタップ（システムシートが開く）
+- tapOn:
+    id: "diagnosis_share_button"
+
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# スタジオへ移動してシェアボタンを確認
+- tapOn:
+    id: "diagnosis_skip_button"
+
+- assertVisible:
+    id: "studio_view"
+
+- assertVisible:
+    id: "studio_share_button"
+
+# ルックを保存
+- tapOn:
+    id: "studio_save_button"
+
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# アーカイブへ移動
+- tapOn:
+    id: "studio_header_saved_button"
+
+- assertVisible:
+    id: "archive_view"

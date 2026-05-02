@@ -1,0 +1,72 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# アドバイス（撮影→分析→診断）E2E フロー
+# 前提: --mock-mode --mock-image-picker の Launch Arguments が付いていること
+
+- launchApp:
+    arguments:
+      - "--mock-mode"
+      - "--mock-image-picker"
+
+# スプラッシュ・オンボーディング通過を待つ
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# オンボーディングが表示されていればスキップ
+- tapOn:
+    id: "onboarding_skip_button"
+    optional: true
+
+# キャプチャ画面の確認
+- assertVisible:
+    id: "advice_capture_view"
+
+# モックモードのため advice_mock_image_picker が表示されているはず
+- assertVisible:
+    id: "advice_mock_image_picker"
+
+# モック画像0を選択 → 分析画面へ遷移
+- tapOn:
+    id: "advice_mock_image_0"
+
+# 分析画面の確認
+- assertVisible:
+    id: "analyzing_view"
+
+- assertVisible:
+    id: "analyzing_progress_bar"
+
+- assertVisible:
+    id: "analyzing_phase_label"
+
+# 分析完了まで待機（最大15秒）
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# 診断結果画面の確認
+- assertVisible:
+    id: "diagnosis_view"
+
+- assertVisible:
+    id: "diagnosis_score_ring"
+
+- assertVisible:
+    id: "diagnosis_score_list"
+
+# スクロールして下部ボタンを確認
+- scrollDown:
+    on:
+      id: "diagnosis_view"
+
+- assertVisible:
+    id: "diagnosis_begin_button"
+
+- assertVisible:
+    id: "diagnosis_skip_button"
+
+# BEGIN COMPOSITION でチュートリアルへ
+- tapOn:
+    id: "diagnosis_begin_button"
+
+- assertVisible:
+    id: "tutorial_view"

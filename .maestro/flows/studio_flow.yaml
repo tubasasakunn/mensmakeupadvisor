@@ -1,0 +1,35 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+- launchApp:
+    arguments:
+      - "--mock-mode"
+
+- waitForAnimationToEnd:
+    timeout: 3000
+
+- tapOn:
+    id: "onboarding_skip_button"
+    optional: true
+
+- tapOn:
+    id: "advice_sample_button"
+
+- waitForAnimationToEnd:
+    timeout: 10000
+
+- tapOn:
+    id: "diagnosis_skip_button"
+
+- assertVisible:
+    id: "studio_view"
+
+# Apply a preset
+- tapOn:
+    id: "studio_preset_natural"
+
+# Save look
+- tapOn:
+    id: "studio_save_button"
+
+- assertVisible:
+    id: "studio_saved_notification"

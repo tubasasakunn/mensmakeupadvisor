@@ -1,0 +1,73 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# チュートリアル画面 E2E フロー
+# 前提: --mock-mode の Launch Arguments が付いていること
+
+- launchApp:
+    arguments:
+      - "--mock-mode"
+
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# オンボーディングをスキップ
+- tapOn:
+    id: "onboarding_skip_button"
+    optional: true
+
+# サンプル画像で分析開始
+- tapOn:
+    id: "advice_sample_button"
+
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# チュートリアル画面の表示を確認
+- assertVisible:
+    id: "tutorial_view"
+
+# ステップ情報を確認
+- assertVisible:
+    id: "tutorial_step_info"
+
+# インテンシティスライダーの確認
+- assertVisible:
+    id: "tutorial_intensity_slider"
+
+# Act I → Act II
+- tapOn:
+    id: "tutorial_next_button"
+
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Act II → Act III
+- tapOn:
+    id: "tutorial_next_button"
+
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Act III → Act IV
+- tapOn:
+    id: "tutorial_next_button"
+
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# Act IV → Act V
+- tapOn:
+    id: "tutorial_next_button"
+
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# 最終ステップで COMPOSE → をタップしてスタジオへ
+- tapOn:
+    id: "tutorial_next_button"
+
+- waitForAnimationToEnd:
+    timeout: 1000
+
+- assertVisible:
+    id: "studio_view"

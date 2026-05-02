@@ -1,0 +1,19 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# Splash 画面 E2E フロー
+# アプリ起動 → Splash 表示 → 自動遷移を確認
+
+- launchApp:
+    arguments:
+      - "--mock-mode"
+
+# Splash 画面が表示されることを確認
+- assertVisible:
+    id: "splash_view"
+
+# 2.2 秒の自動遷移後、Onboarding が表示されるまで待機
+- waitForAnimationToEnd:
+    timeout: 4000
+
+- assertVisible:
+    id: "onboarding_view"

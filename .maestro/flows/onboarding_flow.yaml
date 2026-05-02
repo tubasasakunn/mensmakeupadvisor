@@ -1,0 +1,56 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# Onboarding E2E フロー
+# Splash → Onboarding (全ページ skip) → Capture
+
+- launchApp:
+    arguments:
+      - "--mock-mode"
+
+# Splash 画面の確認
+- assertVisible:
+    id: "splash_view"
+
+# Splash が自動遷移するまで待機（最大 4 秒）
+- waitForAnimationToEnd:
+    timeout: 4000
+
+# Onboarding 画面の確認
+- assertVisible:
+    id: "onboarding_view"
+
+- assertVisible:
+    id: "onboarding_progress_bar"
+
+- assertVisible:
+    id: "onboarding_folio_label"
+
+- assertVisible:
+    id: "onboarding_page_content"
+
+# Continue ボタンで数ページ進める
+- tapOn:
+    id: "onboarding_continue_button"
+
+- assertVisible:
+    id: "onboarding_page_content"
+
+- tapOn:
+    id: "onboarding_continue_button"
+
+- assertVisible:
+    id: "onboarding_page_content"
+
+# Back ボタンのテスト
+- tapOn:
+    id: "onboarding_back_button"
+
+- assertVisible:
+    id: "onboarding_page_content"
+
+# Skip ボタンでオンボーディングをスキップ
+- tapOn:
+    id: "onboarding_skip_button"
+
+- assertVisible:
+    id: "advice_capture_view"

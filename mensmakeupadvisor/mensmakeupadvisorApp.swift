@@ -1,32 +1,27 @@
-//
-//  mensmakeupadvisorApp.swift
-//  mensmakeupadvisor
-//
-//  Created by 若生 翼 on 2026/04/29.
-//
-
 import SwiftUI
 import SwiftData
 
 @main
 struct mensmakeupadvisorApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    @State private var appState = AppState()
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([SavedLook.self])
+        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        do { return try ModelContainer(for: schema, configurations: [config]) }
+        catch { fatalError("ModelContainer error: \(error)") }
     }()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environment(appState)
+                .environment(\.analysisService, resolvedAnalysisService)
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    private var resolvedAnalysisService: any AnalysisServiceProtocol {
+        AppEnvironment.isMockMode ? MockAnalysisService() : AnalysisService()
     }
 }

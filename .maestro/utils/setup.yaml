@@ -1,0 +1,9 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# 共通セットアップ — 全フローで使えるクリーンスタート
+
+- launchApp:
+    clearState: true
+    arguments:
+      - "--mock-mode"
+      - "--mock-image-picker"
