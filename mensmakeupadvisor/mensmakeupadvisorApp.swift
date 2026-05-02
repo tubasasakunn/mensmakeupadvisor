@@ -17,6 +17,11 @@ struct mensmakeupadvisorApp: App {
             RootView()
                 .environment(appState)
                 .environment(\.analysisService, resolvedAnalysisService)
+                .task {
+                    if AppEnvironment.isScreenshotMode {
+                        await appState.runScreenshotFlow()
+                    }
+                }
         }
         .modelContainer(sharedModelContainer)
     }

@@ -82,17 +82,23 @@ struct StudioView: View {
             let width = geo.size.width
             let height = width * (5.0 / 4.0)
 
-            ZStack(alignment: .bottomLeading) {
+            ZStack {
                 if viewModel.displayMode == .compare {
                     compareView(width: width, height: height)
                 } else {
                     afterView(width: width, height: height)
                 }
 
-                // スコア表示
+                // スコア表示（右上 — BEFORE/AFTERラベルと重複しない位置）
                 if let result = appState.analysisResult {
-                    scoreChip(result: result)
-                        .padding(10)
+                    VStack {
+                        HStack {
+                            Spacer()
+                            scoreChip(result: result)
+                                .padding(10)
+                        }
+                        Spacer()
+                    }
                 }
             }
             .frame(width: width, height: height)
@@ -183,15 +189,15 @@ struct StudioView: View {
                     .clipped()
             } else {
                 ZStack {
-                    Color(white: 0.08)
+                    Color(white: 0.10)
                     VStack(spacing: 8) {
                         Ellipse()
-                            .stroke(Color.lineColor, lineWidth: 1)
+                            .stroke(Color.ivory.opacity(0.25), lineWidth: 1)
                             .frame(width: width * 0.55, height: height * 0.68)
-                        Text("AFTER")
-                            .font(.system(size: 9, weight: .light, design: .monospaced))
+                        Text("FIG. B · AFTER")
+                            .font(.system(size: 8, weight: .light, design: .monospaced))
                             .foregroundStyle(Color.inkSecondary)
-                            .kerning(3)
+                            .kerning(2)
                     }
                 }
                 .frame(width: width, height: height)

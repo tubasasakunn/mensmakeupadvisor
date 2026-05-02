@@ -153,14 +153,14 @@ struct AnalyzingView: View {
                 let x = CGFloat(col) * cellW
                 path.move(to: CGPoint(x: x, y: 0))
                 path.addLine(to: CGPoint(x: x, y: size.height))
-                context.stroke(path, with: .color(Color.ivory.opacity(0.04)), lineWidth: 0.5)
+                context.stroke(path, with: .color(Color.ivory.opacity(0.08)), lineWidth: 0.5)
             }
             for row in 0...rows {
                 var path = Path()
                 let y = CGFloat(row) * cellH
                 path.move(to: CGPoint(x: 0, y: y))
                 path.addLine(to: CGPoint(x: size.width, y: y))
-                context.stroke(path, with: .color(Color.ivory.opacity(0.04)), lineWidth: 0.5)
+                context.stroke(path, with: .color(Color.ivory.opacity(0.08)), lineWidth: 0.5)
             }
         }
         .allowsHitTesting(false)

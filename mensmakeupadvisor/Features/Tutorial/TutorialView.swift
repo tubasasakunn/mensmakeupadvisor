@@ -159,18 +159,19 @@ struct TutorialView: View {
     @ViewBuilder
     private func placeholderFace(width: CGFloat, height: CGFloat) -> some View {
         ZStack {
-            Color(white: 0.08)
+            Color(white: 0.10)
 
-            VStack(spacing: 8) {
-                // シンプルな顔のプレースホルダー
-                Ellipse()
-                    .stroke(Color.lineColor, lineWidth: 1)
-                    .frame(width: width * 0.55, height: height * 0.68)
+            Ellipse()
+                .stroke(Color.ivory.opacity(0.25), lineWidth: 1)
+                .frame(width: width * 0.55, height: height * 0.68)
 
-                Text(currentStep.label.uppercased())
-                    .font(.system(size: 9, weight: .light, design: .monospaced))
+            VStack(spacing: 4) {
+                Spacer()
+                Text("ACT \(currentStep.tag) · \(currentStep.label.uppercased())")
+                    .font(.system(size: 8, weight: .light, design: .monospaced))
                     .foregroundStyle(Color.inkSecondary)
-                    .kerning(3)
+                    .kerning(2)
+                    .padding(.bottom, 12)
             }
         }
     }
