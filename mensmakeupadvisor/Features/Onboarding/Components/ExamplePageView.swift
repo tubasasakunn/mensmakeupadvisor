@@ -5,6 +5,8 @@ struct ExamplePageView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            Spacer(minLength: 0)
+
             if let title = page.title {
                 Text(title)
                     .font(.system(size: 24, weight: .bold, design: .serif))
@@ -13,7 +15,7 @@ struct ExamplePageView: View {
             }
 
             if let items = page.exampleItems {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 14) {
                     ForEach(items.indices, id: \.self) { i in
                         ExampleItemView(
                             concern: items[i].concern,
@@ -22,8 +24,10 @@ struct ExamplePageView: View {
                     }
                 }
             }
+
+            Spacer(minLength: 0)
         }
-        .padding(.top, 16)
+        .frame(maxHeight: .infinity)
     }
 }
 
@@ -42,6 +46,7 @@ struct ExampleItemView: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             HStack(alignment: .top, spacing: 8) {
@@ -53,6 +58,7 @@ struct ExampleItemView: View {
                     .font(.system(size: 12))
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(4)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(14)

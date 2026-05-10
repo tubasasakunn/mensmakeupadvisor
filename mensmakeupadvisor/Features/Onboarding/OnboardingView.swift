@@ -14,14 +14,22 @@ struct OnboardingView: View {
                 headerBar
                 progressBar
                 folioBar
-                pageContent
+
+                TabView(selection: $currentPage) {
+                    ForEach(pages.indices, id: \.self) { index in
+                        OnboardPageContentView(page: pages[index])
+                            .tag(index)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+
                 navigationBar
             }
         }
         .accessibilityIdentifier("onboarding_view")
     }
 
-    // MARK: - Header: tag + skip
+    // MARK: - Header
 
     private var headerBar: some View {
         HStack {
@@ -31,15 +39,7 @@ struct OnboardingView: View {
                 .kerning(2.5)
                 .animation(.none, value: currentPage)
                 .accessibilityIdentifier("onboarding_page_tag")
-
             Spacer()
-
-            Button("Skip →") {
-                appState.navigate(to: .capture)
-            }
-            .font(.system(size: 11, design: .monospaced))
-            .foregroundStyle(Color.inkSecondary)
-            .accessibilityIdentifier("onboarding_skip_button")
         }
         .padding(.horizontal, 28)
         .padding(.top, 12)
@@ -66,7 +66,7 @@ struct OnboardingView: View {
         .accessibilityIdentifier("onboarding_progress_bar")
     }
 
-    // MARK: - Folio "p. 001 of 033"
+    // MARK: - Folio
 
     private var folioBar: some View {
         HStack {
@@ -81,77 +81,20 @@ struct OnboardingView: View {
         .padding(.bottom, 4)
     }
 
-    // MARK: - Page content with transitions
-
-    private var pageContent: some View {
-        OnboardPageContentView(page: pages[currentPage])
-            .id(currentPage)
-            .transition(.asymmetric(
-                insertion: .opacity.combined(with: .move(edge: .trailing)),
-                removal: .opacity.combined(with: .move(edge: .leading))
-            ))
-            .animation(.easeInOut(duration: 0.3), value: currentPage)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .accessibilityIdentifier("onboarding_page_content")
-            .highPriorityGesture(
-                DragGesture(minimumDistance: 20)
-                    .onEnded { value in
-                        let horizontal = abs(value.translation.width)
-                        let vertical = abs(value.translation.height)
-                        guard horizontal > vertical else { return }
-                        if value.translation.width < -60 {
-                            // 左スワイプ: 次ページ
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                if currentPage < pages.count - 1 {
-                                    currentPage += 1
-                                }
-                            }
-                        } else if value.translation.width > 60 {
-                            // 右スワイプ: 前ページ
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                if currentPage > 0 {
-                                    currentPage -= 1
-                                }
-                            }
-                        }
-                    }
-            )
-    }
-
-    // MARK: - Navigation: Back + Continue
+    // MARK: - Navigation: BEGIN on last page only
 
     private var navigationBar: some View {
         HStack {
-            if currentPage > 0 {
-                Button {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        currentPage -= 1
-                    }
-                } label: {
-                    Text("← Back")
-                        .font(.system(size: 12, design: .monospaced))
-                        .foregroundStyle(Color.inkSecondary)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                }
-                .accessibilityIdentifier("onboarding_back_button")
-            } else {
-                EmptyView()
-            }
-
             Spacer()
-
-            // 最終ページ以外: 丸矢印ボタン / 最終ページ: BEGIN capsule
             if currentPage == pages.count - 1 {
                 Button {
-                    nextPage()
+                    appState.navigate(to: .capture)
                 } label: {
                     HStack(spacing: 6) {
                         Text("BEGIN")
                             .font(.system(size: 12, weight: .semibold, design: .monospaced))
                             .kerning(1.5)
                             .foregroundStyle(Color.ivory)
-
                         Text("→")
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(Color.ivory)
@@ -161,38 +104,13 @@ struct OnboardingView: View {
                 }
                 .glassEffect(.regular, in: .capsule)
                 .accessibilityIdentifier("onboarding_continue_button")
-            } else {
-                Button {
-                    nextPage()
-                } label: {
-                    Text("→")
-                        .font(.system(size: 18, weight: .light))
-                        .foregroundStyle(Color.ivory)
-                        .padding(16)
-                }
-                .glassEffect(.regular, in: .circle)
-                .accessibilityIdentifier("onboarding_continue_button")
             }
         }
+        .frame(height: 60)
         .padding(.horizontal, 28)
         .padding(.bottom, 32)
-        .padding(.top, 8)
-    }
-
-    // MARK: - Navigation logic
-
-    private func nextPage() {
-        if currentPage < pages.count - 1 {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                currentPage += 1
-            }
-        } else {
-            appState.navigate(to: .capture)
-        }
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     OnboardingView()

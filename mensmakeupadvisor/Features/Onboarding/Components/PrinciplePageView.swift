@@ -1,7 +1,14 @@
 import SwiftUI
+import UIKit
 
 struct PrinciplePageView: View {
     let page: OnboardingPage
+
+    // tag から画像を探す: "MISTAKE 01" → "mistake_01"
+    private var illustrationImage: UIImage? {
+        let key = page.tag.lowercased().replacingOccurrences(of: " ", with: "_")
+        return UIImage(named: key)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -26,7 +33,16 @@ struct PrinciplePageView: View {
                     .font(.system(size: 14))
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(5)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, illustrationImage != nil ? 14 : 20)
+            }
+
+            if let img = illustrationImage {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: 150)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.bottom, 16)
             }
 
             if let items = page.items {
