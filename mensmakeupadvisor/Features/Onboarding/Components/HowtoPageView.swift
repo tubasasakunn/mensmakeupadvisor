@@ -34,8 +34,9 @@ struct HowtoPageView: View {
 
             if let name = svgName {
                 AnimatedSVGView(svgName: name)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 180)
+                    .aspectRatio(1, contentMode: .fit)
+                    .frame(maxWidth: 260)
+                    .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.bottom, 16)
             }
 
