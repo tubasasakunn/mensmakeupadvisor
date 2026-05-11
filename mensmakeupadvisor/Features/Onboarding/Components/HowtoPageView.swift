@@ -16,6 +16,9 @@ struct HowtoPageView: View {
                     .font(.system(size: 120, weight: .bold, design: .serif))
                     .italic()
                     .foregroundStyle(Color.brandPrimary.opacity(0.28))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
+                    .allowsTightening(true)
                     .padding(.bottom, -30)
             }
 
