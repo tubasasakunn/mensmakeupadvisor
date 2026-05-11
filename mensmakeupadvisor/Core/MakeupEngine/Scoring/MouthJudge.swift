@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 // 2.2.6 口の判定
