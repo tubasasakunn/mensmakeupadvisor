@@ -19,7 +19,7 @@ enum BaseApplier {
         var blurScale: Float = 2.5
     }
 
-    static func apply(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
+    nonisolated static func apply(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
         let w = image.width
         let h = image.height
         let allMeshIDs = Array(0..<faceMesh.triangles.count)

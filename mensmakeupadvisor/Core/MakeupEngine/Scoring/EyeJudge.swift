@@ -30,7 +30,7 @@ enum EyeJudge {
         var category: Category
     }
 
-    static func analyze(faceMesh: FaceMesh) -> Result {
+    nonisolated static func analyze(faceMesh: FaceMesh) -> Result {
         let right = measureSide(
             faceMesh: faceMesh,
             outer: FaceLandmarkID.eyeOuterR, inner: FaceLandmarkID.eyeInnerR,
@@ -73,7 +73,7 @@ enum EyeJudge {
         )
     }
 
-    private static func measureSide(faceMesh: FaceMesh,
+    private nonisolated static func measureSide(faceMesh: FaceMesh,
                                     outer: Int, inner: Int, top: Int, bot: Int,
                                     irisIds: [Int]) -> EyeSide {
         var s = EyeSide()

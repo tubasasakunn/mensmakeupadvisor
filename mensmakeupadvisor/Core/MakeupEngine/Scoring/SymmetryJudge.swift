@@ -32,12 +32,12 @@ enum SymmetryJudge {
         var sub: SubResults
     }
 
-    private static func sym(_ a: Double, _ b: Double) -> Double {
+    private nonisolated static func sym(_ a: Double, _ b: Double) -> Double {
         let m = (a + b) / 2
         return m < 1e-6 ? 1.0 : max(0.0, 1.0 - abs(a - b) / m)
     }
 
-    private static func jawLineSharpness(faceMesh: FaceMesh) -> Double {
+    private nonisolated static func jawLineSharpness(faceMesh: FaceMesh) -> Double {
         let mids = [172, 136, 150, 149, 176, 148]
         let g = faceMesh.landmarksPx[FaceLandmarkID.gonionR]
         let c = faceMesh.landmarksPx[FaceLandmarkID.chinBottom]
@@ -56,7 +56,7 @@ enum SymmetryJudge {
         return max(0.0, 1.0 - avg * 4.0)
     }
 
-    static func analyze(faceMesh: FaceMesh) -> Result {
+    nonisolated static func analyze(faceMesh: FaceMesh) -> Result {
         let sub = SubResults(
             skeletal: SkeletalClassifier.classify(faceMesh: faceMesh),
             faceRatio: FaceRatioJudge.analyze(faceMesh: faceMesh),

@@ -20,9 +20,9 @@ import UIKit
 final class MaskBuffer {
     let width: Int
     let height: Int
-    private var storage: UnsafeMutableBufferPointer<UInt8>
+    nonisolated(unsafe) private var storage: UnsafeMutableBufferPointer<UInt8>
 
-    init(width: Int, height: Int) {
+    nonisolated init(width: Int, height: Int) {
         self.width = width
         self.height = height
         let raw = UnsafeMutableRawPointer.allocate(byteCount: width * height, alignment: 16)
@@ -37,11 +37,11 @@ final class MaskBuffer {
         UnsafeMutableRawPointer(storage.baseAddress!).deallocate()
     }
 
-    var dataPointer: UnsafeMutableRawPointer { UnsafeMutableRawPointer(storage.baseAddress!) }
-    var pointer: UnsafeMutablePointer<UInt8> { storage.baseAddress! }
-    var count: Int { width * height }
+    nonisolated var dataPointer: UnsafeMutableRawPointer { UnsafeMutableRawPointer(storage.baseAddress!) }
+    nonisolated var pointer: UnsafeMutablePointer<UInt8> { storage.baseAddress! }
+    nonisolated var count: Int { width * height }
 
-    subscript(x: Int, y: Int) -> UInt8 {
+    nonisolated subscript(x: Int, y: Int) -> UInt8 {
         get { storage[y * width + x] }
         set { storage[y * width + x] = newValue }
     }
@@ -52,9 +52,9 @@ final class MaskBuffer {
 final class FloatBuffer {
     let width: Int
     let height: Int
-    var storage: UnsafeMutableBufferPointer<Float>
+    nonisolated(unsafe) var storage: UnsafeMutableBufferPointer<Float>
 
-    init(width: Int, height: Int) {
+    nonisolated init(width: Int, height: Int) {
         self.width = width
         self.height = height
         let raw = UnsafeMutableRawPointer.allocate(
@@ -72,15 +72,15 @@ final class FloatBuffer {
         UnsafeMutableRawPointer(storage.baseAddress!).deallocate()
     }
 
-    var pointer: UnsafeMutablePointer<Float> { storage.baseAddress! }
-    var count: Int { width * height }
+    nonisolated var pointer: UnsafeMutablePointer<Float> { storage.baseAddress! }
+    nonisolated var count: Int { width * height }
 
-    subscript(x: Int, y: Int) -> Float {
+    nonisolated subscript(x: Int, y: Int) -> Float {
         get { storage[y * width + x] }
         set { storage[y * width + x] = newValue }
     }
 
-    static func fromMask(_ mask: MaskBuffer) -> FloatBuffer {
+    nonisolated static func fromMask(_ mask: MaskBuffer) -> FloatBuffer {
         let out = FloatBuffer(width: mask.width, height: mask.height)
         for i in 0..<out.count {
             out.pointer[i] = Float(mask.pointer[i]) / 255.0
@@ -94,7 +94,7 @@ final class FloatBuffer {
 enum DistanceTransform {
     // 入力: foreground=true のマスク（値>0 を前景扱い）
     // 出力: 各画素から最近傍背景までの L2 距離（ピクセル単位）
-    static func l2(from mask: MaskBuffer) -> FloatBuffer {
+    nonisolated static func l2(from mask: MaskBuffer) -> FloatBuffer {
         let w = mask.width
         let h = mask.height
         let inf: Float = 1e20
@@ -133,7 +133,7 @@ enum DistanceTransform {
     }
 
     // Felzenszwalb-Huttenlocher 1D squared distance transform
-    private static func edt1d(_ f: UnsafeMutablePointer<Float>, n: Int,
+    private nonisolated static func edt1d(_ f: UnsafeMutablePointer<Float>, n: Int,
                               v: UnsafeMutablePointer<Int>,
                               z: UnsafeMutablePointer<Float>) {
         let inf: Float = 1e20
@@ -173,7 +173,7 @@ enum DistanceTransform {
 enum GaussianBlur {
     // 入力 FloatBuffer (0-1) を Gaussian で平滑化する。
     // OpenCV の `cv2.GaussianBlur(src, (k,k), sigma=k/3)` 相当。
-    static func apply(_ buffer: FloatBuffer, ksize: Int) {
+    nonisolated static func apply(_ buffer: FloatBuffer, ksize: Int) {
         var k = max(3, ksize)
         if k.isMultiple(of: 2) { k += 1 }
         let sigma = Float(k) / 3.0
@@ -209,7 +209,7 @@ enum GaussianBlur {
         }
     }
 
-    private static func makeKernel(size: Int, sigma: Float) -> [Float] {
+    private nonisolated static func makeKernel(size: Int, sigma: Float) -> [Float] {
         let half = Float(size / 2)
         var kernel = [Float](repeating: 0, count: size)
         var sum: Float = 0
@@ -227,7 +227,7 @@ enum GaussianBlur {
 // MARK: - Power curve
 
 enum PowerCurve {
-    static func apply(_ buffer: FloatBuffer, exponent: Float) {
+    nonisolated static func apply(_ buffer: FloatBuffer, exponent: Float) {
         for i in 0..<buffer.count {
             buffer.pointer[i] = powf(max(0, buffer.pointer[i]), exponent)
         }
@@ -237,7 +237,7 @@ enum PowerCurve {
 // MARK: - Normalize 0-1
 
 enum BufferNormalize {
-    static func toUnit(_ buffer: FloatBuffer) {
+    nonisolated static func toUnit(_ buffer: FloatBuffer) {
         var mx: Float = 0
         for i in 0..<buffer.count { mx = max(mx, buffer.pointer[i]) }
         guard mx > 1e-6 else { return }
@@ -246,14 +246,14 @@ enum BufferNormalize {
     }
 
     // mask * buffer の要素積（その範囲内に制限）
-    static func multiply(_ buffer: FloatBuffer, with mask: FloatBuffer) {
+    nonisolated static func multiply(_ buffer: FloatBuffer, with mask: FloatBuffer) {
         for i in 0..<buffer.count {
             buffer.pointer[i] *= mask.pointer[i]
         }
     }
 
     // 1.0 - value （マスク領域内で反転）
-    static func invertWithin(_ buffer: FloatBuffer, mask: FloatBuffer) {
+    nonisolated static func invertWithin(_ buffer: FloatBuffer, mask: FloatBuffer) {
         for i in 0..<buffer.count {
             buffer.pointer[i] = (1.0 - buffer.pointer[i]) * mask.pointer[i]
         }
@@ -265,7 +265,7 @@ enum BufferNormalize {
 enum Morphology {
     // 円形カーネルによる単純なグレースケール膨張。
     // OpenCV の `cv2.dilate(..., MORPH_ELLIPSE)` を粗く近似する。
-    static func dilate(_ buffer: FloatBuffer, radius: Int) {
+    nonisolated static func dilate(_ buffer: FloatBuffer, radius: Int) {
         guard radius > 0 else { return }
         let w = buffer.width
         let h = buffer.height
@@ -300,7 +300,7 @@ enum Compositing {
     // intensity と mask の積を α として、src を新色とブレンドする。
 
     // alpha_composite_normal: 線形ブレンド
-    static func normal(image: CGImage, mask: FloatBuffer,
+    nonisolated static func normal(image: CGImage, mask: FloatBuffer,
                        color: SIMD3<Float>, intensity: Float) -> CGImage? {
         return applyBlend(image: image, mask: mask, intensity: intensity) { src, m in
             let r = src.x * (1 - m) + color.x * m
@@ -311,7 +311,7 @@ enum Compositing {
     }
 
     // alpha_composite_additive: 明るい色を加算
-    static func additive(image: CGImage, mask: FloatBuffer,
+    nonisolated static func additive(image: CGImage, mask: FloatBuffer,
                          color: SIMD3<Float>, intensity: Float) -> CGImage? {
         return applyBlend(image: image, mask: mask, intensity: intensity) { src, m in
             let r = min(1.0, src.x + color.x * m / 255.0)
@@ -322,7 +322,7 @@ enum Compositing {
     }
 
     // alpha_composite_multiply: 暗くする（影）
-    static func multiply(image: CGImage, mask: FloatBuffer,
+    nonisolated static func multiply(image: CGImage, mask: FloatBuffer,
                          color: SIMD3<Float>, intensity: Float) -> CGImage? {
         let cn = color / 255.0
         return applyBlend(image: image, mask: mask, intensity: intensity) { src, m in
@@ -334,7 +334,7 @@ enum Compositing {
     }
 
     // 共通ベース: マスク・強度をかけたα、ピクセル単位の関数（color は 0-255 で渡す）
-    private static func applyBlend(
+    private nonisolated static func applyBlend(
         image: CGImage,
         mask: FloatBuffer,
         intensity: Float,

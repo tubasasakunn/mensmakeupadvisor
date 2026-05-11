@@ -20,7 +20,7 @@ struct MeshArea: Sendable, Hashable {
 // と同じく、過去のデータで mesh_id が `[[...]]` の二重リストになっていたケースを
 // 吸収する。
 enum MeshAreaLibrary {
-    static func load(category: MeshAreaCategory, bundle: Bundle = .main) -> [MeshArea] {
+    nonisolated static func load(category: MeshAreaCategory, bundle: Bundle = .main) -> [MeshArea] {
         guard let url = bundle.url(forResource: "target", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -46,11 +46,11 @@ enum MeshAreaLibrary {
         return result
     }
 
-    static func lookup(category: MeshAreaCategory, name: String, bundle: Bundle = .main) -> MeshArea? {
+    nonisolated static func lookup(category: MeshAreaCategory, name: String, bundle: Bundle = .main) -> MeshArea? {
         load(category: category, bundle: bundle).first { $0.name == name }
     }
 
-    static func areas(category: MeshAreaCategory, prefix: String, bundle: Bundle = .main) -> [MeshArea] {
+    nonisolated static func areas(category: MeshAreaCategory, prefix: String, bundle: Bundle = .main) -> [MeshArea] {
         load(category: category, bundle: bundle).filter { $0.name.hasPrefix(prefix) }
     }
 }

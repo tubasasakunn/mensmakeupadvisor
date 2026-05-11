@@ -23,7 +23,7 @@ enum NoseJudge {
         var hitsOutOf4: Int
     }
 
-    static func analyze(faceMesh: FaceMesh) -> Result {
+    nonisolated static func analyze(faceMesh: FaceMesh) -> Result {
         func p(_ i: Int) -> CGPoint { faceMesh.landmarksPx[i] }
         let noseRoot = p(FaceLandmarkID.noseRoot)
         let noseTip = p(FaceLandmarkID.noseTip)

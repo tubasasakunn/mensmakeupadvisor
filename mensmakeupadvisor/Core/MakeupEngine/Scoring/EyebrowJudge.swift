@@ -34,7 +34,7 @@ enum EyebrowJudge {
         var category: Category
     }
 
-    private static func signedDistance(_ a: CGPoint, _ b: CGPoint, _ pt: CGPoint) -> Double {
+    private nonisolated static func signedDistance(_ a: CGPoint, _ b: CGPoint, _ pt: CGPoint) -> Double {
         let abx = Double(b.x - a.x)
         let aby = Double(b.y - a.y)
         let apx = Double(pt.x - a.x)
@@ -44,7 +44,7 @@ enum EyebrowJudge {
         return (abx * apy - aby * apx) / denom
     }
 
-    private static func measureSide(faceMesh: FaceMesh,
+    private nonisolated static func measureSide(faceMesh: FaceMesh,
                                     headId: Int, peakId: Int, tailId: Int,
                                     eyeInId: Int, eyeOutId: Int,
                                     irisOuterId: Int, noseWingId: Int) -> BrowSide {
@@ -78,7 +78,7 @@ enum EyebrowJudge {
         return s
     }
 
-    static func analyze(faceMesh: FaceMesh) -> Result {
+    nonisolated static func analyze(faceMesh: FaceMesh) -> Result {
         let right = measureSide(
             faceMesh: faceMesh,
             headId: FaceLandmarkID.browHeadR, peakId: FaceLandmarkID.browPeakR, tailId: FaceLandmarkID.browTailR,

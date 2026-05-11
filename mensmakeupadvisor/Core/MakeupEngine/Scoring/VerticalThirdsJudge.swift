@@ -4,7 +4,7 @@ import Foundation
 // 2.2.2 顔の垂直三分割判定
 // makeup_claude/loadmap/2/2.2.2-vertical/main.py の `analyze` を移植。
 enum VerticalThirdsJudge {
-    static let foreheadExtend = 0.13
+    nonisolated static let foreheadExtend = 0.13
 
     enum Category: Sendable {
         case traditionalBalanced
@@ -34,7 +34,7 @@ enum VerticalThirdsJudge {
         var category: Category
     }
 
-    static func analyze(faceMesh: FaceMesh) -> Result {
+    nonisolated static func analyze(faceMesh: FaceMesh) -> Result {
         let topY = Double(faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].y)
         let chinY = Double(faceMesh.landmarksPx[FaceLandmarkID.chinBottom].y)
         let rawH = chinY - topY

@@ -18,7 +18,7 @@ enum HighlightApplier {
         var blurScale: Float = 2.0
     }
 
-    static func apply(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
+    nonisolated static func apply(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
         let w = image.width
         let h = image.height
 

@@ -59,7 +59,7 @@ struct FaceMetrics: Sendable {
 }
 
 enum FaceMetricsCalculator {
-    static func measure(faceMesh: FaceMesh) -> FaceMetrics {
+    nonisolated static func measure(faceMesh: FaceMesh) -> FaceMetrics {
         var m = FaceMetrics()
 
         let forehead = p(faceMesh, FaceLandmarkID.foreheadTop)
@@ -129,22 +129,22 @@ enum FaceMetricsCalculator {
 
     // MARK: - Helpers
 
-    static func p(_ fm: FaceMesh, _ idx: Int) -> CGPoint {
+    nonisolated static func p(_ fm: FaceMesh, _ idx: Int) -> CGPoint {
         guard fm.landmarksPx.indices.contains(idx) else { return .zero }
         return fm.landmarksPx[idx]
     }
 
-    static func dist(_ a: CGPoint, _ b: CGPoint) -> Double {
+    nonisolated static func dist(_ a: CGPoint, _ b: CGPoint) -> Double {
         let dx = Double(a.x - b.x)
         let dy = Double(a.y - b.y)
         return sqrt(dx * dx + dy * dy)
     }
 
-    static func vec(_ a: CGPoint, _ b: CGPoint) -> CGPoint {
+    nonisolated static func vec(_ a: CGPoint, _ b: CGPoint) -> CGPoint {
         CGPoint(x: a.x - b.x, y: a.y - b.y)
     }
 
-    static func angleDeg(v1: CGPoint, v2: CGPoint) -> Double {
+    nonisolated static func angleDeg(v1: CGPoint, v2: CGPoint) -> Double {
         let dot = Double(v1.x * v2.x + v1.y * v2.y)
         let n1 = sqrt(Double(v1.x * v1.x + v1.y * v1.y))
         let n2 = sqrt(Double(v2.x * v2.x + v2.y * v2.y))
@@ -152,7 +152,7 @@ enum FaceMetricsCalculator {
         return acos(max(-1, min(1, c))) * 180.0 / .pi
     }
 
-    static func mean(_ fm: FaceMesh, ids: [Int]) -> CGPoint {
+    nonisolated static func mean(_ fm: FaceMesh, ids: [Int]) -> CGPoint {
         guard !ids.isEmpty else { return .zero }
         var sx: Double = 0
         var sy: Double = 0
@@ -164,12 +164,12 @@ enum FaceMetricsCalculator {
         return CGPoint(x: sx / n, y: sy / n)
     }
 
-    static func ratioLoss(value: Double, target: Double) -> Double {
+    nonisolated static func ratioLoss(value: Double, target: Double) -> Double {
         if abs(target) < 1e-9 { return abs(value) }
         return abs(value - target) / target
     }
 
-    private static func irisHorizontalSpan(faceMesh: FaceMesh, ids: [Int]) -> Double {
+    private nonisolated static func irisHorizontalSpan(faceMesh: FaceMesh, ids: [Int]) -> Double {
         guard ids.count >= 4,
               faceMesh.landmarksPx.indices.contains(ids[1]),
               faceMesh.landmarksPx.indices.contains(ids[3])

@@ -51,7 +51,7 @@ enum SkeletalClassifier {
     }
 
     // Python: PROTOTYPES
-    private static let prototypes: [SkeletalType: [String: Double]] = [
+    private nonisolated static let prototypes: [SkeletalType: [String: Double]] = [
         .base:              ["jaw_ratio": 0.830, "chin_angle": 125.0, "aspect": 1.190, "taper": 0.170, "forehead_ratio": 0.858],
         .round:             ["jaw_ratio": 0.817, "chin_angle": 120.0, "aspect": 1.203, "taper": 0.183, "forehead_ratio": 0.853],
         .oval:              ["jaw_ratio": 0.795, "chin_angle": 116.5, "aspect": 1.191, "taper": 0.206, "forehead_ratio": 0.846],
@@ -59,7 +59,7 @@ enum SkeletalClassifier {
         .long:              ["jaw_ratio": 0.785, "chin_angle": 116.0, "aspect": 1.229, "taper": 0.215, "forehead_ratio": 0.858],
     ]
 
-    private static let featureScale: [String: Double] = [
+    private nonisolated static let featureScale: [String: Double] = [
         "jaw_ratio": 0.035,
         "chin_angle": 7.0,
         "aspect": 0.020,
@@ -67,7 +67,7 @@ enum SkeletalClassifier {
         "forehead_ratio": 0.015,
     ]
 
-    private static let featureWeight: [String: Double] = [
+    private nonisolated static let featureWeight: [String: Double] = [
         "jaw_ratio": 1.8,
         "chin_angle": 1.6,
         "aspect": 1.2,
@@ -75,7 +75,7 @@ enum SkeletalClassifier {
         "forehead_ratio": 0.4,
     ]
 
-    static func extractFeatures(_ m: FaceMetrics) -> Features {
+    nonisolated static func extractFeatures(_ m: FaceMetrics) -> Features {
         let temple = max(m.faceWidthTemplePx, 1.0)
         let cheek = max(m.faceWidthCheekbonePx, 1.0)
         return Features(
@@ -88,7 +88,7 @@ enum SkeletalClassifier {
         )
     }
 
-    static func score(_ f: Features) -> [SkeletalType: Double] {
+    nonisolated static func score(_ f: Features) -> [SkeletalType: Double] {
         let fv: [String: Double] = [
             "jaw_ratio": f.jawRatio,
             "chin_angle": f.chinAngle,
@@ -115,7 +115,7 @@ enum SkeletalClassifier {
         return scores
     }
 
-    static func classify(faceMesh: FaceMesh) -> Result {
+    nonisolated static func classify(faceMesh: FaceMesh) -> Result {
         let m = FaceMetricsCalculator.measure(faceMesh: faceMesh)
         let f = extractFeatures(m)
         let scores = score(f)

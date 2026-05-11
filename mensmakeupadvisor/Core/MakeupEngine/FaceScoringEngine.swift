@@ -14,14 +14,14 @@ import UIKit
 //   - "口の比率"     ← 2.2.6 3項目ヒット数
 //   - "左右対称性"   ← 2.2.8 overall_sym + jaw_sharpness
 enum FaceScoringEngine {
-    static func evaluate(image: UIImage) throws -> AnalysisResult {
+    nonisolated static func evaluate(image: UIImage) throws -> AnalysisResult {
         let mesh = FaceMesh(subdivisionLevel: 1)
         try mesh.initialize()
         _ = try mesh.detect(image: image)
         return evaluate(faceMesh: mesh)
     }
 
-    static func evaluate(faceMesh: FaceMesh) -> AnalysisResult {
+    nonisolated static func evaluate(faceMesh: FaceMesh) -> AnalysisResult {
         let symmetry = SymmetryJudge.analyze(faceMesh: faceMesh)
         let sub = symmetry.sub
 
@@ -62,16 +62,16 @@ enum FaceScoringEngine {
         return AnalysisResult(faceShape: bestType.faceShape, scores: scores)
     }
 
-    private static func clamp(_ value: Double) -> Double {
+    private nonisolated static func clamp(_ value: Double) -> Double {
         min(100, max(0, value))
     }
 
-    private static func clampInt(_ value: Int) -> Int {
+    private nonisolated static func clampInt(_ value: Int) -> Int {
         min(98, max(40, value))
     }
 
     // loss は「0 が最良」。Python 版 `_score_loss` を踏襲。
-    private static func lossToScore(_ loss: Double, scale: Double = 333.3) -> Double {
+    private nonisolated static func lossToScore(_ loss: Double, scale: Double = 333.3) -> Double {
         max(0.0, 100.0 - loss * scale)
     }
 }
