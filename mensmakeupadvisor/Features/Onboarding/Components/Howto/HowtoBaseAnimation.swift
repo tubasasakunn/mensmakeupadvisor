@@ -66,7 +66,7 @@ struct HowtoBaseAnimation: View {
             .position(x: dot.x, y: dot.y)
     }
 
-    // 矢印は trim で「点から外側へ」描く paint-on にする
+    // 矢印は trim で「点から外側へ」描く paint-on、先端に矢じりを重ねる
     private func arrowView(arrow: Arrow, t: Double) -> some View {
         let trimEnd = HowtoKeyframes.value(at: t, stops: [
             (0.00, 0), (0.25, 0), (0.40, 1), (1.00, 1)
@@ -74,14 +74,42 @@ struct HowtoBaseAnimation: View {
         let opacity = HowtoKeyframes.value(at: t, stops: [
             (0.00, 0), (0.24, 0), (0.25, 1), (0.75, 1), (0.80, 0), (1.00, 0)
         ])
-        return Path { p in
-            p.move(to: arrow.from)
-            p.addQuadCurve(to: arrow.to, control: arrow.control)
+        // 先端の矢じりは線が末端付近まで描かれたタイミングで現れる
+        let headReveal = HowtoKeyframes.value(at: trimEnd, stops: [(0, 0), (0.9, 0), (1.0, 1)])
+        // quadCurve の t=1 における進行方向ベクトル = 2*(to - control)
+        let dx = arrow.to.x - arrow.control.x
+        let dy = arrow.to.y - arrow.control.y
+        let angle = Angle(radians: atan2(dy, dx))
+        let color = Color(red: 0, green: 0.737, blue: 0.831)
+
+        return ZStack {
+            Path { p in
+                p.move(to: arrow.from)
+                p.addQuadCurve(to: arrow.to, control: arrow.control)
+            }
+            .trim(from: 0, to: trimEnd)
+            .stroke(color, style: .init(lineWidth: 5, lineCap: .round))
+
+            ArrowTipShape()
+                .fill(color)
+                .frame(width: 12, height: 10)
+                .rotationEffect(angle)
+                .position(x: arrow.to.x, y: arrow.to.y)
+                .opacity(headReveal)
         }
-        .trim(from: 0, to: trimEnd)
-        .stroke(Color(red: 0, green: 0.737, blue: 0.831),
-                style: .init(lineWidth: 5, lineCap: .round))
         .opacity(opacity)
+    }
+}
+
+// 右向きに尖った二等辺三角形（rotationEffect で進行方向に向ける）
+private struct ArrowTipShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        p.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+        p.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        p.closeSubpath()
+        return p
     }
 }
 

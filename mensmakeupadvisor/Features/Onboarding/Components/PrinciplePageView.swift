@@ -40,7 +40,7 @@ struct PrinciplePageView: View {
                 Image(uiImage: img)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: 150)
+                    .frame(maxWidth: .infinity, maxHeight: 220)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .padding(.bottom, 16)
             }
