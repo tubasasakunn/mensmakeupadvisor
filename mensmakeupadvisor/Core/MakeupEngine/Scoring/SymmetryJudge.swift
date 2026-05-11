@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 // 2.2.8 左右対称性・骨格感の総合判定

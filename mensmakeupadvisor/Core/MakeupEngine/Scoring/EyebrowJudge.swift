@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 // 2.2.7 眉の幾何学的判定 (一直線ルール)

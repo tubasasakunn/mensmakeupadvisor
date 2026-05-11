@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 // 2.2.3 顔の水平五分割判定

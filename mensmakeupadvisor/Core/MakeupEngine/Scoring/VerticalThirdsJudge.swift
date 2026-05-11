@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 // 2.2.2 顔の垂直三分割判定
