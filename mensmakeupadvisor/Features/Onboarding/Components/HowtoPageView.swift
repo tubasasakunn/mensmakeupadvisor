@@ -15,6 +15,8 @@ struct HowtoPageView: View {
                 Text(step)
                     .font(.system(size: 120, weight: .bold, design: .serif))
                     .italic()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
                     .foregroundStyle(Color.brandPrimary.opacity(0.28))
                     .padding(.bottom, -30)
             }
