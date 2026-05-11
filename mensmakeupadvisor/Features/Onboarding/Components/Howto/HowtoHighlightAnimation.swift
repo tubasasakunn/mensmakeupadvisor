@@ -24,12 +24,16 @@ struct HowtoHighlightAnimation: View {
         .init(x: 265, y: 395),
     ]
 
-    private let highlightGradient = LinearGradient(
-        colors: [
-            Color(red: 1.0, green: 1.0, blue: 0.95, opacity: 0.95),
-            Color(red: 1.0, green: 0.92, blue: 0.6,  opacity: 0.55),
-        ],
-        startPoint: .top, endPoint: .bottom
+    // 元 SVG の radialGradient (#hl-grad) を踏襲: 中心 ほぼ白 → 0.4 黄 → 1.0 透明 のソフトグロー
+    private let highlightGradient = EllipticalGradient(
+        gradient: Gradient(stops: [
+            .init(color: Color(red: 1.0, green: 1.0,   blue: 1.0,   opacity: 0.95), location: 0.0),
+            .init(color: Color(red: 1.0, green: 0.961, blue: 0.616, opacity: 0.8 ), location: 0.4),
+            .init(color: Color(red: 1.0, green: 0.961, blue: 0.616, opacity: 0.0 ), location: 1.0),
+        ]),
+        center: .center,
+        startRadiusFraction: 0,
+        endRadiusFraction: 0.6
     )
 
     var body: some View {
@@ -72,7 +76,6 @@ struct HowtoHighlightAnimation: View {
             .scaleEffect(scale)
             .opacity(opacity)
             .position(x: spot.cx, y: spot.cy)
-            .blendMode(.plusLighter)
     }
 
     // タップ瞬間に広がる波紋リング
