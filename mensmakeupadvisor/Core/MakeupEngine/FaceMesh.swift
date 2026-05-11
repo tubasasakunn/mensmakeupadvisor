@@ -8,6 +8,9 @@ import UIKit
 //
 // makeup_claude/loadmap/shared/facemesh.py の Python 実装を忠実に移植している。
 // 座標系・三角形 ID は target.json のメッシュ番号と一致する。
+//
+// SPM 依存: `paescebu/SwiftTasksVision` 経由で公式 `MediaPipeTasksVision` xcframework を
+// 取り込んでいる (Google 公式は CocoaPods 配布のみだが、このパッケージが daily で同期する)。
 final class FaceMesh {
     struct Point: Sendable {
         var x: Double
@@ -51,7 +54,7 @@ final class FaceMesh {
 
     func initialize(modelPath: String? = nil) throws {
         let resolvedPath: String
-        if let modelPath {
+        if let modelPath, !modelPath.isEmpty {
             resolvedPath = modelPath
         } else if let bundled = Bundle.main.path(forResource: "face_landmarker", ofType: "task") {
             resolvedPath = bundled
@@ -112,7 +115,6 @@ final class FaceMesh {
 
     // MARK: - Mesh utilities
 
-    // 三角形の3頂点をピクセル座標で返す。
     func trianglePixels(triangleID: Int, width: Int, height: Int) -> [CGPoint] {
         guard triangles.indices.contains(triangleID) else { return [] }
         let (a, b, c) = triangles[triangleID]
@@ -122,8 +124,7 @@ final class FaceMesh {
         }
     }
 
-    // 指定メッシュ ID の三角形を fillPoly で塗りつぶし、0.0/1.0 のマスクバッファ(UInt8)を返す。
-    // OpenCV の `cv2.fillPoly(mask, [pts], 1.0)` 相当。
+    // OpenCV `cv2.fillPoly(mask, [pts], 1.0)` 相当。
     func buildMask(meshIDs: [Int], width: Int, height: Int) -> MaskBuffer {
         let mask = MaskBuffer(width: width, height: height)
         guard let context = CGContext(
@@ -204,7 +205,6 @@ final class FaceMesh {
     }
 
     // Python 版 `_get_mirror_map` と同等。
-    // 元 478 点については顔中心線で最近傍検索、中点については構造的に決定。
     private func mirrorMap() -> [Int] {
         let rawN = rawPoints.count
         let total = points.count
@@ -264,8 +264,9 @@ final class FaceMesh {
 
     // MARK: - Resources
 
-    // FaceMesh のテッセレーション接続リスト (約 2556 個) を読み込む。
-    // MediaPipe Python ソリューションの FACEMESH_TESSELATION から生成済み。
+    // FaceMesh のテッセレーション接続リスト (2556 個) を読み込む。
+    // MediaPipe Python ソリューションの FACEMESH_TESSELATION から事前に抽出済みで、
+    // バンドル内 `face_mesh_tesselation.json` に格納している。
     private static var cachedTesselation: [(Int, Int)] = []
     private static let tesselationLock = NSLock()
 
@@ -294,6 +295,7 @@ final class FaceMesh {
         return FileManager.default.fileExists(atPath: target.path) ? target.path : nil
     }
 
+    // Google 公式 CDN から face_landmarker.task をダウンロード (初回のみ)
     static func ensureModelDownloaded() async throws -> String {
         if let bundled = Bundle.main.path(forResource: "face_landmarker", ofType: "task") {
             return bundled

@@ -38,6 +38,8 @@ struct MakeupRenderer {
                        intensity: MakeupIntensity,
                        selection: LayerSelection = .default) -> UIImage {
         guard var current = image.safeCGImage else { return image }
+        // 顔検出が失敗していて三角形が無い場合は元画像を返す
+        guard !faceMesh.triangles.isEmpty else { return image }
 
         // 1.3 ベース (顔全体)
         if selection.applyBase, intensity.base > 0 {

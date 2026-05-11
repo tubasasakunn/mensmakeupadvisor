@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 // MakeupEngine のメインエントリ。
-// 1 回の `prepare(image:)` で MediaPipe を初期化 + 顔検出を実行し、
+// 1 回の `prepare(image:)` で MediaPipe FaceLandmarker を初期化 + 顔検出を実行し、
 // 後続の `analyze()` (顔判定) と `render(intensity:)` (化粧反映) が
 // 同じ FaceMesh インスタンスを再利用するためのキャッシュ層。
 //
