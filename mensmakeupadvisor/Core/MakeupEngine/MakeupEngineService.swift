@@ -3,10 +3,12 @@ import SwiftUI
 import UIKit
 
 // MakeupEngine のメインエントリ。
-// 1 回の `prepare(image:)` で MediaPipe を初期化 + 顔検出を実行し、
+// 1 回の `prepare(image:)` で顔検出 (FaceMesh) を実行し、
 // 後続の `analyze()` (顔判定) と `render(intensity:)` (化粧反映) が
 // 同じ FaceMesh インスタンスを再利用するためのキャッシュ層。
 //
+// FaceMesh の実装は現状 Apple Vision Framework (約 76 点) で、
+// MediaPipe SPM 公開時に差し替え予定。
 // Studio 画面でスライダーを動かす度に再検出が走らないようにする。
 actor MakeupEngineService {
     enum EngineError: Error, LocalizedError {
