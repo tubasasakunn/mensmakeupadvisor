@@ -3,10 +3,10 @@ import SwiftUI
 struct HowtoPageView: View {
     let page: OnboardingPage
 
-    private var svgName: String? {
-        guard let step = page.step else { return nil }
-        let name = "howto_\(step.lowercased())"
-        return AnimatedSVGView.exists(named: name) ? name : nil
+    private var animatedStep: String? {
+        guard let step = page.step,
+              HowtoAnimationView.hasAnimation(for: step) else { return nil }
+        return step
     }
 
     var body: some View {
@@ -32,10 +32,11 @@ struct HowtoPageView: View {
                 .frame(height: 1)
                 .padding(.bottom, 16)
 
-            if let name = svgName {
-                AnimatedSVGView(svgName: name)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 180)
+            if let step = animatedStep {
+                HowtoAnimationView(step: step)
+                    .aspectRatio(1, contentMode: .fit)
+                    .frame(maxWidth: 260)
+                    .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.bottom, 16)
             }
 
