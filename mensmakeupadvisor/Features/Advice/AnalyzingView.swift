@@ -139,7 +139,9 @@ struct AnalyzingView: View {
 
         phase = "DETECTING FACE"
         do {
-            let result = try await analysisService.analyze(image: image)
+            let result = try await analysisService.analyze(
+                image: image, sharedEngine: appState.makeupEngine
+            )
             withAnimation { progress = 0.70 }
 
             phase = "MEASURING PROPORTIONS"

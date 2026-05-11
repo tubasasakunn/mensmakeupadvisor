@@ -106,12 +106,21 @@ struct StudioImagePlate: View {
         ZStack {
             Color.black
 
-            if let img = appState.capturedImage {
+            // makeup_claude の MakeupRenderer で実際に化粧が乗った画像があればそれを、
+            // まだなければ撮影画像 + 簡易グラデーションを表示。
+            if let rendered = appState.renderedImage {
+                Image(uiImage: rendered)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: width, height: height)
+                    .clipped()
+            } else if let img = appState.capturedImage {
                 Image(uiImage: img)
                     .resizable()
                     .scaledToFill()
                     .frame(width: width, height: height)
                     .clipped()
+                    .overlay(makeupCompositeOverlay)
             } else {
                 ZStack {
                     Color(white: 0.10)
@@ -128,8 +137,27 @@ struct StudioImagePlate: View {
                 .frame(width: width, height: height)
             }
 
-            makeupCompositeOverlay
+            if appState.isRenderingMakeup {
+                renderingOverlay
+            }
         }
+    }
+
+    private var renderingOverlay: some View {
+        VStack {
+            HStack {
+                Text("RENDERING…")
+                    .font(.system(size: 8, weight: .medium, design: .monospaced))
+                    .foregroundStyle(Color.ivory.opacity(0.85))
+                    .kerning(1.4)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.appBackground.opacity(0.55))
+                Spacer()
+            }
+            Spacer()
+        }
+        .padding(8)
     }
 
     private var makeupCompositeOverlay: some View {

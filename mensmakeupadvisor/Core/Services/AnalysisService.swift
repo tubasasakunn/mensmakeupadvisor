@@ -1,11 +1,19 @@
 import SwiftUI
 import UIKit
-import Vision
 
 // MARK: - Protocol
 
 protocol AnalysisServiceProtocol: Sendable {
     func analyze(image: UIImage) async throws -> AnalysisResult
+    // makeup_claude の MakeupEngine を共有するためのフック。
+    // モック実装はオプションで何もしない。
+    func analyze(image: UIImage, sharedEngine: MakeupEngineService?) async throws -> AnalysisResult
+}
+
+extension AnalysisServiceProtocol {
+    func analyze(image: UIImage, sharedEngine: MakeupEngineService?) async throws -> AnalysisResult {
+        try await analyze(image: image)
+    }
 }
 
 // MARK: - EnvironmentKey
@@ -22,161 +30,26 @@ extension EnvironmentValues {
 }
 
 // MARK: - Real Implementation
+//
+// makeup_claude/loadmap/2 の Python 顔判定群を Swift に移植した
+// `FaceScoringEngine` を呼び出す実装。
+// MediaPipe FaceLandmarker (478点) を使い、骨格分類 → 7 指標 → 総合スコアを算出する。
+// `sharedEngine` が渡された場合は同じインスタンスで顔検出結果をキャッシュし、
+// Studio 画面での化粧反映 (`MakeupRenderer`) が再検出を伴わずに走れるようにする。
 
 final class AnalysisService: AnalysisServiceProtocol, Sendable {
     func analyze(image: UIImage) async throws -> AnalysisResult {
-        guard let cgImage = image.cgImage else { return .fallback }
-        return try await Task.detached(priority: .userInitiated) {
-            try await withCheckedThrowingContinuation { continuation in
-                let request = VNDetectFaceLandmarksRequest { request, error in
-                    if let error { continuation.resume(throwing: error); return }
-                    guard let results = request.results as? [VNFaceObservation],
-                          let face = results.first,
-                          let landmarks = face.landmarks
-                    else { continuation.resume(returning: .fallback); return }
-                    continuation.resume(returning: Self.buildResult(from: face, landmarks: landmarks))
-                }
-                let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-                do { try handler.perform([request]) }
-                catch { continuation.resume(throwing: error) }
-            }
-        }.value
+        try await analyze(image: image, sharedEngine: nil)
     }
 
-    private static func buildResult(
-        from face: VNFaceObservation,
-        landmarks: VNFaceLandmarks2D
-    ) -> AnalysisResult {
-        let box = face.boundingBox
-
-        let aspectRatio = box.width > 0 ? box.height / box.width : 1.0
-        let balanceScore = scoreFromRatio(value: aspectRatio, ideal: 0.75, tolerance: 0.15)
-        let faceShape = determineFaceShape(aspectRatio: aspectRatio, balanceScore: balanceScore)
-
-        let thirdScore: Int
-        if let allPoints = landmarks.allPoints {
-            let ys = allPoints.normalizedPoints.map { $0.y }
-            let minY = ys.min() ?? 0
-            let maxY = ys.max() ?? 1
-            let range = maxY - minY
-            let thirdsDeviation = range > 0 ? abs(range - 0.33 * 3) / (0.33 * 3) : 0.5
-            thirdScore = clampScore(Int(Double(85) * (1.0 - thirdsDeviation)) + jitter(7))
-        } else {
-            thirdScore = clampScore(68 + jitter(10))
-        }
-
-        let fifthScore: Int
-        if let leftEye = landmarks.leftEye, let rightEye = landmarks.rightEye {
-            let leftCenter = center(of: leftEye.normalizedPoints)
-            let rightCenter = center(of: rightEye.normalizedPoints)
-            let eyeDist = abs(rightCenter.x - leftCenter.x)
-            fifthScore = clampScore(scoreFromRatio(value: eyeDist, ideal: 0.20, tolerance: 0.06) + jitter(6))
-        } else {
-            fifthScore = clampScore(70 + jitter(10))
-        }
-
-        let eyeRatioScore: Int
-        if let leftEye = landmarks.leftEye {
-            let pts = leftEye.normalizedPoints
-            let ys2 = pts.map { $0.y }
-            let xs2 = pts.map { $0.x }
-            let height = (ys2.max() ?? 0) - (ys2.min() ?? 0)
-            let width  = (xs2.max() ?? 0) - (xs2.min() ?? 0)
-            let ratio  = width > 0 ? height / width : 0.33
-            eyeRatioScore = clampScore(scoreFromRatio(value: ratio, ideal: 0.33, tolerance: 0.10) + jitter(6))
-        } else {
-            eyeRatioScore = clampScore(72 + jitter(10))
-        }
-
-        let noseScore: Int
-        if let nose = landmarks.nose,
-           let leftEye = landmarks.leftEye,
-           let rightEye = landmarks.rightEye {
-            let nosePts = nose.normalizedPoints
-            let noseWidth = (nosePts.map(\.x).max() ?? 0) - (nosePts.map(\.x).min() ?? 0)
-            let lc = center(of: leftEye.normalizedPoints)
-            let rc = center(of: rightEye.normalizedPoints)
-            let eyeDist = abs(rc.x - lc.x)
-            let ratio = eyeDist > 0 ? noseWidth / eyeDist : 1.0
-            noseScore = clampScore(scoreFromRatio(value: ratio, ideal: 1.0, tolerance: 0.20) + jitter(6))
-        } else {
-            noseScore = clampScore(69 + jitter(10))
-        }
-
-        let mouthScore: Int
-        if let outerLips = landmarks.outerLips,
-           let leftEye = landmarks.leftEye,
-           let rightEye = landmarks.rightEye {
-            let lipPts = outerLips.normalizedPoints
-            let lipWidth = (lipPts.map(\.x).max() ?? 0) - (lipPts.map(\.x).min() ?? 0)
-            let lc = center(of: leftEye.normalizedPoints)
-            let rc = center(of: rightEye.normalizedPoints)
-            let eyeDist = abs(rc.x - lc.x)
-            let ratio = eyeDist > 0 ? lipWidth / eyeDist : 1.5
-            mouthScore = clampScore(scoreFromRatio(value: ratio, ideal: 1.5, tolerance: 0.25) + jitter(6))
-        } else {
-            mouthScore = clampScore(66 + jitter(10))
-        }
-
-        let symmetryScore: Int = computeSymmetryScore(landmarks: landmarks)
-
-        let names = ["骨格バランス", "三分割比率", "五分割比率", "目の比率", "鼻のバランス", "口の比率", "左右対称性"]
-        let rawScores = [balanceScore, thirdScore, fifthScore, eyeRatioScore, noseScore, mouthScore, symmetryScore]
-        let scores = zip(names, rawScores).map { name, score in
-            FaceScore(name: name, score: score, advice: FaceScore.pickAdvice(name: name, score: score))
-        }
-
-        return AnalysisResult(faceShape: faceShape, scores: scores)
-    }
-
-    private static func scoreFromRatio(value: Double, ideal: Double, tolerance: Double) -> Int {
-        let deviation = abs(value - ideal) / tolerance
-        let normalized = max(0.0, 1.0 - deviation)
-        return Int(40.0 + normalized * 55.0)
-    }
-
-    private static func clampScore(_ value: Int) -> Int {
-        min(95, max(40, value))
-    }
-
-    // Small random jitter so scores feel natural rather than perfectly computed.
-    private static func jitter(_ range: Int) -> Int {
-        Int.random(in: -range...range)
-    }
-
-    private static func center(of points: [CGPoint]) -> CGPoint {
-        guard !points.isEmpty else { return .zero }
-        let sumX = points.map(\.x).reduce(0, +)
-        let sumY = points.map(\.y).reduce(0, +)
-        return CGPoint(x: sumX / Double(points.count), y: sumY / Double(points.count))
-    }
-
-    private static func computeSymmetryScore(landmarks: VNFaceLandmarks2D) -> Int {
-        guard let allPoints = landmarks.allPoints else {
-            return clampScore(74 + jitter(8))
-        }
-        let pts = allPoints.normalizedPoints
-        let sorted = pts.sorted { $0.x < $1.x }
-        let half = sorted.count / 2
-        guard half > 0 else {
-            return clampScore(75 + jitter(8))
-        }
-        let leftPts  = Array(sorted.prefix(half))
-        let rightPts = Array(sorted.suffix(half).reversed())
-        let diffs = zip(leftPts, rightPts).map { l, r in
-            abs((1.0 - r.x) - l.x) + abs(r.y - l.y)
-        }
-        let avgDiff = diffs.reduce(0, +) / Double(diffs.count)
-        return clampScore(Int(Double(90) * (1.0 - avgDiff * 5)) + jitter(5))
-    }
-
-    private static func determineFaceShape(aspectRatio: Double, balanceScore: Int) -> FaceShape {
-        switch aspectRatio {
-        case ..<0.65: return .omonaga   // very tall / narrow → 面長
-        case 0.65..<0.80: return .tamago  // near ideal oval → 卵型
-        case 0.80..<0.90: return .base    // wide with square-ish jaw → ベース型
-        case 0.90..<1.05: return .marugao // round → 丸顔
-        default: return .gyaku            // narrow jaw / wide forehead → 逆三角
+    func analyze(image: UIImage, sharedEngine: MakeupEngineService?) async throws -> AnalysisResult {
+        guard image.cgImage != nil else { return .fallback }
+        let engine = sharedEngine ?? MakeupEngineService()
+        do {
+            try await engine.prepare(image: image)
+            return try await engine.analyze()
+        } catch MakeupEngineService.EngineError.faceNotDetected {
+            return .fallback
         }
     }
 }

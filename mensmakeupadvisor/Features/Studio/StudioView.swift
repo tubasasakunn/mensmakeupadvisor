@@ -39,6 +39,17 @@ struct StudioView: View {
             }
         }
         .aid("studio_view")
+        // makeup_claude の MakeupRenderer に強度変更を流す。
+        // intensity の値変化で task が再起動 → AppState 側で debounce している。
+        .task(id: intensityKey) {
+            await MainActor.run { appState.requestMakeupRender() }
+        }
+    }
+
+    // intensity の各値を 1 つの Hashable キーに集約して task(id:) で監視する
+    private var intensityKey: String {
+        let i = appState.intensity
+        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))-\(Int(i.eyebrow))"
     }
 
     // MARK: - Subviews
