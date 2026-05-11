@@ -38,10 +38,7 @@ struct MakeupRenderer {
                        intensity: MakeupIntensity,
                        selection: LayerSelection = .default) -> UIImage {
         guard var current = image.safeCGImage else { return image }
-
-        // target.json のメッシュ ID は MediaPipe テッセレーション専用。
-        // Vision バックエンドでは三角形が無いので化粧反映は走らせない (no-op)。
-        // MediaPipe SPM 配布が公開されたら FaceMesh をそちらに差し替えるだけで有効になる。
+        // 顔検出が失敗していて三角形が無い場合は元画像を返す
         guard !faceMesh.triangles.isEmpty else { return image }
 
         // 1.3 ベース (顔全体)

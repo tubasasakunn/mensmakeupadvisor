@@ -6,9 +6,32 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8CMP00030000000000000001 /* SwiftTasksVision in Frameworks */ = {isa = PBXBuildFile; productRef = 8CMP00020000000000000001 /* SwiftTasksVision */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		8C9A31062FA1B51D001BDB99 /* mensmakeupadvisor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mensmakeupadvisor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8CMP00010000000000000001 /* XCRemoteSwiftPackageReference "SwiftTasksVision" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/paescebu/SwiftTasksVision";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.10.21;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8CMP00020000000000000001 /* SwiftTasksVision */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8CMP00010000000000000001 /* XCRemoteSwiftPackageReference "SwiftTasksVision" */;
+			productName = SwiftTasksVision;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8C9A31082FA1B51D001BDB99 /* mensmakeupadvisor */ = {
@@ -23,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8CMP00030000000000000001 /* SwiftTasksVision in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +89,7 @@
 			);
 			name = mensmakeupadvisor;
 			packageProductDependencies = (
+				8CMP00020000000000000001 /* SwiftTasksVision */,
 			);
 			productName = mensmakeupadvisor;
 			productReference = 8C9A31062FA1B51D001BDB99 /* mensmakeupadvisor.app */;
@@ -95,6 +120,9 @@
 			mainGroup = 8C9A30FD2FA1B51D001BDB99;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
+			packageReferences = (
+				8CMP00010000000000000001 /* XCRemoteSwiftPackageReference "SwiftTasksVision" */,
+			);
 			productRefGroup = 8C9A31072FA1B51D001BDB99 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
