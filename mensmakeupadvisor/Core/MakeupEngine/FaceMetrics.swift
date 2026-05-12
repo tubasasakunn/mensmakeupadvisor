@@ -3,7 +3,7 @@ import Foundation
 
 // `loadmap/shared/face_metrics.py` の Python 実装をそのまま移植。
 // FaceMesh 検出済みインスタンスから、距離・角度・比率などを一括算出する。
-struct FaceMetrics: Sendable {
+nonisolated struct FaceMetrics: Sendable {
     // 縦方向
     var faceHeightPx: Double = 0
     var foreheadToBrowPx: Double = 0
@@ -58,7 +58,7 @@ struct FaceMetrics: Sendable {
     var foreheadLPoint: CGPoint = .zero
 }
 
-enum FaceMetricsCalculator {
+nonisolated enum FaceMetricsCalculator {
     nonisolated static func measure(faceMesh: FaceMesh) -> FaceMetrics {
         var m = FaceMetrics()
 

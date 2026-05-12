@@ -10,8 +10,8 @@ import UIKit
 // Python POC では各サブディレクトリの `main.py` が個別に呼ばれていたが、
 // ここでは Studio 画面でリアルタイムにレイヤー強度を変更できるよう、
 // 単一の関数で一括適用できる構造にしている。
-struct MakeupRenderer {
-    struct LayerSelection: Sendable {
+nonisolated struct MakeupRenderer {
+    nonisolated struct LayerSelection: Sendable {
         var highlightAreaNames: [String]   // target.json の "highlight" カテゴリ名
         var shadowAreaNames: [String]      // target.json の "shadow" カテゴリ名
         var applyBase: Bool

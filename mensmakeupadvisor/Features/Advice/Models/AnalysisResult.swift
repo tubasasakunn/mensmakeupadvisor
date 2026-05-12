@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AnalysisResult: Sendable {
+nonisolated struct AnalysisResult: Sendable {
     let faceShape: FaceShape
     let scores: [FaceScore]
 

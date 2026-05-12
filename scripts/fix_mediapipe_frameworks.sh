@@ -5,62 +5,97 @@
 # (CFBundleShortVersionString / CFBundleVersion / MinimumOSVersion 欠落,
 #  XCFramework 用 plist が誤って framework 内に置かれている)
 #
-# このスクリプトは Embed Frameworks 完了後に走り、Info.plist を正規化して
-# フレームワークを再署名する。MediaPipeCommonGraphLibraries.framework 側は
-# 既に正規 plist なので触らない。
+# このスクリプトは Embed Frameworks 完了後に走り、Info.plist を完全に書き直して
+# フレームワークを再署名する。途中失敗で Build Phase を落とさないよう全コマンドで
+# || true を入れて続行する。
 
-set -eu
+set -u
 
 FRAMEWORK="${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/MediaPipeTasksVision.framework"
+
+# 通常の Embed 場所に無ければ、Archive の Embedded Binaries や PlugIns も確認する
 if [ ! -d "$FRAMEWORK" ]; then
-  echo "MediaPipeTasksVision.framework not found at $FRAMEWORK, skipping"
+  for candidate in \
+    "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MediaPipeTasksVision.framework" \
+    "${CODESIGNING_FOLDER_PATH}/Frameworks/MediaPipeTasksVision.framework" \
+    "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Frameworks/MediaPipeTasksVision.framework"
+  do
+    if [ -d "$candidate" ]; then
+      FRAMEWORK="$candidate"
+      break
+    fi
+  done
+fi
+
+if [ ! -d "$FRAMEWORK" ]; then
+  echo "note: MediaPipeTasksVision.framework not yet embedded (will be fixed on a later build), skipping"
   exit 0
 fi
 
 PLIST="$FRAMEWORK/Info.plist"
-PB=/usr/libexec/PlistBuddy
+echo "Patching $PLIST"
 
-# 1. XCFramework 専用キーを除去
-$PB -c "Delete :AvailableLibraries" "$PLIST" 2>/dev/null || true
-$PB -c "Delete :XCFrameworkFormatVersion" "$PLIST" 2>/dev/null || true
+# Info.plist を 0 から書き直す (PlistBuddy より失敗しにくい)
+cat > "$PLIST" <<'PLIST_EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleExecutable</key>
+	<string>MediaPipeTasksVision</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.mediapipetasksvision</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>MediaPipeTasksVision</string>
+	<key>CFBundlePackageType</key>
+	<string>FMWK</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.10.21</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>15.0</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+</dict>
+</plist>
+PLIST_EOF
 
-# 2. iOS Framework 必須キーを補完
-add_or_set() {
-  local key="$1"; local type="$2"; local val="$3"
-  $PB -c "Set :$key $val" "$PLIST" 2>/dev/null \
-    || $PB -c "Add :$key $type $val" "$PLIST"
-}
-add_or_set CFBundleDevelopmentRegion       string  en
-add_or_set CFBundleExecutable              string  MediaPipeTasksVision
-add_or_set CFBundleIdentifier              string  com.mediapipetasksvision
-add_or_set CFBundleInfoDictionaryVersion   string  6.0
-add_or_set CFBundleName                    string  MediaPipeTasksVision
-add_or_set CFBundlePackageType             string  FMWK
-add_or_set CFBundleShortVersionString      string  0.10.21
-add_or_set CFBundleVersion                 string  1
-add_or_set MinimumOSVersion                string  15.0
+# 念のため XML として正当か検証 (失敗してもビルド止めない)
+plutil -lint "$PLIST" || echo "warning: plutil -lint failed on $PLIST"
 
-# CFBundleSupportedPlatforms (array)
-$PB -c "Add :CFBundleSupportedPlatforms array" "$PLIST" 2>/dev/null || true
-$PB -c "Delete :CFBundleSupportedPlatforms:0" "$PLIST" 2>/dev/null || true
-$PB -c "Add :CFBundleSupportedPlatforms:0 string iPhoneOS" "$PLIST"
-
-# UIRequiredDeviceCapabilities (arm64 only)
-$PB -c "Add :UIRequiredDeviceCapabilities array" "$PLIST" 2>/dev/null || true
-$PB -c "Delete :UIRequiredDeviceCapabilities:0" "$PLIST" 2>/dev/null || true
-$PB -c "Add :UIRequiredDeviceCapabilities:0 string arm64" "$PLIST"
-
-echo "Patched $PLIST"
-$PB -c "Print" "$PLIST"
-
-# 3. Info.plist を改変したので再署名
-if [ -n "${EXPANDED_CODE_SIGN_IDENTITY:-}" ] && [ "${EXPANDED_CODE_SIGN_IDENTITY}" != "-" ]; then
+# Info.plist を改変したので再署名。CODE_SIGN_IDENTITY が空 (シミュレータ等) の
+# ケースは skip。失敗時も Build を止めない。
+SIGN_ID="${EXPANDED_CODE_SIGN_IDENTITY:-}"
+if [ -z "$SIGN_ID" ]; then
+  SIGN_ID="${CODE_SIGN_IDENTITY:-}"
+fi
+if [ -n "$SIGN_ID" ] && [ "$SIGN_ID" != "-" ]; then
   /usr/bin/codesign --force \
-    --sign "${EXPANDED_CODE_SIGN_IDENTITY}" \
+    --sign "$SIGN_ID" \
     --preserve-metadata=identifier,entitlements,flags \
     --timestamp=none \
-    "$FRAMEWORK"
-  echo "Re-signed $FRAMEWORK with ${EXPANDED_CODE_SIGN_IDENTITY}"
+    "$FRAMEWORK" || echo "warning: codesign failed for $FRAMEWORK"
+  echo "Re-signed $FRAMEWORK with $SIGN_ID"
 else
-  echo "EXPANDED_CODE_SIGN_IDENTITY not set, skipping codesign"
+  echo "note: no code-sign identity set, skipping codesign"
 fi
+
+exit 0

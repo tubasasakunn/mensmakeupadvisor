@@ -2,14 +2,14 @@ import Foundation
 
 // target.json の各カテゴリ。
 // makeup_claude の mesh_id は `subdivision_level = 1` のメッシュ番号と一致する。
-enum MeshAreaCategory: String, CaseIterable, Sendable {
+nonisolated enum MeshAreaCategory: String, CaseIterable, Sendable {
     case highlight
     case shadow
     case eye
     case eyebrow
 }
 
-struct MeshArea: Sendable, Hashable {
+nonisolated struct MeshArea: Sendable, Hashable {
     let name: String
     let meshIDs: [Int]
 }
@@ -19,7 +19,7 @@ struct MeshArea: Sendable, Hashable {
 // Python 版 (`loadmap/1-virtual-makeup/1-1-highlight/main.py:load_target_areas`)
 // と同じく、過去のデータで mesh_id が `[[...]]` の二重リストになっていたケースを
 // 吸収する。
-enum MeshAreaLibrary {
+nonisolated enum MeshAreaLibrary {
     nonisolated static func load(category: MeshAreaCategory, bundle: Bundle = .main) -> [MeshArea] {
         guard let url = bundle.url(forResource: "target", withExtension: "json"),
               let data = try? Data(contentsOf: url),

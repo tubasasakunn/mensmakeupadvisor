@@ -112,9 +112,9 @@ struct TutorialStepInfoArea: View {
 }
 
 #Preview {
-    @State var intensity = MakeupIntensity()
-    @State var showBefore = false
-    return TutorialStepInfoArea(
+    @Previewable @State var intensity = MakeupIntensity()
+    @Previewable @State var showBefore = false
+    TutorialStepInfoArea(
         currentStep: TutorialStep.all[0],
         intensity: $intensity,
         showBeforeImage: $showBefore

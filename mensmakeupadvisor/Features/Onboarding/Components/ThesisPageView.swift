@@ -30,25 +30,27 @@ struct ThesisPageView: View {
     }
 
     private func buildCompositeText() -> Text {
-        var result = Text("")
-        if let b1 = page.body1 {
-            result = result + Text(b1).foregroundColor(Color.ivory)
+        // iOS 26 で Text + Text が deprecated になったため AttributedString で組み立て、
+        // 最後に Text(AttributedString) に渡す。
+        var combined = AttributedString("")
+        func append(_ s: String, color: Color, bold: Bool = false) {
+            var seg = AttributedString(s)
+            seg.foregroundColor = color
+            if bold { seg.font = .system(size: 22, weight: .bold, design: .serif) }
+            combined.append(seg)
         }
-        if let hl = page.highlight {
-            result = result + Text(hl).foregroundColor(Color.brandPrimary).bold()
-        }
-        if let b2 = page.body2 {
-            result = result + Text(b2).foregroundColor(Color.ivory)
-        }
+        if let b1 = page.body1 { append(b1, color: .ivory) }
+        if let hl = page.highlight { append(hl, color: .brandPrimary, bold: true) }
+        if let b2 = page.body2 { append(b2, color: .ivory) }
         if let b3 = page.body3 {
-            result = result + Text("\n") + Text(b3).foregroundColor(Color.brandPrimary).bold()
+            combined.append(AttributedString("\n"))
+            append(b3, color: .brandPrimary, bold: true)
         }
-        if let b4 = page.body4 {
-            result = result + Text(b4).foregroundColor(Color.ivory)
-        }
+        if let b4 = page.body4 { append(b4, color: .ivory) }
         if let b5 = page.body5 {
-            result = result + Text("\n") + Text(b5).foregroundColor(Color.ivory)
+            combined.append(AttributedString("\n"))
+            append(b5, color: .ivory)
         }
-        return result
+        return Text(combined)
     }
 }

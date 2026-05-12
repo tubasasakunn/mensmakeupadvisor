@@ -3,8 +3,8 @@ import Foundation
 // 2.1 骨格による顔判定
 // makeup_claude/loadmap/2/2.1-skeletal/main.py の `extract_features` / `score_types` /
 // `classify` を移植。プロトタイプ・スケール・重みは Python 版と同一の値を使う。
-enum SkeletalClassifier {
-    enum SkeletalType: String, CaseIterable, Sendable {
+nonisolated enum SkeletalClassifier {
+    nonisolated enum SkeletalType: String, CaseIterable, Sendable {
         case oval
         case round
         case long
@@ -33,7 +33,7 @@ enum SkeletalClassifier {
         }
     }
 
-    struct Features: Sendable {
+    nonisolated struct Features: Sendable {
         var aspect: Double
         var cheekToTemple: Double
         var jawRatio: Double
@@ -42,7 +42,7 @@ enum SkeletalClassifier {
         var taper: Double
     }
 
-    struct Result: Sendable {
+    nonisolated struct Result: Sendable {
         var type: SkeletalType
         var typeLabel: String
         var features: Features

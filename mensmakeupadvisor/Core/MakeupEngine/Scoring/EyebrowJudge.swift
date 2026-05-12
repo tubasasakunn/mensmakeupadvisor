@@ -3,8 +3,8 @@ import Foundation
 
 // 2.2.7 眉の幾何学的判定 (一直線ルール)
 // makeup_claude/loadmap/2/2.2.7-eyebrow/main.py の `analyze` を移植。
-enum EyebrowJudge {
-    struct BrowSide: Sendable {
+nonisolated enum EyebrowJudge {
+    nonisolated struct BrowSide: Sendable {
         var head: CGPoint = .zero
         var peak: CGPoint = .zero
         var tail: CGPoint = .zero
@@ -21,13 +21,13 @@ enum EyebrowJudge {
         var angleHeadToPeakDeg: Double = 0  // 上向き正
     }
 
-    enum Category: Sendable {
+    nonisolated enum Category: Sendable {
         case masculineRising
         case natural
         case flatParallel
     }
 
-    struct Result: Sendable {
+    nonisolated struct Result: Sendable {
         var right: BrowSide
         var left: BrowSide
         var symmetryScore: Double

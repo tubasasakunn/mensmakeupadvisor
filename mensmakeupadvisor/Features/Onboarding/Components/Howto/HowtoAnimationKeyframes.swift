@@ -2,8 +2,8 @@ import Foundation
 import SwiftUI
 
 // CSS @keyframes 相当: ソート済み (進捗0-1, 値) ストップ間を補間する
-enum HowtoKeyframes {
-    static func value(
+nonisolated enum HowtoKeyframes {
+    nonisolated static func value(
         at t: Double,
         stops: [(Double, Double)],
         ease: (Double) -> Double = HowtoEasing.easeInOut
@@ -23,9 +23,9 @@ enum HowtoKeyframes {
     }
 }
 
-enum HowtoEasing {
-    static func easeInOut(_ x: Double) -> Double { -(cos(.pi * x) - 1) / 2 }
-    static func linear(_ x: Double) -> Double { x }
+nonisolated enum HowtoEasing {
+    nonisolated static func easeInOut(_ x: Double) -> Double { -(cos(.pi * x) - 1) / 2 }
+    nonisolated static func linear(_ x: Double) -> Double { x }
 }
 
 // SVG の 500x500 ローカル座標で描いたコンテンツを親フレームにフィットさせる

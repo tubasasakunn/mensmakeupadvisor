@@ -9,10 +9,10 @@ import Foundation
 //       メッシュ ID ベース。マスクを Gaussian で柔らかくし、エリアごとに合成方式を選ぶ
 //   - eyeliner:
 //       upper/lower のランドマーク列に沿ったポリラインを目の外側へオフセットして描画
-enum EyeApplier {
-    enum Blend: String, Sendable { case normal, multiply, additive }
+nonisolated enum EyeApplier {
+    nonisolated enum Blend: String, Sendable { case normal, multiply, additive }
 
-    struct AreaConfig: Sendable {
+    nonisolated struct AreaConfig: Sendable {
         var name: String
         var colorRGB: SIMD3<Float>
         var intensity: Float
@@ -20,7 +20,7 @@ enum EyeApplier {
         var blend: Blend
     }
 
-    struct EyelinerData: Sendable {
+    nonisolated struct EyelinerData: Sendable {
         var upperRight: [Int]
         var upperLeft: [Int]
         var lowerRight: [Int]

@@ -3,10 +3,10 @@ import Foundation
 
 // 2.2.2 顔の垂直三分割判定
 // makeup_claude/loadmap/2/2.2.2-vertical/main.py の `analyze` を移植。
-enum VerticalThirdsJudge {
+nonisolated enum VerticalThirdsJudge {
     nonisolated static let foreheadExtend = 0.13
 
-    enum Category: Sendable {
+    nonisolated enum Category: Sendable {
         case traditionalBalanced
         case reiwaSmallFace
         case upperDominant
@@ -14,7 +14,7 @@ enum VerticalThirdsJudge {
         case lowerDominant
     }
 
-    struct Result: Sendable {
+    nonisolated struct Result: Sendable {
         var hairlineY: Double
         var browY: Double
         var subnasalY: Double

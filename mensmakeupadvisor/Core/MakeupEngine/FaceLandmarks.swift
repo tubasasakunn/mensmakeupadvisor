@@ -2,7 +2,7 @@ import Foundation
 
 // MediaPipe FaceLandmarker (478点) のランドマークID定数。
 // makeup_claude/loadmap/shared/face_metrics.py の `LM` クラスをそのまま移植している。
-enum FaceLandmarkID {
+nonisolated enum FaceLandmarkID {
     // MARK: - 縦軸
     nonisolated static let foreheadTop = 10
     nonisolated static let chinBottom = 152

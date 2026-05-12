@@ -3,8 +3,8 @@ import Foundation
 
 // 2.2.4 目の判定
 // makeup_claude/loadmap/2/2.2.4-eye/main.py の `analyze` を移植。
-enum EyeJudge {
-    struct EyeSide: Sendable {
+nonisolated enum EyeJudge {
+    nonisolated struct EyeSide: Sendable {
         var widthPx: Double = 0
         var heightPx: Double = 0
         var ratio: Double = 0          // height / width
@@ -16,11 +16,11 @@ enum EyeJudge {
         var irisLoss: Double = 0       // 1:2:1 との差
     }
 
-    enum Category: Sendable {
+    nonisolated enum Category: Sendable {
         case bigRound, narrow, balanced
     }
 
-    struct Result: Sendable {
+    nonisolated struct Result: Sendable {
         var right: EyeSide
         var left: EyeSide
         var meanWidthRatio: Double

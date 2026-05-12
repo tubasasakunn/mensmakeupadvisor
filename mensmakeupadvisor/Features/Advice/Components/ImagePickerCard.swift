@@ -42,10 +42,9 @@ struct ImagePickerView: UIViewControllerRepresentable {
             let provider = result.itemProvider
             guard provider.canLoadObject(ofClass: UIImage.self) else { return }
             provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
-                guard let self, let image = object as? UIImage else { return }
-                let callback = self.onSelect
-                Task { @MainActor in
-                    callback(image)
+                guard let image = object as? UIImage else { return }
+                Task { @MainActor [weak self] in
+                    self?.onSelect(image)
                 }
             }
         }

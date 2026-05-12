@@ -3,11 +3,11 @@ import Foundation
 
 // 2.2.5 鼻の判定
 // makeup_claude/loadmap/2/2.2.5-nose/main.py の `analyze` を移植。
-enum NoseJudge {
-    enum AngleStatus: Sendable { case ideal, acute, obtuse }
-    enum ElineStatus: Sendable { case ideal, lipAhead, lipBehind }
+nonisolated enum NoseJudge {
+    nonisolated enum AngleStatus: Sendable { case ideal, acute, obtuse }
+    nonisolated enum ElineStatus: Sendable { case ideal, lipAhead, lipBehind }
 
-    struct Result: Sendable {
+    nonisolated struct Result: Sendable {
         var noseLengthPx: Double
         var noseWingWidthPx: Double
         var eyeGapPx: Double

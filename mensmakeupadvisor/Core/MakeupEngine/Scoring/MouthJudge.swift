@@ -3,12 +3,12 @@ import Foundation
 
 // 2.2.6 口の判定
 // makeup_claude/loadmap/2/2.2.6-mouth/main.py の `analyze` を移植。
-enum MouthJudge {
-    enum LipStatus: Sendable { case ideal, upperHeavy, lowerHeavy }
-    enum PhiltrumStatus: Sendable { case ideal, philtrumLong, chinLong }
-    enum AlignmentStatus: Sendable { case ideal, off }
+nonisolated enum MouthJudge {
+    nonisolated enum LipStatus: Sendable { case ideal, upperHeavy, lowerHeavy }
+    nonisolated enum PhiltrumStatus: Sendable { case ideal, philtrumLong, chinLong }
+    nonisolated enum AlignmentStatus: Sendable { case ideal, off }
 
-    struct Result: Sendable {
+    nonisolated struct Result: Sendable {
         var mouthWidthPx: Double
         var upperLipThicknessPx: Double
         var lowerLipThicknessPx: Double

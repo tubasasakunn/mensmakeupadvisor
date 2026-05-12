@@ -10,8 +10,8 @@ import Foundation
 //   4. mask 範囲で制限
 //   5. Gaussian blur で輪郭を滑らかに
 //   6. 通常合成（線形ブレンド）
-enum BaseApplier {
-    struct Options: Sendable {
+nonisolated enum BaseApplier {
+    nonisolated struct Options: Sendable {
         // Python 版は BGR=(170,200,235) で渡している(=肌色 RGB(235,200,170))。
         // Swift では RGB そのままで保持し、Compositing 側で 0-255 → 0-1 へ正規化する。
         var colorRGB: SIMD3<Float> = SIMD3<Float>(235, 200, 170)

@@ -4,8 +4,8 @@ import Foundation
 // 2.2.8 左右対称性・骨格感の総合判定
 // makeup_claude/loadmap/2/2.2.8-symmetry/main.py の `analyze` を移植。
 // 2.1〜2.2.7 の各判定結果を集約して総合スコアを計算する。
-enum SymmetryJudge {
-    struct SubResults: Sendable {
+nonisolated enum SymmetryJudge {
+    nonisolated struct SubResults: Sendable {
         var skeletal: SkeletalClassifier.Result
         var faceRatio: FaceRatioJudge.Result
         var vertical: VerticalThirdsJudge.Result
@@ -16,7 +16,7 @@ enum SymmetryJudge {
         var eyebrow: EyebrowJudge.Result
     }
 
-    struct Result: Sendable {
+    nonisolated struct Result: Sendable {
         var eyeSym: Double
         var browSym: Double
         var faceContourSym: Double

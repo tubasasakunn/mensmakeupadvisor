@@ -11,14 +11,14 @@ import UIKit
 //
 // SPM 依存: `paescebu/SwiftTasksVision` 経由で公式 `MediaPipeTasksVision` xcframework を
 // 取り込んでいる (Google 公式は CocoaPods 配布のみだが、このパッケージが daily で同期する)。
-final class FaceMesh {
-    struct Point: Sendable {
+nonisolated final class FaceMesh {
+    nonisolated struct Point: Sendable {
         var x: Double
         var y: Double
         var z: Double
     }
 
-    struct DetectionResult: Sendable {
+    nonisolated struct DetectionResult: Sendable {
         var points: [Point]              // 細分化後の頂点 (x,y は正規化 0-1)
         var triangles: [(Int, Int, Int)] // 細分化後の三角形 (頂点インデックス)
         var landmarksPx: [CGPoint]       // 478 個のランドマーク (ピクセル座標)
@@ -26,7 +26,7 @@ final class FaceMesh {
         var imageHeight: Int
     }
 
-    enum FaceMeshError: Error {
+    nonisolated enum FaceMeshError: Error {
         case modelMissing
         case tesselationMissing
         case faceNotDetected
@@ -268,7 +268,7 @@ final class FaceMesh {
     // MediaPipe Python ソリューションの FACEMESH_TESSELATION から事前に抽出済みで、
     // バンドル内 `face_mesh_tesselation.json` に格納している。
     nonisolated(unsafe) private static var cachedTesselation: [(Int, Int)] = []
-    nonisolated(unsafe) private static let tesselationLock = NSLock()
+    private static let tesselationLock = NSLock()
 
     private nonisolated static func loadTesselationConnections() throws -> [(Int, Int)] {
         tesselationLock.lock()
@@ -316,7 +316,7 @@ final class FaceMesh {
     }
 }
 
-private struct TriKey: Hashable {
+private nonisolated struct TriKey: Hashable {
     let a: Int
     let b: Int
     let c: Int

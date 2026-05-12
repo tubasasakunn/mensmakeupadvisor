@@ -17,7 +17,7 @@ import UIKit
 
 // MARK: - Mask buffer (UInt8, single channel, value 0-255)
 
-final class MaskBuffer {
+nonisolated final class MaskBuffer {
     let width: Int
     let height: Int
     nonisolated(unsafe) private var storage: UnsafeMutableBufferPointer<UInt8>
@@ -49,7 +49,7 @@ final class MaskBuffer {
 
 // MARK: - Float buffer (single channel, normalized 0-1)
 
-final class FloatBuffer {
+nonisolated final class FloatBuffer {
     let width: Int
     let height: Int
     nonisolated(unsafe) var storage: UnsafeMutableBufferPointer<Float>
@@ -91,7 +91,7 @@ final class FloatBuffer {
 
 // MARK: - Distance transform (squared, two-pass Felzenszwalb)
 
-enum DistanceTransform {
+nonisolated enum DistanceTransform {
     // 入力: foreground=true のマスク（値>0 を前景扱い）
     // 出力: 各画素から最近傍背景までの L2 距離（ピクセル単位）
     nonisolated static func l2(from mask: MaskBuffer) -> FloatBuffer {
@@ -170,7 +170,7 @@ enum DistanceTransform {
 
 // MARK: - Gaussian blur (separable, normalized kernel)
 
-enum GaussianBlur {
+nonisolated enum GaussianBlur {
     // 入力 FloatBuffer (0-1) を Gaussian で平滑化する。
     // OpenCV の `cv2.GaussianBlur(src, (k,k), sigma=k/3)` 相当。
     nonisolated static func apply(_ buffer: FloatBuffer, ksize: Int) {
@@ -226,7 +226,7 @@ enum GaussianBlur {
 
 // MARK: - Power curve
 
-enum PowerCurve {
+nonisolated enum PowerCurve {
     nonisolated static func apply(_ buffer: FloatBuffer, exponent: Float) {
         for i in 0..<buffer.count {
             buffer.pointer[i] = powf(max(0, buffer.pointer[i]), exponent)
@@ -236,7 +236,7 @@ enum PowerCurve {
 
 // MARK: - Normalize 0-1
 
-enum BufferNormalize {
+nonisolated enum BufferNormalize {
     nonisolated static func toUnit(_ buffer: FloatBuffer) {
         var mx: Float = 0
         for i in 0..<buffer.count { mx = max(mx, buffer.pointer[i]) }
@@ -262,7 +262,7 @@ enum BufferNormalize {
 
 // MARK: - Morphological dilate
 
-enum Morphology {
+nonisolated enum Morphology {
     // 円形カーネルによる単純なグレースケール膨張。
     // OpenCV の `cv2.dilate(..., MORPH_ELLIPSE)` を粗く近似する。
     nonisolated static func dilate(_ buffer: FloatBuffer, radius: Int) {
@@ -295,7 +295,7 @@ enum Morphology {
 
 // MARK: - Compositing
 
-enum Compositing {
+nonisolated enum Compositing {
     // OpenCV BGR 順は使わず、Swift / CoreGraphics 標準の RGBA を使う。
     // intensity と mask の積を α として、src を新色とブレンドする。
 
@@ -387,7 +387,7 @@ enum Compositing {
 // MARK: - UIImage / CGImage helpers
 
 extension UIImage {
-    var safeCGImage: CGImage? {
+    nonisolated var safeCGImage: CGImage? {
         if let img = cgImage { return img }
         guard let ci = ciImage else { return nil }
         let ctx = CIContext(options: nil)

@@ -10,8 +10,8 @@ import UIKit
 //   3. power(0.5) で端の減衰を緩やかに
 //   4. 2段階 Gaussian blur (内側→外側)
 //   5. 加算合成
-enum HighlightApplier {
-    struct Options: Sendable {
+nonisolated enum HighlightApplier {
+    nonisolated struct Options: Sendable {
         var meshIDs: [Int]
         var colorRGB: SIMD3<Float> = SIMD3<Float>(255, 255, 255)
         var intensity: Float = 0.12

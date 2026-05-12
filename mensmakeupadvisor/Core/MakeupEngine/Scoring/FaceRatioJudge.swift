@@ -2,7 +2,7 @@ import Foundation
 
 // 2.2.1 顔全体の縦横バランス判定
 // makeup_claude/loadmap/2/2.2.1-face-ratio/main.py の `analyze` を移植。
-enum FaceRatioJudge {
+nonisolated enum FaceRatioJudge {
     // landmark 10 が生え際より下にあるための補正係数
     nonisolated static let foreheadExtend = 1.25
     nonisolated static let irisDiameterMM = 11.7
@@ -11,12 +11,12 @@ enum FaceRatioJudge {
     nonisolated static let kogaoHeightCM = 20.0
     nonisolated static let kogaoWidthCM = 14.0
 
-    enum RatioName: String, Sendable { case golden, silver, japanese }
+    nonisolated enum RatioName: String, Sendable { case golden, silver, japanese }
     nonisolated static let ratios: [RatioName: Double] = [
         .golden: 1.618, .silver: 1.414, .japanese: 1.460,
     ]
 
-    struct Result: Sendable {
+    nonisolated struct Result: Sendable {
         var faceHeightPxRaw: Double
         var faceHeightPx: Double
         var faceWidthPx: Double
