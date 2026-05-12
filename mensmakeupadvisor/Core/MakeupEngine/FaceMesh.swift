@@ -268,7 +268,7 @@ nonisolated final class FaceMesh {
     // MediaPipe Python ソリューションの FACEMESH_TESSELATION から事前に抽出済みで、
     // バンドル内 `face_mesh_tesselation.json` に格納している。
     nonisolated(unsafe) private static var cachedTesselation: [(Int, Int)] = []
-    nonisolated(unsafe) private static let tesselationLock = NSLock()
+    private static let tesselationLock = NSLock()
 
     private nonisolated static func loadTesselationConnections() throws -> [(Int, Int)] {
         tesselationLock.lock()

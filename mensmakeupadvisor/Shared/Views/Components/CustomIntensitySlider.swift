@@ -45,8 +45,8 @@ extension Comparable {
 }
 
 #Preview {
-    @State var value: Double = 50
-    return CustomIntensitySlider(value: $value, range: 0...100)
+    @Previewable @State var value: Double = 50
+    CustomIntensitySlider(value: $value, range: 0...100)
         .padding(24)
         .background(Color.appBackground)
 }
