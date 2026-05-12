@@ -79,6 +79,7 @@
 				8C9A31022FA1B51D001BDB99 /* Sources */,
 				8C9A31032FA1B51D001BDB99 /* Frameworks */,
 				8C9A31042FA1B51D001BDB99 /* Resources */,
+				8CMP00040000000000000001 /* Fix MediaPipe Info.plist */,
 			);
 			buildRules = (
 			);
@@ -141,6 +142,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		8CMP00040000000000000001 /* Fix MediaPipe Info.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Fix MediaPipe Info.plist";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/scripts/fix_mediapipe_frameworks.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8C9A31022FA1B51D001BDB99 /* Sources */ = {
