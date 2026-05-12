@@ -4,15 +4,15 @@ import Foundation
 // makeup_claude/loadmap/2/2.2.1-face-ratio/main.py の `analyze` を移植。
 enum FaceRatioJudge {
     // landmark 10 が生え際より下にあるための補正係数
-    static let foreheadExtend = 1.25
-    static let irisDiameterMM = 11.7
-    static let aistMaleHeightCM = 23.2
-    static let aistMaleWidthCM = 14.5
-    static let kogaoHeightCM = 20.0
-    static let kogaoWidthCM = 14.0
+    nonisolated static let foreheadExtend = 1.25
+    nonisolated static let irisDiameterMM = 11.7
+    nonisolated static let aistMaleHeightCM = 23.2
+    nonisolated static let aistMaleWidthCM = 14.5
+    nonisolated static let kogaoHeightCM = 20.0
+    nonisolated static let kogaoWidthCM = 14.0
 
     enum RatioName: String, Sendable { case golden, silver, japanese }
-    static let ratios: [RatioName: Double] = [
+    nonisolated static let ratios: [RatioName: Double] = [
         .golden: 1.618, .silver: 1.414, .japanese: 1.460,
     ]
 
@@ -33,7 +33,7 @@ enum FaceRatioJudge {
         var vsAistWidth: Double
     }
 
-    static func analyze(faceMesh: FaceMesh) -> Result {
+    nonisolated static func analyze(faceMesh: FaceMesh) -> Result {
         let m = FaceMetricsCalculator.measure(faceMesh: faceMesh)
 
         let raw = m.faceHeightPx

@@ -26,7 +26,7 @@ enum EyebrowApplier {
         var doDraw: Bool = true
     }
 
-    static func apply(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
+    nonisolated static func apply(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
         var current = image
         if options.doErase {
             if let erased = eraseEyebrows(image: current, faceMesh: faceMesh) {
@@ -43,7 +43,7 @@ enum EyebrowApplier {
 
     // MARK: - Erase
 
-    private static func buildEyebrowPolygonMask(faceMesh: FaceMesh, width: Int, height: Int,
+    private nonisolated static func buildEyebrowPolygonMask(faceMesh: FaceMesh, width: Int, height: Int,
                                                 expandPx: Int = 0) -> MaskBuffer {
         let mask = MaskBuffer(width: width, height: height)
         guard let ctx = CGContext(
@@ -87,7 +87,7 @@ enum EyebrowApplier {
         return mask
     }
 
-    private static func eraseEyebrows(image: CGImage, faceMesh: FaceMesh) -> CGImage? {
+    private nonisolated static func eraseEyebrows(image: CGImage, faceMesh: FaceMesh) -> CGImage? {
         let w = image.width
         let h = image.height
         let faceH = max(1.0, hypot(
@@ -162,7 +162,7 @@ enum EyebrowApplier {
     }
 
     // Python `compute_brow_anchors` の対称化ロジックを忠実に移植。
-    private static func anchors(faceMesh: FaceMesh, side: Side) -> Anchors {
+    private nonisolated static func anchors(faceMesh: FaceMesh, side: Side) -> Anchors {
         struct SideData {
             var noseWing: CGPoint
             var innerEye: CGPoint
@@ -257,9 +257,9 @@ enum EyebrowApplier {
     enum Side { case right, left }
 
     // eyebrow_shapes.json をキャッシュ
-    private static var shapesCache: [String: (upper: [(Double, Double)], lower: [(Double, Double)])] = [:]
+    nonisolated(unsafe) private static var shapesCache: [String: (upper: [(Double, Double)], lower: [(Double, Double)])] = [:]
 
-    private static func loadShapes() {
+    private nonisolated static func loadShapes() {
         guard shapesCache.isEmpty else { return }
         guard let url = Bundle.main.url(forResource: "eyebrow_shapes", withExtension: "json"),
               let data = try? Data(contentsOf: url),
@@ -277,7 +277,7 @@ enum EyebrowApplier {
     }
 
     // shape (正規化 t/offset) → ピクセル座標のポリゴン
-    private static func polygonFromShape(anchors: Anchors,
+    private nonisolated static func polygonFromShape(anchors: Anchors,
                                          shape: (upper: [(Double, Double)], lower: [(Double, Double)]),
                                          thicknessScale: Double = 1.0,
                                          samples: Int = 80) -> [CGPoint] {
@@ -336,7 +336,7 @@ enum EyebrowApplier {
         return poly
     }
 
-    private static func drawEyebrows(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
+    private nonisolated static func drawEyebrows(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
         loadShapes()
         guard let shape = shapesCache[options.type.rawValue] else { return image }
 

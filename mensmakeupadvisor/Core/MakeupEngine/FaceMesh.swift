@@ -33,26 +33,26 @@ final class FaceMesh {
     }
 
     private let subdivisionLevel: Int
-    private var landmarker: FaceLandmarker?
+    nonisolated(unsafe) private var landmarker: FaceLandmarker?
 
-    private var rawPoints: [Point] = []
-    private var rawTriangles: [(Int, Int, Int)] = []
+    nonisolated(unsafe) private var rawPoints: [Point] = []
+    nonisolated(unsafe) private var rawTriangles: [(Int, Int, Int)] = []
 
-    private(set) var points: [Point] = []
-    private(set) var triangles: [(Int, Int, Int)] = []
-    private(set) var landmarksPx: [CGPoint] = []
-    private(set) var imageSize: CGSize = .zero
+    nonisolated(unsafe) private(set) var points: [Point] = []
+    nonisolated(unsafe) private(set) var triangles: [(Int, Int, Int)] = []
+    nonisolated(unsafe) private(set) var landmarksPx: [CGPoint] = []
+    nonisolated(unsafe) private(set) var imageSize: CGSize = .zero
 
-    private var midpointCache: [Int64: Int] = [:]
-    private var reverseCache: [Int: (Int, Int)] = [:]
+    nonisolated(unsafe) private var midpointCache: [Int64: Int] = [:]
+    nonisolated(unsafe) private var reverseCache: [Int: (Int, Int)] = [:]
 
-    init(subdivisionLevel: Int = 1) {
+    nonisolated init(subdivisionLevel: Int = 1) {
         self.subdivisionLevel = subdivisionLevel
     }
 
     // MARK: - Init / Detect
 
-    func initialize(modelPath: String? = nil) throws {
+    nonisolated func initialize(modelPath: String? = nil) throws {
         let resolvedPath: String
         if let modelPath, !modelPath.isEmpty {
             resolvedPath = modelPath
@@ -73,7 +73,7 @@ final class FaceMesh {
     }
 
     @discardableResult
-    func detect(image: UIImage) throws -> DetectionResult {
+    nonisolated func detect(image: UIImage) throws -> DetectionResult {
         guard let landmarker else { throw FaceMeshError.modelMissing }
 
         let mpImage = try MPImage(uiImage: image)
@@ -115,7 +115,7 @@ final class FaceMesh {
 
     // MARK: - Mesh utilities
 
-    func trianglePixels(triangleID: Int, width: Int, height: Int) -> [CGPoint] {
+    nonisolated func trianglePixels(triangleID: Int, width: Int, height: Int) -> [CGPoint] {
         guard triangles.indices.contains(triangleID) else { return [] }
         let (a, b, c) = triangles[triangleID]
         return [a, b, c].map { idx in
@@ -125,7 +125,7 @@ final class FaceMesh {
     }
 
     // OpenCV `cv2.fillPoly(mask, [pts], 1.0)` 相当。
-    func buildMask(meshIDs: [Int], width: Int, height: Int) -> MaskBuffer {
+    nonisolated func buildMask(meshIDs: [Int], width: Int, height: Int) -> MaskBuffer {
         let mask = MaskBuffer(width: width, height: height)
         guard let context = CGContext(
             data: mask.dataPointer,
@@ -152,7 +152,7 @@ final class FaceMesh {
     }
 
     // 左右反転メッシュ ID を返す。Python 版 `find_mirror_meshes` と同じ。
-    func mirrorMeshes(meshIDs: Set<Int>) -> Set<Int> {
+    nonisolated func mirrorMeshes(meshIDs: Set<Int>) -> Set<Int> {
         let mirror = mirrorMap()
         var triMap: [TriKey: Int] = [:]
         triMap.reserveCapacity(triangles.count)
@@ -173,7 +173,7 @@ final class FaceMesh {
 
     // MARK: - Private
 
-    private func midpoint(_ i: Int, _ j: Int) -> Int {
+    private nonisolated func midpoint(_ i: Int, _ j: Int) -> Int {
         let key = Int64(min(i, j)) * 100_000 + Int64(max(i, j))
         if let cached = midpointCache[key] { return cached }
         let a = points[i]
@@ -189,7 +189,7 @@ final class FaceMesh {
         return idx
     }
 
-    private func subdivideAll() {
+    private nonisolated func subdivideAll() {
         var newTris: [(Int, Int, Int)] = []
         newTris.reserveCapacity(triangles.count * 4)
         for (a, b, c) in triangles {
@@ -205,7 +205,7 @@ final class FaceMesh {
     }
 
     // Python 版 `_get_mirror_map` と同等。
-    private func mirrorMap() -> [Int] {
+    private nonisolated func mirrorMap() -> [Int] {
         let rawN = rawPoints.count
         let total = points.count
         var mirror = Array(0..<total)
@@ -241,7 +241,7 @@ final class FaceMesh {
         return mirror
     }
 
-    private static func extractTriangles(connections: [(Int, Int)]) -> [(Int, Int, Int)] {
+    private nonisolated static func extractTriangles(connections: [(Int, Int)]) -> [(Int, Int, Int)] {
         var adj: [Int: Set<Int>] = [:]
         for (u, v) in connections {
             adj[u, default: []].insert(v)
@@ -267,10 +267,10 @@ final class FaceMesh {
     // FaceMesh のテッセレーション接続リスト (2556 個) を読み込む。
     // MediaPipe Python ソリューションの FACEMESH_TESSELATION から事前に抽出済みで、
     // バンドル内 `face_mesh_tesselation.json` に格納している。
-    private static var cachedTesselation: [(Int, Int)] = []
-    private static let tesselationLock = NSLock()
+    nonisolated(unsafe) private static var cachedTesselation: [(Int, Int)] = []
+    nonisolated(unsafe) private static let tesselationLock = NSLock()
 
-    private static func loadTesselationConnections() throws -> [(Int, Int)] {
+    private nonisolated static func loadTesselationConnections() throws -> [(Int, Int)] {
         tesselationLock.lock()
         defer { tesselationLock.unlock() }
         if !cachedTesselation.isEmpty { return cachedTesselation }
@@ -287,7 +287,7 @@ final class FaceMesh {
         return cachedTesselation
     }
 
-    static func cachedModelPath() -> String? {
+    nonisolated static func cachedModelPath() -> String? {
         guard let cache = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
             return nil
         }
@@ -296,7 +296,7 @@ final class FaceMesh {
     }
 
     // Google 公式 CDN から face_landmarker.task をダウンロード (初回のみ)
-    static func ensureModelDownloaded() async throws -> String {
+    nonisolated static func ensureModelDownloaded() async throws -> String {
         if let bundled = Bundle.main.path(forResource: "face_landmarker", ofType: "task") {
             return bundled
         }
@@ -320,7 +320,7 @@ private struct TriKey: Hashable {
     let a: Int
     let b: Int
     let c: Int
-    init(_ tri: (Int, Int, Int)) {
+    nonisolated init(_ tri: (Int, Int, Int)) {
         var arr = [tri.0, tri.1, tri.2]
         arr.sort()
         a = arr[0]; b = arr[1]; c = arr[2]

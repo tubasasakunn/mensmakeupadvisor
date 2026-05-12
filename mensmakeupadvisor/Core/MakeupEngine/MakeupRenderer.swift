@@ -19,7 +19,7 @@ struct MakeupRenderer {
         var applyEyeliner: Bool
         var eyebrowType: EyebrowApplier.BrowType
 
-        static let `default` = LayerSelection(
+        nonisolated static let `default` = LayerSelection(
             highlightAreaNames: ["base_t-zone", "base_c-zone", "base_under-eye"],
             shadowAreaNames: ["omonaga-upper", "omonaga-lower"],
             applyBase: true,
@@ -30,11 +30,11 @@ struct MakeupRenderer {
     }
 
     // 0-100 を 0-1 に正規化する単純な変換
-    private static func normalize(_ value: Double) -> Float {
+    private nonisolated static func normalize(_ value: Double) -> Float {
         Float(max(0.0, min(100.0, value)) / 100.0)
     }
 
-    static func render(image: UIImage, faceMesh: FaceMesh,
+    nonisolated static func render(image: UIImage, faceMesh: FaceMesh,
                        intensity: MakeupIntensity,
                        selection: LayerSelection = .default) -> UIImage {
         guard var current = image.safeCGImage else { return image }

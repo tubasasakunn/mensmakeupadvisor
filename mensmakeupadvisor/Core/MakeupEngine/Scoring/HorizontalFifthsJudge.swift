@@ -4,7 +4,7 @@ import Foundation
 // 2.2.3 顔の水平五分割判定
 // makeup_claude/loadmap/2/2.2.3-horizontal/main.py の `analyze` を移植。
 enum HorizontalFifthsJudge {
-    static let jpIdeal: [Double] = [1.0, 1.15, 1.0]
+    nonisolated static let jpIdeal: [Double] = [1.0, 1.15, 1.0]
 
     enum Category: Sendable {
         case ideal, centerConverged, centerDiverged
@@ -21,7 +21,7 @@ enum HorizontalFifthsJudge {
         var category: Category
     }
 
-    static func analyze(faceMesh: FaceMesh) -> Result {
+    nonisolated static func analyze(faceMesh: FaceMesh) -> Result {
         func x(_ idx: Int) -> Double { Double(faceMesh.landmarksPx[idx].x) }
         let xs = [x(FaceLandmarkID.templeR), x(FaceLandmarkID.templeL)].sorted()
         let xLeftEdge = xs[0]

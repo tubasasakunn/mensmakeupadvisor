@@ -30,7 +30,7 @@ enum EyeApplier {
     }
 
     // Python `AREA_DEFAULTS` のデフォルト
-    static let defaultConfigs: [String: AreaConfig] = [
+    nonisolated static let defaultConfigs: [String: AreaConfig] = [
         "eyeshadow_base":   .init(name: "eyeshadow_base",   colorRGB: SIMD3<Float>(190, 145, 120), intensity: 0.35, blurScale: 0.8, blend: .normal),
         "eyeshadow_crease": .init(name: "eyeshadow_crease", colorRGB: SIMD3<Float>(160, 110, 85),  intensity: 0.25, blurScale: 0.5, blend: .normal),
         "eyeliner":         .init(name: "eyeliner",         colorRGB: SIMD3<Float>(35, 20, 10),    intensity: 0.55, blurScale: 0.3, blend: .normal),
@@ -39,7 +39,7 @@ enum EyeApplier {
     ]
 
     // メッシュ ID 系
-    static func applyMeshArea(image: CGImage, faceMesh: FaceMesh,
+    nonisolated static func applyMeshArea(image: CGImage, faceMesh: FaceMesh,
                               meshIDs: [Int], config: AreaConfig) -> CGImage? {
         let w = image.width
         let h = image.height
@@ -55,7 +55,7 @@ enum EyeApplier {
     }
 
     // アイライナー (ポリライン)
-    static func applyEyeliner(image: CGImage, faceMesh: FaceMesh,
+    nonisolated static func applyEyeliner(image: CGImage, faceMesh: FaceMesh,
                               data: EyelinerData, config: AreaConfig) -> CGImage? {
         let w = image.width
         let h = image.height
@@ -128,7 +128,7 @@ enum EyeApplier {
     }
 
     // MARK: - private
-    private static func composite(image: CGImage, mask: FloatBuffer,
+    private nonisolated static func composite(image: CGImage, mask: FloatBuffer,
                                   color: SIMD3<Float>, intensity: Float, blend: Blend) -> CGImage? {
         switch blend {
         case .normal:   return Compositing.normal(image: image, mask: mask, color: color, intensity: intensity)
@@ -138,7 +138,7 @@ enum EyeApplier {
     }
 
     // target.json の eye カテゴリから (meshAreas, eyelinerData) を切り出す
-    static func loadFromTargetJSON(bundle: Bundle = .main) -> (mesh: [MeshArea], eyeliner: EyelinerData?) {
+    nonisolated static func loadFromTargetJSON(bundle: Bundle = .main) -> (mesh: [MeshArea], eyeliner: EyelinerData?) {
         guard let url = bundle.url(forResource: "target", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],

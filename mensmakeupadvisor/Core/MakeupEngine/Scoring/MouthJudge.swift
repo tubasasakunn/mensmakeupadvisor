@@ -24,7 +24,7 @@ enum MouthJudge {
         var hitsOutOf3: Int
     }
 
-    static func analyze(faceMesh: FaceMesh) -> Result {
+    nonisolated static func analyze(faceMesh: FaceMesh) -> Result {
         func p(_ i: Int) -> CGPoint { faceMesh.landmarksPx[i] }
         let mR = p(FaceLandmarkID.mouthR)
         let mL = p(FaceLandmarkID.mouthL)
