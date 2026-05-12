@@ -12,12 +12,12 @@ import UIKit
 //   Phase 2: 眉描画
 //     - eyebrow_shapes.json のトレース形状を左右の anchors にマッピング
 //     - 二次 Bezier ベースの輪郭をポリゴンとして塗りつぶし、Gaussian でソフトに合成
-enum EyebrowApplier {
-    enum BrowType: String, CaseIterable, Sendable {
+nonisolated enum EyebrowApplier {
+    nonisolated enum BrowType: String, CaseIterable, Sendable {
         case natural, straight, arch, parallel, corner
     }
 
-    struct Options: Sendable {
+    nonisolated struct Options: Sendable {
         var type: BrowType = .straight
         var colorRGB: SIMD3<Float> = SIMD3<Float>(85, 60, 45)
         var intensity: Float = 0.75
@@ -154,7 +154,7 @@ enum EyebrowApplier {
 
     // MARK: - Draw
 
-    struct Anchors {
+    nonisolated struct Anchors {
         var head: CGPoint
         var tail: CGPoint
         var eyeHeight: Double
@@ -254,7 +254,7 @@ enum EyebrowApplier {
         )
     }
 
-    enum Side { case right, left }
+    nonisolated enum Side { case right, left }
 
     // eyebrow_shapes.json をキャッシュ
     nonisolated(unsafe) private static var shapesCache: [String: (upper: [(Double, Double)], lower: [(Double, Double)])] = [:]

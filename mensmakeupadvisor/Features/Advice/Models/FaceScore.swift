@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct FaceScore: Identifiable, Sendable {
+nonisolated struct FaceScore: Identifiable, Sendable {
     var id: String { name }
     let name: String
     let score: Int
@@ -28,7 +28,7 @@ struct FaceScore: Identifiable, Sendable {
 // MARK: - Advice Dictionaries
 
 extension FaceScore {
-    private static let adviceDict: [String: (high: String, mid: String, low: String)] = [
+    private nonisolated static let adviceDict: [String: (high: String, mid: String, low: String)] = [
         "骨格バランス": (
             high: "理想的な縦横比。バランスの取れた骨格は、すべてを許容する。",
             mid:  "やや縦長/横長傾向。シェーディングで縦横比を整えたい。",
@@ -66,7 +66,7 @@ extension FaceScore {
         ),
     ]
 
-    static func pickAdvice(name: String, score: Int) -> String {
+    nonisolated static func pickAdvice(name: String, score: Int) -> String {
         guard let entry = adviceDict[name] else { return "" }
         switch score {
         case 75...: return entry.high

@@ -3,14 +3,14 @@ import Foundation
 
 // 2.2.3 顔の水平五分割判定
 // makeup_claude/loadmap/2/2.2.3-horizontal/main.py の `analyze` を移植。
-enum HorizontalFifthsJudge {
+nonisolated enum HorizontalFifthsJudge {
     nonisolated static let jpIdeal: [Double] = [1.0, 1.15, 1.0]
 
-    enum Category: Sendable {
+    nonisolated enum Category: Sendable {
         case ideal, centerConverged, centerDiverged
     }
 
-    struct Result: Sendable {
+    nonisolated struct Result: Sendable {
         var segPx: [Double]          // [右余白, 右目幅, 目間, 左目幅, 左余白]
         var segNorm: [Double]
         var eyeGapRatio: Double

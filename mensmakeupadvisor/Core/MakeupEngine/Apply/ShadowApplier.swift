@@ -9,8 +9,8 @@ import Foundation
 //   3. power(1.5) で内側への減衰を緩やかに
 //   4. 2段階 Gaussian blur
 //   5. 乗算合成（暗くする）
-enum ShadowApplier {
-    struct Options: Sendable {
+nonisolated enum ShadowApplier {
+    nonisolated struct Options: Sendable {
         var meshIDs: [Int]
         var colorRGB: SIMD3<Float> = SIMD3<Float>(90, 68, 50)
         var intensity: Float = 0.25

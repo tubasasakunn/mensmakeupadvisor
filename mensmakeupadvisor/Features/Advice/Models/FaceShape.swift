@@ -1,4 +1,4 @@
-enum FaceShape: String, Sendable {
+nonisolated enum FaceShape: String, Sendable {
     case tamago, marugao, omonaga, gyaku, base
 
     var label: String {

@@ -13,7 +13,7 @@ import UIKit
 //   - "鼻のバランス" ← 2.2.5 4項目ヒット数
 //   - "口の比率"     ← 2.2.6 3項目ヒット数
 //   - "左右対称性"   ← 2.2.8 overall_sym + jaw_sharpness
-enum FaceScoringEngine {
+nonisolated enum FaceScoringEngine {
     nonisolated static func evaluate(image: UIImage) throws -> AnalysisResult {
         let mesh = FaceMesh(subdivisionLevel: 1)
         try mesh.initialize()
