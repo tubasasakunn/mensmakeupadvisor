@@ -1,43 +1,17 @@
 #!/bin/sh
-# SwiftTasksVision (MediaPipeTasksVision.framework) は同梱 Info.plist が
-# 壊れており、App Store 提出時に下記エラーになる:
-#   ITMS-90530 / ITMS-90360 / ITMS-90057 / ITMS-90056
-# (CFBundleShortVersionString / CFBundleVersion / MinimumOSVersion 欠落,
-#  XCFramework 用 plist が誤って framework 内に置かれている)
+# MediaPipeTasksVision.framework の Info.plist を修復するスクリプト。
 #
-# このスクリプトは Embed Frameworks 完了後に走り、Info.plist を完全に書き直して
-# フレームワークを再署名する。途中失敗で Build Phase を落とさないよう全コマンドで
-# || true を入れて続行する。
+# 問題: SwiftTasksVision が同梱する MediaPipeTasksVision.xcframework 内の
+#       各 .framework/Info.plist が XCFramework 用 plist のまま誤配置されており、
+#       App Store 提出時に以下エラーになる:
+#         ITMS-90530 / ITMS-90360 / ITMS-90056 / ITMS-90057
+#
+# 対策: ビルド前に SPM チェックアウト内の Info.plist を正しい内容に書き換える。
+#       DerivedData クリーン後も毎ビルドで自動修復されるように常時実行する。
 
-set -u
+set -eu
 
-FRAMEWORK="${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/MediaPipeTasksVision.framework"
-
-# 通常の Embed 場所に無ければ、Archive の Embedded Binaries や PlugIns も確認する
-if [ ! -d "$FRAMEWORK" ]; then
-  for candidate in \
-    "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MediaPipeTasksVision.framework" \
-    "${CODESIGNING_FOLDER_PATH}/Frameworks/MediaPipeTasksVision.framework" \
-    "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Frameworks/MediaPipeTasksVision.framework"
-  do
-    if [ -d "$candidate" ]; then
-      FRAMEWORK="$candidate"
-      break
-    fi
-  done
-fi
-
-if [ ! -d "$FRAMEWORK" ]; then
-  echo "note: MediaPipeTasksVision.framework not yet embedded (will be fixed on a later build), skipping"
-  exit 0
-fi
-
-PLIST="$FRAMEWORK/Info.plist"
-echo "Patching $PLIST"
-
-# Info.plist を 0 から書き直す (PlistBuddy より失敗しにくい)
-cat > "$PLIST" <<'PLIST_EOF'
-<?xml version="1.0" encoding="UTF-8"?>
+CORRECT_PLIST='<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -57,12 +31,6 @@ cat > "$PLIST" <<'PLIST_EOF'
 	<string>0.10.21</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleSupportedPlatforms</key>
-	<array>
-		<string>iPhoneOS</string>
-	</array>
 	<key>MinimumOSVersion</key>
 	<string>15.0</string>
 	<key>UIDeviceFamily</key>
@@ -70,32 +38,57 @@ cat > "$PLIST" <<'PLIST_EOF'
 		<integer>1</integer>
 		<integer>2</integer>
 	</array>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>arm64</string>
-	</array>
 </dict>
-</plist>
-PLIST_EOF
+</plist>'
 
-# 念のため XML として正当か検証 (失敗してもビルド止めない)
-plutil -lint "$PLIST" || echo "warning: plutil -lint failed on $PLIST"
+patch_plist() {
+  local plist="$1"
+  if [ ! -f "$plist" ]; then
+    echo "note: fix_mediapipe: not found, skipping: $plist"
+    return 0
+  fi
+  # 既に正しい内容ならスキップ（CFBundleShortVersionString の有無で判定）
+  if /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$plist" > /dev/null 2>&1; then
+    echo "note: fix_mediapipe: already correct: $plist"
+    return 0
+  fi
+  chmod u+w "$plist"
+  printf '%s\n' "$CORRECT_PLIST" > "$plist"
+  echo "fix_mediapipe: patched $plist"
+}
 
-# Info.plist を改変したので再署名。CODE_SIGN_IDENTITY が空 (シミュレータ等) の
-# ケースは skip。失敗時も Build を止めない。
-SIGN_ID="${EXPANDED_CODE_SIGN_IDENTITY:-}"
-if [ -z "$SIGN_ID" ]; then
-  SIGN_ID="${CODE_SIGN_IDENTITY:-}"
-fi
-if [ -n "$SIGN_ID" ] && [ "$SIGN_ID" != "-" ]; then
-  /usr/bin/codesign --force \
-    --sign "$SIGN_ID" \
-    --preserve-metadata=identifier,entitlements,flags \
-    --timestamp=none \
-    "$FRAMEWORK" || echo "warning: codesign failed for $FRAMEWORK"
-  echo "Re-signed $FRAMEWORK with $SIGN_ID"
+# ── 1. SPM チェックアウト内を修復（DerivedData クリーン後も次ビルドで自動修復）
+# SYMROOT は常に .../DerivedData/<ID>/Build/... の形式なので、Build より前を取り出す
+DERIVED_DATA_ROOT="${SYMROOT%%/Build/*}"
+SPM_XCFW="$DERIVED_DATA_ROOT/SourcePackages/checkouts/SwiftTasksVision/Dependencies/MediaPipeTasksVision.xcframework"
+
+if [ -d "$SPM_XCFW" ]; then
+  patch_plist "$SPM_XCFW/ios-arm64/MediaPipeTasksVision.framework/Info.plist"
+  patch_plist "$SPM_XCFW/ios-arm64_x86_64-simulator/MediaPipeTasksVision.framework/Info.plist"
 else
-  echo "note: no code-sign identity set, skipping codesign"
+  echo "note: fix_mediapipe: SPM checkout not found at $SPM_XCFW (will retry on next build)"
 fi
+
+# ── 2. ビルド済みバンドル内も修復（Archive / Install 時のベルト & サスペンダー）
+for candidate in \
+  "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/MediaPipeTasksVision.framework" \
+  "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MediaPipeTasksVision.framework" \
+  "${CODESIGNING_FOLDER_PATH}/Frameworks/MediaPipeTasksVision.framework" \
+  "${DSTROOT:-}/Applications/${WRAPPER_NAME}/Frameworks/MediaPipeTasksVision.framework"
+do
+  if [ -d "$candidate" ]; then
+    patch_plist "$candidate/Info.plist"
+
+    # Info.plist 変更後に再署名（署名 ID がある場合のみ）
+    SIGN_ID="${EXPANDED_CODE_SIGN_IDENTITY:-${CODE_SIGN_IDENTITY:-}}"
+    if [ -n "$SIGN_ID" ] && [ "$SIGN_ID" != "-" ]; then
+      /usr/bin/codesign --force \
+        --sign "$SIGN_ID" \
+        --preserve-metadata=identifier,entitlements,flags \
+        --timestamp=none \
+        "$candidate" 2>/dev/null && echo "fix_mediapipe: re-signed $candidate" || true
+    fi
+  fi
+done
 
 exit 0
