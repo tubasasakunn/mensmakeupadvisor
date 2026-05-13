@@ -6,8 +6,11 @@
 #       App Store 提出時に以下エラーになる:
 #         ITMS-90530 / ITMS-90360 / ITMS-90056 / ITMS-90057
 #
-# 対策: ビルド前に SPM チェックアウト内の Info.plist を正しい内容に書き換える。
-#       DerivedData クリーン後も毎ビルドで自動修復されるように常時実行する。
+# 対策:
+#   [1] ビルド前に SPM チェックアウト内の Info.plist を修正 → Xcode が正しい
+#       plist で embed + 署名するため、コード署名が壊れない。
+#   [2] 万が一 SPM チェックアウトが見つからない場合は embed 済みバンドルも修正し、
+#       必ず再署名する。再署名失敗時はビルドエラーにして破損 IPA の提出を防ぐ。
 
 set -eu
 
@@ -41,13 +44,12 @@ CORRECT_PLIST='<?xml version="1.0" encoding="UTF-8"?>
 </dict>
 </plist>'
 
+# 戻り値: 0=スキップ（既に正しい）, 1=パッチ済み
 patch_plist() {
   local plist="$1"
   if [ ! -f "$plist" ]; then
-    echo "note: fix_mediapipe: not found, skipping: $plist"
     return 0
   fi
-  # 既に正しい内容ならスキップ（CFBundleShortVersionString の有無で判定）
   if /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$plist" > /dev/null 2>&1; then
     echo "note: fix_mediapipe: already correct: $plist"
     return 0
@@ -55,38 +57,46 @@ patch_plist() {
   chmod u+w "$plist"
   printf '%s\n' "$CORRECT_PLIST" > "$plist"
   echo "fix_mediapipe: patched $plist"
+  return 1
 }
 
-# ── 1. SPM チェックアウト内を修復（DerivedData クリーン後も次ビルドで自動修復）
-# SYMROOT は常に .../DerivedData/<ID>/Build/... の形式なので、Build より前を取り出す
+# ── 1. SPM チェックアウト内を修復（embed 前に直すため署名を壊さない）
+# SYMROOT は .../DerivedData/<ID>/Build/... の形式なので Build より前を取り出す
 DERIVED_DATA_ROOT="${SYMROOT%%/Build/*}"
 SPM_XCFW="$DERIVED_DATA_ROOT/SourcePackages/checkouts/SwiftTasksVision/Dependencies/MediaPipeTasksVision.xcframework"
 
 if [ -d "$SPM_XCFW" ]; then
-  patch_plist "$SPM_XCFW/ios-arm64/MediaPipeTasksVision.framework/Info.plist"
-  patch_plist "$SPM_XCFW/ios-arm64_x86_64-simulator/MediaPipeTasksVision.framework/Info.plist"
+  patch_plist "$SPM_XCFW/ios-arm64/MediaPipeTasksVision.framework/Info.plist"             || true
+  patch_plist "$SPM_XCFW/ios-arm64_x86_64-simulator/MediaPipeTasksVision.framework/Info.plist" || true
 else
-  echo "note: fix_mediapipe: SPM checkout not found at $SPM_XCFW (will retry on next build)"
+  echo "note: fix_mediapipe: SPM checkout not found at $SPM_XCFW"
 fi
 
-# ── 2. ビルド済みバンドル内も修復（Archive / Install 時のベルト & サスペンダー）
+# ── 2. embed 済みバンドル内も確認（[1] が成功していれば "already correct" で素通り）
+#       実際にパッチした場合のみ再署名。再署名失敗はビルドエラーにする。
+SIGN_ID="${EXPANDED_CODE_SIGN_IDENTITY:-${CODE_SIGN_IDENTITY:-}}"
+
 for candidate in \
   "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/MediaPipeTasksVision.framework" \
   "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MediaPipeTasksVision.framework" \
   "${CODESIGNING_FOLDER_PATH}/Frameworks/MediaPipeTasksVision.framework" \
   "${DSTROOT:-}/Applications/${WRAPPER_NAME}/Frameworks/MediaPipeTasksVision.framework"
 do
-  if [ -d "$candidate" ]; then
-    patch_plist "$candidate/Info.plist"
+  [ -d "$candidate" ] || continue
 
-    # Info.plist 変更後に再署名（署名 ID がある場合のみ）
-    SIGN_ID="${EXPANDED_CODE_SIGN_IDENTITY:-${CODE_SIGN_IDENTITY:-}}"
+  # patch_plist の戻り値で「実際に書き換えたか」を判定
+  if patch_plist "$candidate/Info.plist"; then
+    # 戻り値 0 = 変更なし → 署名を触らない
+    :
+  else
+    # 戻り値 1 = plist を書き換えた → 必ず再署名（失敗したらビルドエラー）
     if [ -n "$SIGN_ID" ] && [ "$SIGN_ID" != "-" ]; then
-      /usr/bin/codesign --force \
-        --sign "$SIGN_ID" \
-        --preserve-metadata=identifier,entitlements,flags \
-        --timestamp=none \
-        "$candidate" 2>/dev/null && echo "fix_mediapipe: re-signed $candidate" || true
+      echo "fix_mediapipe: re-signing $candidate"
+      /usr/bin/codesign --force --sign "$SIGN_ID" --timestamp=none "$candidate" \
+        || { echo "error: fix_mediapipe: codesign failed for $candidate" >&2; exit 1; }
+      echo "fix_mediapipe: re-signed $candidate"
+    else
+      echo "note: fix_mediapipe: no signing identity — skipping re-sign of $candidate"
     fi
   fi
 done
