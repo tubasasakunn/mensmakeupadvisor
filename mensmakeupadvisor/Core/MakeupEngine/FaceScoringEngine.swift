@@ -59,7 +59,23 @@ nonisolated enum FaceScoringEngine {
             return FaceScore(name: name, score: clampInt(intScore), advice: FaceScore.pickAdvice(name: name, score: clampInt(intScore)))
         }
 
-        return AnalysisResult(faceShape: bestType.faceShape, scores: scores)
+        // DiagnosisView でメッシュと比率線を描画するために、478 ランドマークと
+        // 主要指標を AnalysisResult に同梱する。
+        let w = max(1.0, Double(faceMesh.imageSize.width))
+        let h = max(1.0, Double(faceMesh.imageSize.height))
+        let normalized = faceMesh.landmarksPx.map { px in
+            CGPoint(x: Double(px.x) / w, y: Double(px.y) / h)
+        }
+        let metrics = FaceMetricsCalculator.measure(faceMesh: faceMesh)
+
+        return AnalysisResult(
+            faceShape: bestType.faceShape,
+            scores: scores,
+            landmarksNormalized: normalized,
+            imageWidthPx: Int(w),
+            imageHeightPx: Int(h),
+            metrics: metrics
+        )
     }
 
     private nonisolated static func clamp(_ value: Double) -> Double {

@@ -40,8 +40,12 @@ struct DiagnosisView: View {
                             .padding(.top, 20)
                             .padding(.horizontal, 24)
 
-                        DiagnosisFaceMeshPlate(capturedImage: appState.capturedImage)
+                        DiagnosisFaceMeshPlate(capturedImage: appState.capturedImage, result: result)
                             .padding(.top, 20)
+                            .padding(.horizontal, 24)
+
+                        DiagnosisProportionPlate(capturedImage: appState.capturedImage, result: result)
+                            .padding(.top, 16)
                             .padding(.horizontal, 24)
 
                         dividerLine

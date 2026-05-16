@@ -3,6 +3,25 @@ import SwiftUI
 nonisolated struct AnalysisResult: Sendable {
     let faceShape: FaceShape
     let scores: [FaceScore]
+    // DiagnosisView でメッシュ・比率線を画像に重ねるための実検出データ。
+    // モック/フォールバックでは nil。
+    var landmarksNormalized: [CGPoint]? = nil  // 478点、x/y は 0-1 正規化
+    var imageWidthPx: Int? = nil
+    var imageHeightPx: Int? = nil
+    var metrics: FaceMetrics? = nil
+
+    init(faceShape: FaceShape, scores: [FaceScore],
+         landmarksNormalized: [CGPoint]? = nil,
+         imageWidthPx: Int? = nil,
+         imageHeightPx: Int? = nil,
+         metrics: FaceMetrics? = nil) {
+        self.faceShape = faceShape
+        self.scores = scores
+        self.landmarksNormalized = landmarksNormalized
+        self.imageWidthPx = imageWidthPx
+        self.imageHeightPx = imageHeightPx
+        self.metrics = metrics
+    }
 
     var totalScore: Int {
         guard !scores.isEmpty else { return 0 }

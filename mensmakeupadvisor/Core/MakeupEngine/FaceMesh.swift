@@ -281,6 +281,10 @@ nonisolated final class FaceMesh {
     nonisolated(unsafe) private static var cachedTesselation: [(Int, Int)] = []
     private static let tesselationLock = NSLock()
 
+    nonisolated static func tesselationConnections() -> [(Int, Int)] {
+        (try? loadTesselationConnections()) ?? []
+    }
+
     private nonisolated static func loadTesselationConnections() throws -> [(Int, Int)] {
         tesselationLock.lock()
         defer { tesselationLock.unlock() }

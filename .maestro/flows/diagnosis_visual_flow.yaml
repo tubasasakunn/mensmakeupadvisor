@@ -1,0 +1,37 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# DiagnosisView のメッシュ + 比率視覚化スクリーンショット採取
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: "onboarding_skip_button"
+    timeout: 8000
+
+- tapOn:
+    id: "onboarding_skip_button"
+
+- tapOn:
+    id: "advice_sample_button"
+
+- extendedWaitUntil:
+    visible:
+      id: "diagnosis_view"
+    timeout: 30000
+
+# メッシュプレートが見える位置までスクロール（小さめ）
+- swipe:
+    start: 50%, 70%
+    end: 50%, 30%
+    duration: 400
+
+- takeScreenshot: /tmp/maestro_screens/diagnosis_mesh
+
+# 比率プレートが見える位置までさらに少しスクロール
+- swipe:
+    start: 50%, 70%
+    end: 50%, 40%
+    duration: 400
+
+- takeScreenshot: /tmp/maestro_screens/diagnosis_proportions
