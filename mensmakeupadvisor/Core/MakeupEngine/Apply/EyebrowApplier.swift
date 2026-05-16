@@ -55,6 +55,10 @@ nonisolated enum EyebrowApplier {
             space: CGColorSpaceCreateDeviceGray(),
             bitmapInfo: CGImageAlphaInfo.none.rawValue
         ) else { return mask }
+        // landmarksPx は画像座標(Y-DOWN)。CGContext は Y-UP なので flip しないと
+        // 眉ポリゴンが上下反転して描かれ、消す位置/描く位置がズレる。
+        ctx.translateBy(x: 0, y: CGFloat(height))
+        ctx.scaleBy(x: 1, y: -1)
         ctx.setFillColor(gray: 1.0, alpha: 1.0)
 
         let pairs: [(upper: [Int], lower: [Int])] = [
@@ -347,6 +351,9 @@ nonisolated enum EyebrowApplier {
             data: mask.dataPointer, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w,
             space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue
         ) else { return image }
+        // anchors / polygonFromShape は画像座標(Y-DOWN)で計算しているため CTM を反転。
+        ctx.translateBy(x: 0, y: CGFloat(h))
+        ctx.scaleBy(x: 1, y: -1)
         ctx.setFillColor(gray: 1.0, alpha: 1.0)
 
         for side in [Side.right, .left] {

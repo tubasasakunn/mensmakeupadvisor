@@ -72,6 +72,10 @@ nonisolated enum EyeApplier {
             space: CGColorSpaceCreateDeviceGray(),
             bitmapInfo: CGImageAlphaInfo.none.rawValue
         ) else { return image }
+        // landmarksPx は画像座標(Y-DOWN)。CGContext は Y-UP なので CTM を反転して
+        // 画像座標で stroke を描けるようにする (詳細は FaceMesh.buildMask のコメント参照)。
+        ctx.translateBy(x: 0, y: CGFloat(h))
+        ctx.scaleBy(x: 1, y: -1)
 
         let faceWPx = abs(faceMesh.landmarksPx[FaceLandmarkID.templeR].x - faceMesh.landmarksPx[FaceLandmarkID.templeL].x)
         let thickness = max(2.0, Double(faceWPx) * 0.012 * data.thickness * Double(data.thicknessScale))

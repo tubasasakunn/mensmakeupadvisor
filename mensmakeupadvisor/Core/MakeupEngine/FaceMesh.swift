@@ -155,6 +155,16 @@ nonisolated final class FaceMesh {
             bitmapInfo: CGImageAlphaInfo.none.rawValue
         ) else { return mask }
 
+        // CGBitmapContext の user space は Y-UP（左下原点）。一方 landmarksPx /
+        // trianglePixels は画像座標 (Y-DOWN, 左上原点) で渡している。何もしないと
+        // mask buffer の row 0 (=画像 top) にユーザー空間 y=h の三角形が書き込まれ、
+        // 結果としてマスクが上下反転する。Compositing 側は buffer[y*w+x] を
+        // 画像座標で解釈するため、マスクと画像のピクセル対応がズレて
+        // 「化粧が顔と違う位置に乗る/効いていないように見える」原因になる。
+        // ここで CTM を Y-flip して画像座標で path を解釈できるようにする。
+        context.translateBy(x: 0, y: CGFloat(height))
+        context.scaleBy(x: 1, y: -1)
+
         context.setFillColor(gray: 1.0, alpha: 1.0)
         for mid in meshIDs where triangles.indices.contains(mid) {
             let pts = trianglePixels(triangleID: mid, width: width, height: height)
