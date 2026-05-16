@@ -2,6 +2,7 @@ import Observation
 import SwiftUI
 
 @Observable
+@MainActor
 final class AppRouter {
     var path: NavigationPath = NavigationPath()
 

@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 
 @Observable
+@MainActor
 final class AdviceViewModel {
     var showImagePicker = false
     var errorMessage: String?

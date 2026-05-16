@@ -296,8 +296,8 @@ nonisolated enum EyebrowApplier {
             let sorted = pts.sorted { $0.0 < $1.0 }
             let ts = sorted.map { $0.0 }
             let offs = sorted.map { $0.1 }
-            let tMin = ts.first!
-            let tMax = ts.last!
+            let tMin = ts[0]
+            let tMax = ts[ts.count - 1]
             var out: [(Double, Double)] = []
             for i in 0..<n {
                 let t = tMin + (tMax - tMin) * Double(i) / Double(n - 1)

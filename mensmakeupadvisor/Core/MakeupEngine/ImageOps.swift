@@ -20,30 +20,28 @@ import UIKit
 nonisolated final class MaskBuffer {
     let width: Int
     let height: Int
-    nonisolated(unsafe) private var storage: UnsafeMutableBufferPointer<UInt8>
+    nonisolated(unsafe) private let basePointer: UnsafeMutablePointer<UInt8>
 
     nonisolated init(width: Int, height: Int) {
         self.width = width
         self.height = height
-        let raw = UnsafeMutableRawPointer.allocate(byteCount: width * height, alignment: 16)
-        raw.initializeMemory(as: UInt8.self, repeating: 0, count: width * height)
-        storage = UnsafeMutableBufferPointer(
-            start: raw.assumingMemoryBound(to: UInt8.self),
-            count: width * height
-        )
+        let totalCount = width * height
+        let raw = UnsafeMutableRawPointer.allocate(byteCount: totalCount, alignment: 16)
+        raw.initializeMemory(as: UInt8.self, repeating: 0, count: totalCount)
+        self.basePointer = raw.assumingMemoryBound(to: UInt8.self)
     }
 
     deinit {
-        UnsafeMutableRawPointer(storage.baseAddress!).deallocate()
+        UnsafeMutableRawPointer(basePointer).deallocate()
     }
 
-    nonisolated var dataPointer: UnsafeMutableRawPointer { UnsafeMutableRawPointer(storage.baseAddress!) }
-    nonisolated var pointer: UnsafeMutablePointer<UInt8> { storage.baseAddress! }
+    nonisolated var dataPointer: UnsafeMutableRawPointer { UnsafeMutableRawPointer(basePointer) }
+    nonisolated var pointer: UnsafeMutablePointer<UInt8> { basePointer }
     nonisolated var count: Int { width * height }
 
     nonisolated subscript(x: Int, y: Int) -> UInt8 {
-        get { storage[y * width + x] }
-        set { storage[y * width + x] = newValue }
+        get { basePointer[y * width + x] }
+        set { basePointer[y * width + x] = newValue }
     }
 }
 
@@ -52,32 +50,30 @@ nonisolated final class MaskBuffer {
 nonisolated final class FloatBuffer {
     let width: Int
     let height: Int
-    nonisolated(unsafe) var storage: UnsafeMutableBufferPointer<Float>
+    nonisolated(unsafe) private let basePointer: UnsafeMutablePointer<Float>
 
     nonisolated init(width: Int, height: Int) {
         self.width = width
         self.height = height
+        let totalCount = width * height
         let raw = UnsafeMutableRawPointer.allocate(
-            byteCount: width * height * MemoryLayout<Float>.stride,
+            byteCount: totalCount * MemoryLayout<Float>.stride,
             alignment: 16
         )
-        raw.initializeMemory(as: Float.self, repeating: 0, count: width * height)
-        storage = UnsafeMutableBufferPointer(
-            start: raw.assumingMemoryBound(to: Float.self),
-            count: width * height
-        )
+        raw.initializeMemory(as: Float.self, repeating: 0, count: totalCount)
+        self.basePointer = raw.assumingMemoryBound(to: Float.self)
     }
 
     deinit {
-        UnsafeMutableRawPointer(storage.baseAddress!).deallocate()
+        UnsafeMutableRawPointer(basePointer).deallocate()
     }
 
-    nonisolated var pointer: UnsafeMutablePointer<Float> { storage.baseAddress! }
+    nonisolated var pointer: UnsafeMutablePointer<Float> { basePointer }
     nonisolated var count: Int { width * height }
 
     nonisolated subscript(x: Int, y: Int) -> Float {
-        get { storage[y * width + x] }
-        set { storage[y * width + x] = newValue }
+        get { basePointer[y * width + x] }
+        set { basePointer[y * width + x] = newValue }
     }
 
     nonisolated static func fromMask(_ mask: MaskBuffer) -> FloatBuffer {
