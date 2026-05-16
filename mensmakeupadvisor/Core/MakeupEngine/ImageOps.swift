@@ -298,10 +298,13 @@ nonisolated enum Compositing {
     // alpha_composite_normal: 線形ブレンド
     nonisolated static func normal(image: CGImage, mask: FloatBuffer,
                        color: SIMD3<Float>, intensity: Float) -> CGImage? {
+        // src は 0-1 に正規化済みなので color も 0-1 に揃える。
+        // 揃えないと出力が極端に明るくなり、最終的に白飛びする。
+        let cn = color / 255.0
         return applyBlend(image: image, mask: mask, intensity: intensity) { src, m in
-            let r = src.x * (1 - m) + color.x * m
-            let g = src.y * (1 - m) + color.y * m
-            let b = src.z * (1 - m) + color.z * m
+            let r = src.x * (1 - m) + cn.x * m
+            let g = src.y * (1 - m) + cn.y * m
+            let b = src.z * (1 - m) + cn.z * m
             return SIMD3<Float>(r, g, b)
         }
     }

@@ -115,12 +115,14 @@ struct StudioImagePlate: View {
                     .frame(width: width, height: height)
                     .clipped()
             } else if let img = appState.capturedImage {
+                // renderedImage がまだ無いときは撮影画像をそのまま見せる。
+                // 以前はここに intensity 連動の LinearGradient をかぶせていたが、
+                // 実エンジンが効いていないのに「動いている風」に見えて誤解の元だった。
                 Image(uiImage: img)
                     .resizable()
                     .scaledToFill()
                     .frame(width: width, height: height)
                     .clipped()
-                    .overlay(makeupCompositeOverlay)
             } else {
                 ZStack {
                     Color(white: 0.10)
@@ -158,22 +160,6 @@ struct StudioImagePlate: View {
             Spacer()
         }
         .padding(8)
-    }
-
-    private var makeupCompositeOverlay: some View {
-        let intensity = appState.intensity
-        return ZStack {
-            LinearGradient(
-                colors: [Color.clear, Color.ivory.opacity(intensity.highlight / 250)],
-                startPoint: .bottom,
-                endPoint: .top
-            )
-            LinearGradient(
-                colors: [Color.clear, Color(white: 0.05).opacity(intensity.shadow / 200)],
-                startPoint: .center,
-                endPoint: .leading
-            )
-        }
     }
 
     private func placeholderHalf(width: CGFloat, height: CGFloat) -> some View {

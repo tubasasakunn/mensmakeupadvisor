@@ -1,0 +1,57 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# 化粧反映の視覚確認スモーク。モックを使わず Studio までいき、
+# プリセット適用前後のスクリーンショットを撮る。
+# /tmp/maestro_screens/ に出力される。
+
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: "onboarding_skip_button"
+    timeout: 8000
+
+- tapOn:
+    id: "onboarding_skip_button"
+
+- tapOn:
+    id: "advice_sample_button"
+
+- extendedWaitUntil:
+    visible:
+      id: "diagnosis_view"
+    timeout: 30000
+
+# 診断画面の最下部までスクロール
+- swipe:
+    direction: UP
+- swipe:
+    direction: UP
+- swipe:
+    direction: UP
+
+- tapOn:
+    id: "diagnosis_skip_button"
+
+- extendedWaitUntil:
+    visible:
+      id: "studio_view"
+    timeout: 10000
+
+# 初期状態 (intensity=0) のスクリーンショット
+- takeScreenshot: /tmp/maestro_screens/studio_before
+
+# 一番濃い "k-style" プリセットでレンダリングを試す
+- tapOn:
+    id: "studio_preset_k-style"
+
+# レンダリング完了 + 画像反映を待つ。Release で 200ms 程度、Debug は数十秒〜長時間。
+- waitForAnimationToEnd:
+    timeout: 60000
+
+# 画像差し替えが UI に反映されるための余裕
+- swipe:
+    direction: DOWN
+
+- takeScreenshot: /tmp/maestro_screens/studio_after_kstyle

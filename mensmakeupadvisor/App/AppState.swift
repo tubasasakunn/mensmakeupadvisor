@@ -1,5 +1,8 @@
+import OSLog
 import SwiftUI
 import UIKit
+
+private let renderLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "Render")
 
 enum AppScreen: Equatable {
     case splash, onboarding, capture, analyzing, diagnosis, tutorial, studio, archive
@@ -38,6 +41,7 @@ final class AppState {
 
     // 化粧反映を非同期で要求する。短時間に複数回呼ばれても直近の 1 回だけ実行する。
     func requestMakeupRender() {
+        renderLog.notice("requestMakeupRender: invoked — base=\(Int(self.intensity.base), privacy: .public) hl=\(Int(self.intensity.highlight), privacy: .public) sh=\(Int(self.intensity.shadow), privacy: .public)")
         renderTask?.cancel()
         let snapshot = intensity
         renderTask = Task { [weak self] in
@@ -47,12 +51,15 @@ final class AppState {
             if Task.isCancelled { return }
             self.isRenderingMakeup = true
             defer { self.isRenderingMakeup = false }
+            let started = Date()
             do {
                 let img = try await self.makeupEngine.render(intensity: snapshot)
                 if Task.isCancelled { return }
                 self.renderedImage = img
+                let ms = Int(Date().timeIntervalSince(started) * 1000)
+                renderLog.notice("render: ok in \(ms, privacy: .public)ms — base=\(Int(snapshot.base), privacy: .public) hl=\(Int(snapshot.highlight), privacy: .public) sh=\(Int(snapshot.shadow), privacy: .public) eye=\(Int(snapshot.eye), privacy: .public) brow=\(Int(snapshot.eyebrow), privacy: .public)")
             } catch {
-                // エンジン未準備等は無視 (capturedImage を使う)
+                renderLog.error("render: failed — \(String(describing: error), privacy: .public)")
             }
         }
     }

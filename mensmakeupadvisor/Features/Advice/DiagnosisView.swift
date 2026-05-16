@@ -61,6 +61,8 @@ struct DiagnosisView: View {
                 }
             }
         }
+        // 親に付けた identifier を子の Button (BACK / BEGIN / SKIP) に継承させない。
+        .accessibilityElement(children: .contain)
         .aid("diagnosis_view")
     }
 
