@@ -1,16 +1,20 @@
 struct MakeupIntensity: Sendable {
-    var base: Double = 25
-    var highlight: Double = 20
-    var shadow: Double = 18
-    var eye: Double = 18
-    var eyebrow: Double = 30
+    // 初期値は全 0 = 化粧無し。Studio に入った直後は素の写真を見せ、
+    // プリセット適用 or FINE TUNE スライダー操作で明確に「化粧 ON」が
+    // 分かるようにする。以前は初期値が入っていたため、画面に来た瞬間から
+    // 中途半端な化粧が乗っており「変化していないように見える」原因だった。
+    var base: Double = 0
+    var highlight: Double = 0
+    var shadow: Double = 0
+    var eye: Double = 0
+    var eyebrow: Double = 0
 
     init(
-        base: Double = 25,
-        highlight: Double = 20,
-        shadow: Double = 18,
-        eye: Double = 18,
-        eyebrow: Double = 30
+        base: Double = 0,
+        highlight: Double = 0,
+        shadow: Double = 0,
+        eye: Double = 0,
+        eyebrow: Double = 0
     ) {
         self.base = base
         self.highlight = highlight

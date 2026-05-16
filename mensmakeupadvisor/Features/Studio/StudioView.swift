@@ -38,6 +38,8 @@ struct StudioView: View {
                 savedNotification
             }
         }
+        // 親 identifier が子の Button/Toggle 等に継承されないようにする
+        .accessibilityElement(children: .contain)
         .aid("studio_view")
         // makeup_claude の MakeupRenderer に強度変更を流す。
         // intensity の値変化で task が再起動 → AppState 側で debounce している。

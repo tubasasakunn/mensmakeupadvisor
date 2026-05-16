@@ -1,0 +1,65 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# FINE TUNE モードで base スライダーだけを動かし、顔の領域内に化粧が
+# 限定されているかを目視確認するためのスクリーンショット採取フロー。
+- launchApp:
+    clearState: true
+
+- extendedWaitUntil:
+    visible:
+      id: "onboarding_skip_button"
+    timeout: 8000
+
+- tapOn:
+    id: "onboarding_skip_button"
+
+- tapOn:
+    id: "advice_sample_button"
+
+- extendedWaitUntil:
+    visible:
+      id: "diagnosis_view"
+    timeout: 30000
+
+- swipe:
+    start: 50%, 80%
+    end: 50%, 20%
+    duration: 400
+- swipe:
+    start: 50%, 80%
+    end: 50%, 20%
+    duration: 400
+- swipe:
+    start: 50%, 80%
+    end: 50%, 20%
+    duration: 400
+- swipe:
+    start: 50%, 80%
+    end: 50%, 20%
+    duration: 400
+
+- tapOn:
+    id: "diagnosis_skip_button"
+
+- extendedWaitUntil:
+    visible:
+      id: "studio_view"
+    timeout: 10000
+
+# AFTER だけが見えるよう FINE TUNE モードに切り替える
+- tapOn:
+    id: "studio_finetune_button"
+
+# 何も化粧していない素の画像
+- takeScreenshot: /tmp/maestro_screens/ft_00_zero
+
+# base スライダーを思いっきり右に動かす（座標で操作）
+- swipe:
+    start: 10%, 60%
+    end: 90%, 60%
+    duration: 600
+
+- waitForAnimationToEnd:
+    timeout: 8000
+
+- takeScreenshot: /tmp/maestro_screens/ft_01_base_max

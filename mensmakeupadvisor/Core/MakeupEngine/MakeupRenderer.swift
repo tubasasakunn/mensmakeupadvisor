@@ -40,6 +40,12 @@ nonisolated struct MakeupRenderer {
         // CGImage は imageOrientation を持たないため、ここで .up に正規化しないと
         // 各 Applier の mask 座標がピクセル方向とユーザー方向で 90° ズレる。
         let image = rawImage.uprightOriented()
+        // すべての intensity が 0 なら何も合成せずに元画像を返す（化粧 OFF）。
+        // Studio 入場直後を「素の写真」として確実に見せるため。
+        if intensity.base <= 0, intensity.highlight <= 0, intensity.shadow <= 0,
+           intensity.eye <= 0, intensity.eyebrow <= 0 {
+            return image
+        }
         guard var current = image.safeCGImage else { return image }
         // 顔検出が失敗していて三角形が無い場合は元画像を返す
         guard !faceMesh.triangles.isEmpty else { return image }
