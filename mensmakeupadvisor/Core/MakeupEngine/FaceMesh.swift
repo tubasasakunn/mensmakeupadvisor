@@ -82,8 +82,15 @@ nonisolated final class FaceMesh {
     }
 
     @discardableResult
-    nonisolated func detect(image: UIImage) throws -> DetectionResult {
+    nonisolated func detect(image rawImage: UIImage) throws -> DetectionResult {
         guard let landmarker else { throw FaceMeshError.modelMissing }
+
+        // パイプライン外から orientation 付き UIImage が来た場合に備えて
+        // ここでも .up に正規化する。すでに .up なら no-op。
+        let image = rawImage.uprightOriented()
+        if rawImage.imageOrientation != .up {
+            faceMeshLog.notice("detect: normalized orientation \(rawImage.imageOrientation.rawValue, privacy: .public) → .up")
+        }
 
         let mpImage = try MPImage(uiImage: image)
         let result = try landmarker.detect(image: mpImage)

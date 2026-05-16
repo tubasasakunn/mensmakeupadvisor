@@ -41,6 +41,9 @@ nonisolated enum HighlightApplier {
         GaussianBlur.apply(dist, ksize: kInner)
         let kOuter = Int(Double(faceH) * 0.02 * Double(options.blurScale))
         GaussianBlur.apply(dist, ksize: kOuter)
+        // Blur で highlight が顔範囲外に滲み出して背景まで明るくなるのを止める。
+        let maskF = FloatBuffer.fromMask(mask)
+        BufferNormalize.multiply(dist, with: maskF)
 
         // 5. 加算合成
         return Compositing.additive(image: image, mask: dist, color: options.colorRGB, intensity: options.intensity)

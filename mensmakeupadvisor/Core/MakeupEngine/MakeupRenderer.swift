@@ -34,9 +34,12 @@ nonisolated struct MakeupRenderer {
         Float(max(0.0, min(100.0, value)) / 100.0)
     }
 
-    nonisolated static func render(image: UIImage, faceMesh: FaceMesh,
+    nonisolated static func render(image rawImage: UIImage, faceMesh: FaceMesh,
                        intensity: MakeupIntensity,
                        selection: LayerSelection = .default) -> UIImage {
+        // CGImage は imageOrientation を持たないため、ここで .up に正規化しないと
+        // 各 Applier の mask 座標がピクセル方向とユーザー方向で 90° ズレる。
+        let image = rawImage.uprightOriented()
         guard var current = image.safeCGImage else { return image }
         // 顔検出が失敗していて三角形が無い場合は元画像を返す
         guard !faceMesh.triangles.isEmpty else { return image }

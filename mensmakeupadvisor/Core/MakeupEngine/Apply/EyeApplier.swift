@@ -45,12 +45,15 @@ nonisolated enum EyeApplier {
         let h = image.height
         let mask = faceMesh.buildMask(meshIDs: meshIDs, width: w, height: h)
         let soft = FloatBuffer.fromMask(mask)
+        let hard = FloatBuffer.fromMask(mask)
         let faceH = max(1.0, hypot(
             faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].x - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].x,
             faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].y - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].y
         ))
         let ksize = Int(Double(faceH) * 0.03 * Double(config.blurScale))
         GaussianBlur.apply(soft, ksize: ksize)
+        // 目周り色が頬まで滲み出すのを抑える
+        BufferNormalize.multiply(soft, with: hard)
         return composite(image: image, mask: soft, color: config.colorRGB, intensity: config.intensity, blend: config.blend)
     }
 

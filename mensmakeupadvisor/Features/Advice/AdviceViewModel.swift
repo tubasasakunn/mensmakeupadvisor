@@ -8,14 +8,17 @@ final class AdviceViewModel {
     var errorMessage: String?
 
     func selectImage(_ image: UIImage, appState: AppState) {
-        appState.capturedImage = image
+        // ピッカー/カメラから来た画像は imageOrientation が .right などになって
+        // いることが多い。MediaPipe や MakeupRenderer の座標系を揃えるため、
+        // ここで .up に正規化してから以降のパイプラインに流す。
+        appState.capturedImage = image.uprightOriented()
         appState.navigate(to: .analyzing)
     }
 
     func useSample(appState: AppState) {
         // サンプル画像でも MediaPipe を実走させたいので AnalyzingView に流す。
         // 検出失敗時は AnalysisService が .fallback を返す。
-        let sampleImage = UIImage(named: "sample_face") ?? makeSamplePlaceholderImage()
+        let sampleImage = (UIImage(named: "sample_face") ?? makeSamplePlaceholderImage()).uprightOriented()
         appState.capturedImage = sampleImage
         appState.navigate(to: .analyzing)
     }
