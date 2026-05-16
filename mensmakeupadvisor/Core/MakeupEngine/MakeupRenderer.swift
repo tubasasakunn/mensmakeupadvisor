@@ -54,7 +54,7 @@ nonisolated struct MakeupRenderer {
         if selection.applyBase, intensity.base > 0 {
             let opts = BaseApplier.Options(
                 colorRGB: SIMD3<Float>(235, 200, 170),
-                intensity: 0.30 * normalize(intensity.base)
+                intensity: 0.60 * normalize(intensity.base)  // bumped 0.30 → 0.60
             )
             if let out = BaseApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
                 current = out
@@ -69,7 +69,7 @@ nonisolated struct MakeupRenderer {
                 let opts = ShadowApplier.Options(
                     meshIDs: area.meshIDs,
                     colorRGB: SIMD3<Float>(90, 68, 50),
-                    intensity: 0.25 * scale
+                    intensity: 0.60 * scale  // bumped 0.25 → 0.60 で視覚的に明確化
                 )
                 if let out = ShadowApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
                     current = out
@@ -85,7 +85,7 @@ nonisolated struct MakeupRenderer {
                 let opts = HighlightApplier.Options(
                     meshIDs: area.meshIDs,
                     colorRGB: SIMD3<Float>(255, 255, 255),
-                    intensity: 0.12 * scale
+                    intensity: 0.45 * scale  // bumped 0.12 → 0.45 で視覚的に明確化
                 )
                 if let out = HighlightApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
                     current = out
