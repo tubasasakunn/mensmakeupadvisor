@@ -44,6 +44,9 @@ final class AppState {
         renderLog.notice("requestMakeupRender: invoked — base=\(Int(self.intensity.base), privacy: .public) hl=\(Int(self.intensity.highlight), privacy: .public) sh=\(Int(self.intensity.shadow), privacy: .public)")
         renderTask?.cancel()
         let snapshot = intensity
+        // makeup_claude POC と同じく、顔判定で得た FaceShape ごとに highlight/shadow
+        // のエリア prefix を切り替える。顔判定前は tamago 相当 (LayerSelection.default)。
+        let selection = MakeupRenderer.LayerSelection.forFaceShape(self.analysisResult?.faceShape)
         renderTask = Task { [weak self] in
             guard let self else { return }
             // 連続スライド時に過剰な再計算を抑える
@@ -53,7 +56,7 @@ final class AppState {
             defer { self.isRenderingMakeup = false }
             let started = Date()
             do {
-                let img = try await self.makeupEngine.render(intensity: snapshot)
+                let img = try await self.makeupEngine.render(intensity: snapshot, selection: selection)
                 if Task.isCancelled { return }
                 self.renderedImage = img
                 let ms = Int(Date().timeIntervalSince(started) * 1000)

@@ -19,11 +19,57 @@ nonisolated struct MakeupRenderer {
         var applyEyeliner: Bool
         var eyebrowType: EyebrowApplier.BrowType
 
+        // makeup_claude/loadmap/1-virtual-makeup/{1-1-highlight,1-2-shadow}/run_all.py
+        // の PRESET_MAP に揃える。highlight/shadow とも prefix で target.json から
+        // matching する POC のロジックそのままを Swift 側で再現する:
+        //
+        //   tamago (卵)   : highlight=base   shadow=なし
+        //   marugao (丸顔) : highlight=marugao shadow=marugao
+        //   omonaga (面長) : highlight=omonaga shadow=omonaga
+        //   gyaku (逆三角) : highlight=base   shadow=なし
+        //   base (ベース)  : highlight=base   shadow=なし
+        //
+        // 顔判定結果が手に入る前 (Studio 単独 Preview など) は tamago と同じ扱いに
+        // する (PRESET_MAP の "base" 行に相当)。
+        nonisolated static func forFaceShape(_ shape: FaceShape?) -> LayerSelection {
+            let hlPrefix: String
+            let shPrefix: String?
+            switch shape ?? .tamago {
+            case .tamago, .gyaku, .base:
+                hlPrefix = "base"
+                shPrefix = nil
+            case .marugao:
+                hlPrefix = "marugao"
+                shPrefix = "marugao"
+            case .omonaga:
+                hlPrefix = "omonaga"
+                shPrefix = "omonaga"
+            }
+            let highlightNames = MeshAreaLibrary
+                .areas(category: .highlight, prefix: hlPrefix)
+                .map(\.name)
+            let shadowNames: [String]
+            if let prefix = shPrefix {
+                shadowNames = MeshAreaLibrary
+                    .areas(category: .shadow, prefix: prefix)
+                    .map(\.name)
+            } else {
+                shadowNames = []
+            }
+            return LayerSelection(
+                highlightAreaNames: highlightNames,
+                shadowAreaNames: shadowNames,
+                applyBase: true,
+                eyeAreaNames: ["eyeshadow_base", "eyeshadow_crease", "tear_bag", "lower_outer"],
+                applyEyeliner: true,
+                eyebrowType: .natural
+            )
+        }
+
+        // Preview/Studio で顔判定結果が無い場合の既定値。tamago 相当 (=base prefix)。
         nonisolated static let `default` = LayerSelection(
             highlightAreaNames: ["base_t-zone", "base_c-zone", "base_under-eye"],
-            // omonaga (額・顎) は髪/陰で見づらいため marugao-side (頬の輪郭) も含めて
-            // SHADOW スライダーの効果を目視しやすくする
-            shadowAreaNames: ["omonaga-upper", "omonaga-lower", "marugao-side"],
+            shadowAreaNames: [],
             applyBase: true,
             eyeAreaNames: ["eyeshadow_base", "eyeshadow_crease", "tear_bag", "lower_outer"],
             applyEyeliner: true,
@@ -52,11 +98,21 @@ nonisolated struct MakeupRenderer {
         // 顔検出が失敗していて三角形が無い場合は元画像を返す
         guard !faceMesh.triangles.isEmpty else { return image }
 
+        // 各レイヤーの強度は makeup_claude POC (run_all.py の --intensity default)
+        // と完全一致させる。slider 100 で POC の default、50 で半分、と直感的に
+        // 対応するようにする。
+        //
+        //   highlight : 0.12  (1-1-highlight/run_all.py default)
+        //   shadow    : 0.25  (1-2-shadow/run_all.py default)
+        //   base      : 0.30  (1-3-base/main.py default)
+        //   eye       : 各エリア毎の AREA_DEFAULTS (eyeshadow_base=0.35 etc) × scale
+        //   eyebrow   : 0.75  (DEFAULT_EYEBROW_INTENSITY)
+
         // 1.3 ベース (顔全体)
         if selection.applyBase, intensity.base > 0 {
             let opts = BaseApplier.Options(
                 colorRGB: SIMD3<Float>(235, 200, 170),
-                intensity: 0.60 * normalize(intensity.base)  // bumped 0.30 → 0.60
+                intensity: 0.30 * normalize(intensity.base)
             )
             if let out = BaseApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
                 current = out
@@ -68,10 +124,12 @@ nonisolated struct MakeupRenderer {
             let scale = normalize(intensity.shadow)
             for name in selection.shadowAreaNames {
                 guard let area = MeshAreaLibrary.lookup(category: .shadow, name: name) else { continue }
+                // POC CLI default の RGB(139, 90, 43) (ブラウン) に揃える。
+                // 関数 default の (90, 68, 50) は実利用されない値だった。
                 let opts = ShadowApplier.Options(
                     meshIDs: area.meshIDs,
-                    colorRGB: SIMD3<Float>(90, 68, 50),
-                    intensity: 0.85 * scale  // 視覚的に明確化(0.25 → 0.85)
+                    colorRGB: SIMD3<Float>(139, 90, 43),
+                    intensity: 0.25 * scale
                 )
                 if let out = ShadowApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
                     current = out
@@ -87,7 +145,7 @@ nonisolated struct MakeupRenderer {
                 let opts = HighlightApplier.Options(
                     meshIDs: area.meshIDs,
                     colorRGB: SIMD3<Float>(255, 255, 255),
-                    intensity: 0.45 * scale  // bumped 0.12 → 0.45 で視覚的に明確化
+                    intensity: 0.12 * scale
                 )
                 if let out = HighlightApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
                     current = out
@@ -97,9 +155,7 @@ nonisolated struct MakeupRenderer {
 
         // 1.4 アイメイク
         if intensity.eye > 0 {
-            // UI スライダー連動を視覚的にする倍率。各エリアの default intensity は
-            // POC で抑えめに設定されているため、Studio では 1.8x 程度に底上げする。
-            let scale = normalize(intensity.eye) * 1.8
+            let scale = normalize(intensity.eye)
             let (meshAreas, eyeliner) = EyeApplier.loadFromTargetJSON()
             for name in selection.eyeAreaNames {
                 guard let area = meshAreas.first(where: { $0.name == name }),
@@ -107,7 +163,7 @@ nonisolated struct MakeupRenderer {
                 cfg = EyeApplier.AreaConfig(
                     name: cfg.name,
                     colorRGB: cfg.colorRGB,
-                    intensity: min(1.0, cfg.intensity * scale),
+                    intensity: cfg.intensity * scale,
                     blurScale: cfg.blurScale,
                     blend: cfg.blend
                 )
@@ -120,7 +176,7 @@ nonisolated struct MakeupRenderer {
                 lineCfg = EyeApplier.AreaConfig(
                     name: lineCfg.name,
                     colorRGB: lineCfg.colorRGB,
-                    intensity: min(1.0, lineCfg.intensity * scale),
+                    intensity: lineCfg.intensity * scale,
                     blurScale: lineCfg.blurScale,
                     blend: lineCfg.blend
                 )
