@@ -7,6 +7,10 @@ struct TutorialFacePlate: View {
     let capturedImage: UIImage?
     let showBeforeImage: Bool
     let intensity: MakeupIntensity
+    // 実エンジンが出力した after 画像。AppState.renderedImage を Tutorial 側で
+    // bind して渡す。nil の間は capturedImage を表示してフェイクオーバーレイは
+    // 出さない (画像の上だけが色変わる現象を避けるため)。
+    let renderedImage: UIImage?
 
     var body: some View {
         GeometryReader { geo in
@@ -22,14 +26,21 @@ struct TutorialFacePlate: View {
                         .scaledToFill()
                         .frame(width: width, height: height)
                         .clipped()
+                } else if let after = renderedImage {
+                    // MakeupRenderer が出力した実 after 画像をそのまま表示する。
+                    // 以前は LinearGradient(下→上の色グラデ)を被せるだけだったため
+                    // ユーザーには「画像の上の方が色変わるだけ」に見えていた。
+                    Image(uiImage: after)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: width, height: height)
+                        .clipped()
                 } else if let img = capturedImage {
                     Image(uiImage: img)
                         .resizable()
                         .scaledToFill()
                         .frame(width: width, height: height)
                         .clipped()
-                        // メイクレイヤー強度のオーバーレイ表示（抽象的）
-                        .overlay(makeupOverlay)
                 } else {
                     placeholderFace(width: width, height: height)
                 }
@@ -60,20 +71,6 @@ struct TutorialFacePlate: View {
         .aspectRatio(4.0 / 5.0, contentMode: .fit)
     }
 
-    private var makeupOverlay: some View {
-        let layer = currentStep.layer
-        let opacity = intensity[layer] / 200.0
-
-        return Rectangle()
-            .fill(
-                LinearGradient(
-                    colors: [Color.clear, overlayColor(for: layer).opacity(opacity)],
-                    startPoint: .bottom,
-                    endPoint: .top
-                )
-            )
-    }
-
     @ViewBuilder
     private func placeholderFace(width: CGFloat, height: CGFloat) -> some View {
         ZStack {
@@ -93,16 +90,6 @@ struct TutorialFacePlate: View {
             }
         }
     }
-
-    private func overlayColor(for layer: MakeupLayer) -> Color {
-        switch layer {
-        case .highlight: Color.ivory
-        case .shadow:    Color(white: 0.1)
-        case .base:      Color(red: 0.85, green: 0.72, blue: 0.6)
-        case .eye:       Color(red: 0.2, green: 0.15, blue: 0.3)
-        case .eyebrow:   Color(red: 0.3, green: 0.22, blue: 0.15)
-        }
-    }
 }
 
 #Preview {
@@ -110,7 +97,8 @@ struct TutorialFacePlate: View {
         currentStep: TutorialStep.all[0],
         capturedImage: nil,
         showBeforeImage: false,
-        intensity: MakeupIntensity()
+        intensity: MakeupIntensity(),
+        renderedImage: nil
     )
     .padding(28)
     .background(Color.appBackground)

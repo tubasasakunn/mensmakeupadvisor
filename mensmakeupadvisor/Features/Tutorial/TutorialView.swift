@@ -25,7 +25,8 @@ struct TutorialView: View {
                     currentStep: currentStep,
                     capturedImage: appState.capturedImage,
                     showBeforeImage: viewModel.showBeforeImage,
-                    intensity: appState.intensity
+                    intensity: appState.intensity,
+                    renderedImage: appState.renderedImage
                 )
                 .padding(.horizontal, 28)
 
@@ -44,7 +45,19 @@ struct TutorialView: View {
                     .padding(.horizontal, 28)
             }
         }
+        // 親 identifier "tutorial_view" が子の Button/Slider 等に継承されないようにする
+        .accessibilityElement(children: .contain)
         .aid("tutorial_view")
+        // Studio 側と同じく intensity 変化で実エンジンに渡して renderedImage を
+        // 更新する。これでスライダーの動きが顔写真上に反映される。
+        .task(id: intensityKey) {
+            await MainActor.run { appState.requestMakeupRender() }
+        }
+    }
+
+    private var intensityKey: String {
+        let i = appState.intensity
+        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))-\(Int(i.eyebrow))"
     }
 
     // MARK: - Subviews
