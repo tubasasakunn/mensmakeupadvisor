@@ -1,4 +1,5 @@
 {
+  "originHash" : "5e26c597faa3572714b4b5d172f66972a3d95963b9ba5ad8b94fc08f3d321489",
   "pins" : [
     {
       "identity" : "swifttasksvision",
@@ -10,5 +11,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

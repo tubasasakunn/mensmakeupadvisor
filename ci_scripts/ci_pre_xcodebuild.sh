@@ -4,12 +4,29 @@
 #
 # MediaPipeTasksVision.xcframework 内の各 .framework/Info.plist が
 # XCFramework 用 plist のまま誤配置されている問題を修正する。
+#
+# MinimumOSVersion は app の IPHONEOS_DEPLOYMENT_TARGET と揃える必要がある。
+# Xcode は SwiftPM の static binary target を embed する際に dylib stub を生成し、
+# その LC_BUILD_VERSION minos を app の deployment target に合わせる。
+# plist の MinimumOSVersion が低いと「バイナリは X を要求しているのに plist は Y と
+# 約束している」という不整合になり ITMS-90208 で reject される。
 
 set -eu
 
-CORRECT_PLIST='<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
+# project.pbxproj から deployment target を読み取る
+# Xcode Cloud では CI_PRIMARY_REPOSITORY_PATH がリポジトリルートを指す
+REPO_ROOT="${CI_PRIMARY_REPOSITORY_PATH:-$PWD}"
+PBX="$REPO_ROOT/mensmakeupadvisor.xcodeproj/project.pbxproj"
+MIN_OS=""
+if [ -f "$PBX" ]; then
+  MIN_OS=$(grep -m 1 'IPHONEOS_DEPLOYMENT_TARGET' "$PBX" | awk -F'= ' '{print $2}' | tr -d '; ')
+fi
+MIN_OS="${MIN_OS:-26.0}"
+echo "ci_pre_xcodebuild: using MinimumOSVersion=$MIN_OS"
+
+CORRECT_PLIST="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
@@ -28,25 +45,27 @@ CORRECT_PLIST='<?xml version="1.0" encoding="UTF-8"?>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>MinimumOSVersion</key>
-	<string>15.0</string>
+	<string>${MIN_OS}</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>
 		<integer>2</integer>
 	</array>
 </dict>
-</plist>'
+</plist>"
 
 patch_plist() {
-  local plist="$1"
+  plist="$1"
   [ -f "$plist" ] || return 0
-  if /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$plist" > /dev/null 2>&1; then
+  current=$(/usr/libexec/PlistBuddy -c "Print :MinimumOSVersion" "$plist" 2>/dev/null || echo "")
+  current_short=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$plist" 2>/dev/null || echo "")
+  if [ "$current" = "$MIN_OS" ] && [ "$current_short" = "0.10.21" ]; then
     echo "ci_pre_xcodebuild: already correct: $plist"
     return 0
   fi
   chmod u+w "$plist"
   printf '%s\n' "$CORRECT_PLIST" > "$plist"
-  echo "ci_pre_xcodebuild: patched $plist"
+  echo "ci_pre_xcodebuild: patched (MinimumOSVersion=$MIN_OS): $plist"
 }
 
 # Xcode Cloud では CI_DERIVED_DATA_PATH が設定されている
