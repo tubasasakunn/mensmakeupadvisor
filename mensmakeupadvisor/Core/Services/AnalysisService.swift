@@ -1,5 +1,8 @@
+import OSLog
 import SwiftUI
 import UIKit
+
+private let analysisLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "AnalysisService")
 
 // MARK: - Protocol
 
@@ -43,13 +46,24 @@ final class AnalysisService: AnalysisServiceProtocol, Sendable {
     }
 
     func analyze(image: UIImage, sharedEngine: MakeupEngineService?) async throws -> AnalysisResult {
-        guard image.cgImage != nil else { return .fallback }
+        guard image.cgImage != nil else {
+            analysisLog.error("analyze: image has no cgImage, returning fallback")
+            return .fallback
+        }
         let engine = sharedEngine ?? MakeupEngineService()
+        let started = Date()
         do {
             try await engine.prepare(image: image)
-            return try await engine.analyze()
+            let result = try await engine.analyze()
+            let ms = Int(Date().timeIntervalSince(started) * 1000)
+            analysisLog.notice("analyze: MediaPipe ok in \(ms, privacy: .public)ms — faceShape=\(String(describing: result.faceShape), privacy: .public) total=\(result.totalScore, privacy: .public)")
+            return result
         } catch MakeupEngineService.EngineError.faceNotDetected {
+            analysisLog.warning("analyze: face not detected, returning fallback")
             return .fallback
+        } catch {
+            analysisLog.error("analyze: MediaPipe failed — \(String(describing: error), privacy: .public)")
+            throw error
         }
     }
 }

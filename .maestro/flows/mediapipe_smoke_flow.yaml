@@ -1,0 +1,35 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# MediaPipe 実走スモーク
+# モックモードを使わず、サンプル画像で AnalysisService → MakeupEngineService → FaceMesh (MediaPipe) を実行する。
+# Xcode Console / `xcrun simctl spawn booted log stream` で subsystem=com.tubasasakun.mensmakeupadvisor
+# のログを観察すると、FaceMesh の初期化と検出ログが出る。
+
+- launchApp:
+    clearState: true
+
+# Splash → Onboarding 自動遷移を待つ
+- extendedWaitUntil:
+    visible:
+      id: "onboarding_skip_button"
+    timeout: 8000
+
+# Onboarding スキップ
+- tapOn:
+    id: "onboarding_skip_button"
+
+- assertVisible:
+    id: "advice_capture_view"
+
+# サンプル画像で分析を開始（実 AnalysisService → MediaPipe）
+- tapOn:
+    id: "advice_sample_button"
+
+- assertVisible:
+    id: "analyzing_view"
+
+# 診断画面まで遷移できれば MediaPipe 経路を踏破した証拠
+- extendedWaitUntil:
+    visible:
+      id: "diagnosis_view"
+    timeout: 30000

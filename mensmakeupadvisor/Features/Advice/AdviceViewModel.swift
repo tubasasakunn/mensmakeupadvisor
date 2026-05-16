@@ -13,11 +13,11 @@ final class AdviceViewModel {
     }
 
     func useSample(appState: AppState) {
-        // アセットから顔サンプル画像を取得、なければプレースホルダーを使用
+        // サンプル画像でも MediaPipe を実走させたいので AnalyzingView に流す。
+        // 検出失敗時は AnalysisService が .fallback を返す。
         let sampleImage = UIImage(named: "sample_face") ?? makeSamplePlaceholderImage()
         appState.capturedImage = sampleImage
-        appState.analysisResult = .mock
-        appState.navigate(to: .diagnosis)
+        appState.navigate(to: .analyzing)
     }
 
     private func makeSamplePlaceholderImage() -> UIImage {

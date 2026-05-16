@@ -26,6 +26,9 @@ struct OnboardingView: View {
                 navigationBar
             }
         }
+        // 親に付けた identifier を子に継承させない。SwiftUI のデフォルト挙動だと
+        // 子の Button の identifier が "onboarding_view" で上書きされる。
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("onboarding_view")
     }
 
@@ -40,10 +43,37 @@ struct OnboardingView: View {
                 .animation(.none, value: currentPage)
                 .accessibilityIdentifier("onboarding_page_tag")
             Spacer()
+            skipButton
         }
         .padding(.horizontal, 28)
         .padding(.top, 12)
         .padding(.bottom, 10)
+    }
+
+    private var skipButton: some View {
+        Button {
+            appState.navigate(to: .capture)
+        } label: {
+            HStack(spacing: 4) {
+                Text("SKIP")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .kerning(1.5)
+                Text("→")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+            }
+            .foregroundStyle(Color.inkSecondary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .overlay(
+                RoundedRectangle(cornerRadius: 2)
+                    .stroke(Color.inkSecondary.opacity(0.4), lineWidth: 1)
+            )
+        }
+        // 子要素の Text を1つのアクセシビリティ要素に束ね、Maestro 等から identifier で
+        // 確実にヒットさせる。
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Skip onboarding")
+        .accessibilityIdentifier("onboarding_skip_button")
     }
 
     // MARK: - Progress hairline

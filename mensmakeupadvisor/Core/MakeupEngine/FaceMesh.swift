@@ -1,7 +1,10 @@
 import CoreGraphics
 import Foundation
 import MediaPipeTasksVision
+import OSLog
 import UIKit
+
+private let faceMeshLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "FaceMesh")
 
 // MediaPipe FaceLandmarker (478点) を呼び出し、テッセレーション三角形を抽出して
 // 中点分割でメッシュを細かくする。
@@ -54,13 +57,18 @@ nonisolated final class FaceMesh {
 
     nonisolated func initialize(modelPath: String? = nil) throws {
         let resolvedPath: String
+        let source: String
         if let modelPath, !modelPath.isEmpty {
             resolvedPath = modelPath
+            source = "explicit"
         } else if let bundled = Bundle.main.path(forResource: "face_landmarker", ofType: "task") {
             resolvedPath = bundled
+            source = "bundle"
         } else if let cached = Self.cachedModelPath() {
             resolvedPath = cached
+            source = "cache"
         } else {
+            faceMeshLog.error("initialize: face_landmarker.task not found in bundle or cache")
             throw FaceMeshError.modelMissing
         }
 
@@ -70,6 +78,7 @@ nonisolated final class FaceMesh {
         options.runningMode = .image
 
         landmarker = try FaceLandmarker(options: options)
+        faceMeshLog.notice("initialize: FaceLandmarker ready (source=\(source, privacy: .public))")
     }
 
     @discardableResult
@@ -79,8 +88,10 @@ nonisolated final class FaceMesh {
         let mpImage = try MPImage(uiImage: image)
         let result = try landmarker.detect(image: mpImage)
         guard let face = result.faceLandmarks.first else {
+            faceMeshLog.warning("detect: no face detected (size=\(Int(image.size.width), privacy: .public)x\(Int(image.size.height), privacy: .public))")
             throw FaceMeshError.faceNotDetected
         }
+        faceMeshLog.notice("detect: face landmarks=\(face.count, privacy: .public) (image=\(Int(image.size.width), privacy: .public)x\(Int(image.size.height), privacy: .public))")
 
         let w = Int(image.size.width * image.scale)
         let h = Int(image.size.height * image.scale)
