@@ -7,6 +7,11 @@ struct FineTunePanelView: View {
     // type picker で操作するためここから外す。
     private let sliderLayers: [MakeupLayer] = [.base, .highlight, .shadow, .eye]
 
+    // 各カテゴリで選べる area name の一覧 (target.json 由来)。アプリ起動時に 1 回読む。
+    private let highlightAreaNames: [String] = MeshAreaLibrary.load(category: .highlight).map(\.name)
+    private let shadowAreaNames:    [String] = MeshAreaLibrary.load(category: .shadow).map(\.name)
+    private let eyeAreaNames:       [String] = ["eyeshadow_base", "eyeshadow_crease", "tear_bag", "lower_outer", "eyeliner"]
+
     var body: some View {
         @Bindable var bindable = appState
 
@@ -21,27 +26,44 @@ struct FineTunePanelView: View {
                 ForEach(sliderLayers, id: \.self) { layer in
                     layerSliderRow(layer)
                     if layer == .highlight {
-                        presetRow(
-                            title: "HIGHLIGHT TARGET",
-                            options: HighlightPreset.allCases,
-                            current: appState.highlightPreset,
-                            select: { bindable.highlightPreset = $0 },
-                            aidPrefix: "studio_highlight_preset"
+                        areaChipsSection(
+                            title: "HIGHLIGHT AREAS",
+                            areas: highlightAreaNames,
+                            selected: appState.highlightAreas,
+                            toggle: { name in toggle(name, in: &bindable.highlightAreas) },
+                            aidPrefix: "studio_highlight_area"
                         )
                     }
                     if layer == .shadow {
-                        presetRow(
-                            title: "SHADOW TARGET",
-                            options: ShadowPreset.allCases,
-                            current: appState.shadowPreset,
-                            select: { bindable.shadowPreset = $0 },
-                            aidPrefix: "studio_shadow_preset"
+                        areaChipsSection(
+                            title: "SHADOW AREAS",
+                            areas: shadowAreaNames,
+                            selected: appState.shadowAreas,
+                            toggle: { name in toggle(name, in: &bindable.shadowAreas) },
+                            aidPrefix: "studio_shadow_area"
+                        )
+                    }
+                    if layer == .eye {
+                        areaChipsSection(
+                            title: "EYE AREAS",
+                            areas: eyeAreaNames,
+                            selected: appState.eyeAreas,
+                            toggle: { name in toggle(name, in: &bindable.eyeAreas) },
+                            aidPrefix: "studio_eye_area"
                         )
                     }
                 }
 
                 browTypeRow(bindable: bindable)
             }
+        }
+    }
+
+    private func toggle(_ name: String, in set: inout Set<String>) {
+        if set.contains(name) {
+            set.remove(name)
+        } else {
+            set.insert(name)
         }
     }
 
@@ -76,39 +98,37 @@ struct FineTunePanelView: View {
         }
     }
 
-    private func presetRow<P: Identifiable & CaseIterable & Hashable>(
-        title: String,
-        options: P.AllCases,
-        current: P,
-        select: @escaping (P) -> Void,
-        aidPrefix: String
-    ) -> some View where P.AllCases: RandomAccessCollection, P: PresetLabelable {
+    // 複数選択可能な area チップ行
+    private func areaChipsSection(title: String,
+                                  areas: [String],
+                                  selected: Set<String>,
+                                  toggle: @escaping (String) -> Void,
+                                  aidPrefix: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.system(size: 9, weight: .medium, design: .monospaced))
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(2)
 
-            // 横スクロール対応で 3-4 個の選択肢を並べる
-            HStack(spacing: 6) {
-                ForEach(options) { option in
-                    let isActive = (option == current)
+            // 横並び flow layout。SwiftUI の LazyVGrid(.adaptive(min:)) で
+            // チップサイズに応じて自動折り返し。
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 72), spacing: 6)], spacing: 6) {
+                ForEach(areas, id: \.self) { name in
+                    let isOn = selected.contains(name)
                     Button {
-                        withAnimation(.easeInOut(duration: 0.15)) { select(option) }
+                        withAnimation(.easeInOut(duration: 0.12)) { toggle(name) }
                     } label: {
-                        Text(option.presetLabel)
+                        Text(MakeupAreaLabel.display(name))
                             .font(.system(size: 9, weight: .medium, design: .monospaced))
                             .kerning(1.2)
-                            .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
-                            .padding(.horizontal, 10)
+                            .foregroundStyle(isOn ? Color.appBackground : Color.ivory)
+                            .padding(.horizontal, 8)
                             .padding(.vertical, 6)
                             .frame(maxWidth: .infinity)
-                            .background(isActive ? Color.ivory : Color.clear)
-                            .overlay(
-                                Rectangle().stroke(Color.lineColor, lineWidth: 1)
-                            )
+                            .background(isOn ? Color.ivory : Color.clear)
+                            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
                     }
-                    .aid("\(aidPrefix)_\(String(describing: option.id))")
+                    .aid("\(aidPrefix)_\(name)")
                 }
             }
         }
@@ -130,23 +150,12 @@ struct FineTunePanelView: View {
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(2)
 
-            // 2 段 (横 3 個) で並べる
-            VStack(spacing: 6) {
-                HStack(spacing: 6) {
-                    ForEach(0..<3, id: \.self) { i in
-                        let entry = options[i]
-                        browTypeButton(entry: entry,
-                                       current: appState.eyebrowType,
-                                       select: { bindable.eyebrowType = $0 })
-                    }
-                }
-                HStack(spacing: 6) {
-                    ForEach(3..<6, id: \.self) { i in
-                        let entry = options[i]
-                        browTypeButton(entry: entry,
-                                       current: appState.eyebrowType,
-                                       select: { bindable.eyebrowType = $0 })
-                    }
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 88), spacing: 6)], spacing: 6) {
+                ForEach(0..<options.count, id: \.self) { i in
+                    let entry = options[i]
+                    browTypeButton(entry: entry,
+                                   current: appState.eyebrowType,
+                                   select: { bindable.eyebrowType = $0 })
                 }
             }
         }
@@ -174,13 +183,6 @@ struct FineTunePanelView: View {
         .aid("studio_brow_type_\(aidValue)")
     }
 }
-
-// preset enum 共通の表示文字列プロトコル
-protocol PresetLabelable {
-    var presetLabel: String { get }
-}
-extension HighlightPreset: PresetLabelable { var presetLabel: String { label } }
-extension ShadowPreset: PresetLabelable { var presetLabel: String { label } }
 
 // MARK: - Studio Slider
 

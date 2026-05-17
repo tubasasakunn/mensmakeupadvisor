@@ -48,12 +48,15 @@ struct StudioView: View {
         }
     }
 
-    // intensity の各値 + preset 選択を 1 つの Hashable キーに集約して
-    // task(id:) で監視する。preset 切替でも再レンダリングが走る。
+    // intensity + area 選択 + 眉 type を 1 つの Hashable キーに集約して
+    // task(id:) で監視する。area チェック切替や type 切替でも再レンダリングが走る。
     private var intensityKey: String {
         let i = appState.intensity
         let brow = appState.eyebrowType?.rawValue ?? "off"
-        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))-\(appState.highlightPreset.rawValue)-\(appState.shadowPreset.rawValue)-\(brow)"
+        let hl = appState.highlightAreas.sorted().joined(separator: ",")
+        let sh = appState.shadowAreas.sorted().joined(separator: ",")
+        let ey = appState.eyeAreas.sorted().joined(separator: ",")
+        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))|hl:\(hl)|sh:\(sh)|ey:\(ey)|br:\(brow)"
     }
 
     // MARK: - Subviews

@@ -59,7 +59,10 @@ struct TutorialView: View {
     private var intensityKey: String {
         let i = appState.intensity
         let brow = appState.eyebrowType?.rawValue ?? "off"
-        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))-\(appState.highlightPreset.rawValue)-\(appState.shadowPreset.rawValue)-\(brow)"
+        let hl = appState.highlightAreas.sorted().joined(separator: ",")
+        let sh = appState.shadowAreas.sorted().joined(separator: ",")
+        let ey = appState.eyeAreas.sorted().joined(separator: ",")
+        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))|hl:\(hl)|sh:\(sh)|ey:\(ey)|br:\(brow)"
     }
 
     // MARK: - Subviews

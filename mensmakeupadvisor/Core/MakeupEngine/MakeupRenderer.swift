@@ -19,32 +19,18 @@ nonisolated struct MakeupRenderer {
         var applyEyeliner: Bool
         var eyebrowType: EyebrowApplier.BrowType
 
-        // Studio の preset 選択 + 顔型から構築する。
-        // 各 preset は target.json の prefix と対応する。
-        // eyebrowType に nil を渡すと眉描画スキップ。
-        nonisolated static func from(highlight: HighlightPreset,
-                                      shadow: ShadowPreset,
+        // Studio で選択された個別 area set からセレクションを構築する。
+        // eyebrow=nil なら眉描画スキップ、それ以外は指定 type で描く。
+        nonisolated static func from(highlightAreas: Set<String>,
+                                      shadowAreas: Set<String>,
+                                      eyeAreas: Set<String>,
                                       eyebrow: EyebrowApplier.BrowType?) -> LayerSelection {
-            let highlightNames: [String]
-            if let prefix = highlight.targetPrefix {
-                highlightNames = MeshAreaLibrary
-                    .areas(category: .highlight, prefix: prefix)
-                    .map(\.name)
-            } else {
-                highlightNames = []
-            }
-            var shadowNames: [String] = []
-            for prefix in shadow.targetPrefixes {
-                shadowNames.append(contentsOf:
-                    MeshAreaLibrary.areas(category: .shadow, prefix: prefix).map(\.name)
-                )
-            }
             return LayerSelection(
-                highlightAreaNames: highlightNames,
-                shadowAreaNames: shadowNames,
+                highlightAreaNames: Array(highlightAreas),
+                shadowAreaNames: Array(shadowAreas),
                 applyBase: true,
-                eyeAreaNames: ["eyeshadow_base", "eyeshadow_crease", "tear_bag", "lower_outer"],
-                applyEyeliner: true,
+                eyeAreaNames: Array(eyeAreas),
+                applyEyeliner: eyeAreas.contains("eyeliner"),
                 eyebrowType: eyebrow ?? .natural
             )
         }

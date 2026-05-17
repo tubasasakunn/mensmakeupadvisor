@@ -22,12 +22,18 @@ final class AppState {
     var activePresetID: String?
     var isRenderingMakeup: Bool = false
 
-    // Studio で「どこに highlight/shadow を当てるか」をユーザーが切り替える
-    // ための選択状態。顔判定結果でデフォルトが入る。
-    var highlightPreset: HighlightPreset = .base
-    var shadowPreset: ShadowPreset = .both
-    // 眉は intensity slider ではなく type 選択で表現する。nil = 眉描画 OFF。
-    var eyebrowType: EyebrowApplier.BrowType? = .natural
+    // Studio で「どの highlight / shadow / eye エリアを当てるか」を multi-select
+    // で持つ。target.json の area name (例: "base_t-zone") の集合。顔判定結果で
+    // 初期値が決まり、ユーザーが一度でも触ったら以降は自動上書きしない。
+    var highlightAreas: Set<String> = []
+    var shadowAreas: Set<String> = []
+    var eyeAreas: Set<String> = []
+
+    // 眉は intensity slider ではなく type 選択で表現する。
+    // nil = 眉描画 OFF。デフォルトを nil にして、ユーザーが BROW TYPE を
+    // 選ぶまでは眉描画が走らないようにする (顔診断直後の画面で勝手に
+    // 眉が描き換えられないように)。
+    var eyebrowType: EyebrowApplier.BrowType? = nil
 
     private var presetsInitializedFromAnalysis = false
 
@@ -46,19 +52,21 @@ final class AppState {
         capturedImage = nil; renderedImage = nil; analysisResult = nil
         tutorialStep = 0; tutorialDone = false
         intensity = .init(); activePresetID = nil
-        highlightPreset = .base; shadowPreset = .both; eyebrowType = .natural
+        highlightAreas = []; shadowAreas = []; eyeAreas = []
+        eyebrowType = nil
         presetsInitializedFromAnalysis = false
         renderTask?.cancel(); renderTask = nil
         Task { await makeupEngine.reset() }
     }
 
-    // 顔診断完了時、ユーザーが Studio で preset を触っていなければ顔型に
-    // 応じたデフォルトを差し替える。一度でも触ったら以降は上書きしない。
+    // 顔診断完了時、ユーザーが Studio で area を触っていなければ顔型に
+    // 応じたデフォルト集合を入れる。一度でも触ったら以降は上書きしない。
     private func applyPresetDefaultsFromAnalysisIfNeeded() {
         guard !presetsInitializedFromAnalysis else { return }
         let shape = analysisResult?.faceShape
-        highlightPreset = MakeupPresetDefaults.highlight(for: shape)
-        shadowPreset = MakeupPresetDefaults.shadow(for: shape)
+        highlightAreas = MakeupAreaDefaults.highlight(for: shape)
+        shadowAreas = MakeupAreaDefaults.shadow(for: shape)
+        eyeAreas = MakeupAreaDefaults.eye(for: shape)
         presetsInitializedFromAnalysis = analysisResult != nil
     }
 
@@ -70,10 +78,11 @@ final class AppState {
         // 眉描画をスキップさせ、選択中ならフル強度 (100) で描画させる。
         var snapshot = intensity
         snapshot.eyebrow = eyebrowType == nil ? 0 : 100
-        // ユーザーが Studio で選んだ preset でセレクションを構築する。
+        // ユーザーが Studio で選んだ area 集合からセレクションを構築する。
         let selection = MakeupRenderer.LayerSelection.from(
-            highlight: highlightPreset,
-            shadow: shadowPreset,
+            highlightAreas: highlightAreas,
+            shadowAreas: shadowAreas,
+            eyeAreas: eyeAreas,
             eyebrow: eyebrowType
         )
         renderTask = Task { [weak self] in
