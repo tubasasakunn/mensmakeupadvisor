@@ -19,7 +19,8 @@ nonisolated enum BaseApplier {
         var blurScale: Float = 2.5
     }
 
-    nonisolated static func apply(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
+    nonisolated static func apply(image: CGImage, faceMesh: FaceMesh, options: Options,
+                       skinMask: FloatBuffer? = nil) -> CGImage? {
         let w = image.width
         let h = image.height
         let allMeshIDs = Array(0..<faceMesh.triangles.count)
@@ -40,6 +41,11 @@ nonisolated enum BaseApplier {
         // 押し戻すとマスクの輪郭がシャープに残ってブラーが効いていない見た目に
         // なるため、ここでは clamp を入れない。distance transform で既に輪郭近くは
         // 値が小さく、blur で滲み出る量も顔の外周ぶんで自然にフェードする。
+
+        // 肌マスクが渡されたら掛け合わせて髪・眉・口・目を除外する
+        if let skinMask, skinMask.width == w, skinMask.height == h {
+            BufferNormalize.multiply(dist, with: skinMask)
+        }
 
         return Compositing.normal(image: image, mask: dist, color: options.colorRGB, intensity: options.intensity)
     }

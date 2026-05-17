@@ -103,6 +103,16 @@ nonisolated struct MakeupRenderer {
             }
         }
 
+        // 肌マスク (髪・眉・唇・目を除外) を 1 回だけ生成して全 Applier で共有。
+        // 元画像 (current) から作るので、画像内のピクセル色しか見ず化粧前後で
+        // 不変。Base/Highlight/Shadow に渡して合成領域から非肌を切る。
+        // base/highlight/shadow いずれも intensity>0 のときだけ計算する
+        // (eye/eyebrow しか触らないなら不要)。
+        let needsSkinMask = intensity.base > 0 || intensity.highlight > 0 || intensity.shadow > 0
+        let skinMask: FloatBuffer? = needsSkinMask
+            ? SkinMask.build(image: current, faceMesh: faceMesh)
+            : nil
+
         // 強度マッピング: slider 100 = POC default の 2x (UI で派手にいじったときに
         // 「ガッツリ盛った」見た目になる)、slider 50 で POC default 相当、と
         // 直感的に対応させる。色や合成式 (alpha_composite_*) はすべて POC 完全
@@ -120,7 +130,7 @@ nonisolated struct MakeupRenderer {
                 colorRGB: SIMD3<Float>(235, 200, 170),
                 intensity: 0.60 * normalize(intensity.base)
             )
-            if let out = BaseApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
+            if let out = BaseApplier.apply(image: current, faceMesh: faceMesh, options: opts, skinMask: skinMask) {
                 current = out
             }
         }
@@ -137,7 +147,7 @@ nonisolated struct MakeupRenderer {
                     colorRGB: SIMD3<Float>(139, 90, 43),
                     intensity: 0.50 * scale
                 )
-                if let out = ShadowApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
+                if let out = ShadowApplier.apply(image: current, faceMesh: faceMesh, options: opts, skinMask: skinMask) {
                     current = out
                 }
             }
@@ -153,7 +163,7 @@ nonisolated struct MakeupRenderer {
                     colorRGB: SIMD3<Float>(255, 255, 255),
                     intensity: 0.24 * scale
                 )
-                if let out = HighlightApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
+                if let out = HighlightApplier.apply(image: current, faceMesh: faceMesh, options: opts, skinMask: skinMask) {
                     current = out
                 }
             }

@@ -17,7 +17,8 @@ nonisolated enum ShadowApplier {
         var blurScale: Float = 2.5
     }
 
-    nonisolated static func apply(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
+    nonisolated static func apply(image: CGImage, faceMesh: FaceMesh, options: Options,
+                       skinMask: FloatBuffer? = nil) -> CGImage? {
         let w = image.width
         let h = image.height
         let mask = faceMesh.buildMask(meshIDs: options.meshIDs, width: w, height: h)
@@ -36,6 +37,11 @@ nonisolated enum ShadowApplier {
         GaussianBlur.apply(dist, ksize: kOuter)
         // POC (apply_shadow) は blur 後に再クランプしない。Swift で押し戻すと
         // 輪郭が硬くなりブラー感が失われるためここでは行わない。
+
+        // 肌マスクで髪・眉・口・目を除外
+        if let skinMask, skinMask.width == w, skinMask.height == h {
+            BufferNormalize.multiply(dist, with: skinMask)
+        }
 
         return Compositing.multiply(image: image, mask: dist, color: options.colorRGB, intensity: options.intensity)
     }

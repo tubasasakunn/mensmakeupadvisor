@@ -18,7 +18,8 @@ nonisolated enum HighlightApplier {
         var blurScale: Float = 2.0
     }
 
-    nonisolated static func apply(image: CGImage, faceMesh: FaceMesh, options: Options) -> CGImage? {
+    nonisolated static func apply(image: CGImage, faceMesh: FaceMesh, options: Options,
+                       skinMask: FloatBuffer? = nil) -> CGImage? {
         let w = image.width
         let h = image.height
 
@@ -41,6 +42,11 @@ nonisolated enum HighlightApplier {
         let kOuter = Int(Double(faceH) * 0.02 * Double(options.blurScale))
         GaussianBlur.apply(dist, ksize: kOuter)
         // POC (apply_highlight) は blur 後にマスクで再クランプしない。
+
+        // 肌マスクで髪・眉・口・目を除外
+        if let skinMask, skinMask.width == w, skinMask.height == h {
+            BufferNormalize.multiply(dist, with: skinMask)
+        }
 
         // 5. 加算合成
         return Compositing.additive(image: image, mask: dist, color: options.colorRGB, intensity: options.intensity)
