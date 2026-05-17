@@ -232,8 +232,25 @@ nonisolated enum EyebrowApplier {
         let l = load(.left)
         let faceCx = Double(lm(faceMesh, FaceLandmarkID.noseTip, width, height).x)
         let avgEyeHeight = (r.eyeHeight + l.eyeHeight) / 2
-        let avgEyeTopY = (Double(r.eyeTop.y) + Double(l.eyeTop.y)) / 2
-        let headY = avgEyeTopY - avgEyeHeight * 1.85
+
+        // 眉の Y 位置はユーザーから「実際の眉とズレる」と報告があった。
+        // POC は avgEyeTopY - eyeHeight*1.85 という「目から幾何的に算出」する
+        // 値を使っていたが、被写体ごとに 眉と目の距離が違うので合わない。
+        // 代わりに「実際の眉ランドマークの下辺の平均 Y」を採用すれば、
+        // 検出された眉のすぐ上に揃って描画される。
+        let lowerBrowIDs: [Int] = FaceLandmarkID.rightEyebrowLower + FaceLandmarkID.leftEyebrowLower
+        let validLower = lowerBrowIDs.filter { faceMesh.points.indices.contains($0) }
+        let headY: Double
+        if !validLower.isEmpty {
+            let ySum = validLower
+                .map { Double(faceMesh.landmark($0, width: width, height: height).y) }
+                .reduce(0, +)
+            headY = ySum / Double(validLower.count)
+        } else {
+            // フォールバック (ランドマーク欠落時): POC と同じ式
+            let avgEyeTopY = (Double(r.eyeTop.y) + Double(l.eyeTop.y)) / 2
+            headY = avgEyeTopY - avgEyeHeight * 1.85
+        }
 
         let rHeadOff = abs(Double(r.browHead.x) - faceCx)
         let lHeadOff = abs(Double(l.browHead.x) - faceCx)
