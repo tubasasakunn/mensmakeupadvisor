@@ -7,65 +7,80 @@ struct TutorialFacePlate: View {
     let capturedImage: UIImage?
     let showBeforeImage: Bool
     let intensity: MakeupIntensity
-    // 実エンジンが出力した after 画像。AppState.renderedImage を Tutorial 側で
-    // bind して渡す。nil の間は capturedImage を表示してフェイクオーバーレイは
-    // 出さない (画像の上だけが色変わる現象を避けるため)。
+    // 実エンジンが出力した after 画像。nil の間は capturedImage を表示。
     let renderedImage: UIImage?
+
+    // 顔まわりトリミング後の画像は ~5:7 など 4:5 と微妙にズレることがある。
+    // プレート枠を画像の実アスペクトに合わせて、額・あごが切れないようにする。
+    private var displayAspect: CGFloat {
+        if let img = capturedImage, img.size.width > 0, img.size.height > 0 {
+            return img.size.width / img.size.height
+        }
+        return 4.0 / 5.0
+    }
 
     var body: some View {
         GeometryReader { geo in
             let width = geo.size.width
-            let height = width * (5.0 / 4.0)
+            let height = width / max(displayAspect, 0.5)
 
             ZStack(alignment: .topLeading) {
                 Color.black
-
-                if showBeforeImage, let img = capturedImage {
-                    Image(uiImage: img)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: width, height: height)
-                        .clipped()
-                } else if let after = renderedImage {
-                    Image(uiImage: after)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: width, height: height)
-                        .clipped()
-                } else if let img = capturedImage {
-                    Image(uiImage: img)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: width, height: height)
-                        .clipped()
-                } else {
-                    placeholderFace(width: width, height: height)
-                }
-
-                Text(currentStep.tag)
-                    .font(.system(size: 11, weight: .light, design: .monospaced))
-                    .foregroundStyle(Color.ivory.opacity(0.6))
-                    .padding(10)
-
-                if showBeforeImage {
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Text("FIG. A — BEFORE")
-                                .font(.system(size: 9, weight: .medium, design: .monospaced))
-                                .foregroundStyle(Color.ivory.opacity(0.7))
-                                .kerning(1.5)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                            Spacer()
-                        }
-                    }
-                }
+                faceImage(width: width, height: height)
+                stepTag
+                if showBeforeImage { beforeLabel }
             }
             .frame(width: width, height: height)
             .clipped()
         }
-        .aspectRatio(4.0 / 5.0, contentMode: .fit)
+        .aspectRatio(displayAspect, contentMode: .fit)
+    }
+
+    @ViewBuilder
+    private func faceImage(width: CGFloat, height: CGFloat) -> some View {
+        if showBeforeImage, let img = capturedImage {
+            Image(uiImage: img)
+                .resizable()
+                .scaledToFill()
+                .frame(width: width, height: height)
+                .clipped()
+        } else if let after = renderedImage {
+            Image(uiImage: after)
+                .resizable()
+                .scaledToFill()
+                .frame(width: width, height: height)
+                .clipped()
+        } else if let img = capturedImage {
+            Image(uiImage: img)
+                .resizable()
+                .scaledToFill()
+                .frame(width: width, height: height)
+                .clipped()
+        } else {
+            placeholderFace(width: width, height: height)
+        }
+    }
+
+    private var stepTag: some View {
+        Text(currentStep.tag)
+            .font(.system(size: 11, weight: .light, design: .monospaced))
+            .foregroundStyle(Color.ivory.opacity(0.6))
+            .padding(10)
+    }
+
+    private var beforeLabel: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Text("FIG. A — BEFORE")
+                    .font(.system(size: 9, weight: .medium, design: .monospaced))
+                    .foregroundStyle(Color.ivory.opacity(0.7))
+                    .kerning(1.5)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                Spacer()
+            }
+        }
     }
 
     @ViewBuilder

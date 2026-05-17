@@ -40,6 +40,10 @@ struct HomeView: View {
         .background(Color.appBackground)
         .accessibilityElement(children: .contain)
         .aid("home_view")
+        // Home に戻ってきた時点で Create フラグはクリアする。
+        // HomeCreateTab で立てた後、別タブから Diagnosis に行くなどの
+        // 経路で残留して Tutorial がスキップされる事故を防ぐ。
+        .task { appState.skipTutorialOnNextFlow = false }
     }
 }
 

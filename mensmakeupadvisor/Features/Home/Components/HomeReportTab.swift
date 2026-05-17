@@ -129,6 +129,8 @@ struct HomeReportTab: View {
     private var actionButtons: some View {
         VStack(spacing: 12) {
             Button {
+                // 通常の閲覧導線。Create フラグが残ってる場合は明示的に外す。
+                appState.skipTutorialOnNextFlow = false
                 appState.navigate(to: .diagnosis)
             } label: {
                 Text("詳細レポートを開く →")

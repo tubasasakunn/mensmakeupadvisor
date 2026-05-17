@@ -5,7 +5,7 @@ import UIKit
 private let renderLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "Render")
 
 enum AppScreen: Equatable {
-    case splash, onboarding, home, capture, analyzing, diagnosis, tutorial, studio, archive
+    case splash, onboarding, home, capture, analyzing, diagnosis, tutorial, studio
 }
 
 @Observable @MainActor
@@ -58,6 +58,7 @@ final class AppState {
         intensity = .init(); activePresetID = nil
         highlightAreas = []; shadowAreas = []; eyeAreas = []
         eyebrowType = nil
+        skipTutorialOnNextFlow = false
         presetsInitializedFromAnalysis = false
         renderTask?.cancel(); renderTask = nil
         Task { await makeupEngine.reset() }
@@ -114,7 +115,7 @@ final class AppState {
         capturedImage = makePlaceholderImage()
         analysisResult = .mock
 
-        let screens: [AppScreen] = [.splash, .onboarding, .capture, .analyzing, .diagnosis, .tutorial, .studio, .archive]
+        let screens: [AppScreen] = [.splash, .onboarding, .home, .capture, .analyzing, .diagnosis, .tutorial, .studio]
         for screen in screens {
             navigate(to: screen)
             try? await Task.sleep(for: .seconds(3))

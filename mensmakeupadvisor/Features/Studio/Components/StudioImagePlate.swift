@@ -6,10 +6,19 @@ struct StudioImagePlate: View {
     let viewModel: StudioViewModel
     @Environment(AppState.self) private var appState
 
+    // capturedImage 実物のアスペクト比を使う。
+    // 顔まわりトリミングで 5:7 などになり得るため、固定 4:5 だと顔が切れる。
+    private var displayAspect: CGFloat {
+        if let img = appState.capturedImage, img.size.width > 0, img.size.height > 0 {
+            return img.size.width / img.size.height
+        }
+        return 4.0 / 5.0
+    }
+
     var body: some View {
         GeometryReader { geo in
             let width = geo.size.width
-            let height = width * (5.0 / 4.0)
+            let height = width / max(displayAspect, 0.5)
 
             ZStack {
                 if viewModel.displayMode == .compare {
@@ -33,7 +42,7 @@ struct StudioImagePlate: View {
             .frame(width: width, height: height)
             .clipped()
         }
-        .aspectRatio(4.0 / 5.0, contentMode: .fit)
+        .aspectRatio(displayAspect, contentMode: .fit)
     }
 
     private func compareView(width: CGFloat, height: CGFloat) -> some View {

@@ -18,7 +18,6 @@ struct RootView: View {
                 case .diagnosis:  DiagnosisView()
                 case .tutorial:   TutorialView()
                 case .studio:     StudioView()
-                case .archive:    ArchiveView()
                 }
             }
             .transition(.opacity)
