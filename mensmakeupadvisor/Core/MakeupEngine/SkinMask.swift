@@ -95,6 +95,56 @@ nonisolated enum SkinMask {
                 mask.pointer[y * w + x] = 1.0 - t
             }
         }
+
+        // 3. 唇 (赤味で skin と紛らわしい) を多角形マスクで 0 にする。
+        // 唇外周ランドマークから作ったポリゴンを少し膨らませて掛ける。
+        zeroOutLips(mask: mask, faceMesh: faceMesh)
+
         return mask
+    }
+
+    // 唇のポリゴンを mask 上で 0 に塗りつぶす。
+    private nonisolated static func zeroOutLips(mask: FloatBuffer, faceMesh: FaceMesh) {
+        let w = mask.width
+        let h = mask.height
+        // 一時 grayscale CGContext に唇ポリゴンを描いて、その内側ピクセルを mask=0 に
+        let lipMaskBuf = MaskBuffer(width: w, height: h)
+        guard let ctx = CGContext(
+            data: lipMaskBuf.dataPointer, width: w, height: h, bitsPerComponent: 8,
+            bytesPerRow: w, space: CGColorSpaceCreateDeviceGray(),
+            bitmapInfo: CGImageAlphaInfo.none.rawValue
+        ) else { return }
+        // CGContext は Y-UP なので CTM を反転して画像座標 (Y-DOWN) で描画
+        ctx.translateBy(x: 0, y: CGFloat(h))
+        ctx.scaleBy(x: 1, y: -1)
+        ctx.setFillColor(gray: 1.0, alpha: 1.0)
+
+        let ids = FaceLandmarkID.lipOuter
+        var pts: [CGPoint] = []
+        for id in ids where faceMesh.points.indices.contains(id) {
+            pts.append(faceMesh.landmark(id, width: w, height: h))
+        }
+        guard pts.count >= 3 else { return }
+        ctx.beginPath()
+        ctx.move(to: pts[0])
+        for i in 1..<pts.count { ctx.addLine(to: pts[i]) }
+        ctx.closePath()
+        ctx.fillPath()
+
+        // 唇周辺 (口紅にじみで近接する微妙な領域) も少し dilate して切る
+        let lipFloat = FloatBuffer.fromMask(lipMaskBuf)
+        // 軽く dilate (顔横幅の 0.5% 程度) — 大きすぎると鼻まで切れる
+        let templeR = faceMesh.landmark(FaceLandmarkID.templeR, width: w, height: h)
+        let templeL = faceMesh.landmark(FaceLandmarkID.templeL, width: w, height: h)
+        let faceWPx = max(1.0, abs(templeR.x - templeL.x))
+        let dilateR = max(1, Int(Double(faceWPx) * 0.008))
+        Morphology.dilate(lipFloat, radius: dilateR)
+        // ぼかして急峻な切り口にしない
+        let blurK = max(3, Int(Double(faceWPx) * 0.015))
+        GaussianBlur.apply(lipFloat, ksize: blurK)
+        // mask = mask * (1 - lipFloat)
+        for i in 0..<mask.count {
+            mask.pointer[i] *= (1.0 - min(1.0, lipFloat.pointer[i]))
+        }
     }
 }

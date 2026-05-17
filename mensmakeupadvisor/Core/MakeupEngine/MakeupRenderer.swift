@@ -19,43 +19,37 @@ nonisolated struct MakeupRenderer {
         var applyEyeliner: Bool
         var eyebrowType: EyebrowApplier.BrowType
 
-        // makeup_claude/loadmap/1-virtual-makeup/{1-1-highlight,1-2-shadow}/run_all.py
-        // の PRESET_MAP に基本準拠する。highlight は POC と完全一致。
-        //
-        //   tamago (卵)   : highlight=base
-        //   marugao (丸顔) : highlight=marugao
-        //   omonaga (面長) : highlight=omonaga
-        //   gyaku (逆三角) : highlight=base
-        //   base (ベース)  : highlight=base
-        //
-        // shadow は POC では face shape ごとに 1 preset だけだが、Studio FINE TUNE
-        // のシャドウスライダーで「ガッツリ陰影を入れる」UX を成立させるため、
-        // どの顔型でも omonaga (顎下) + marugao (頬の輪郭) を併用する。これで
-        // 顔の上下と左右両方に陰が乗り、視認性が高くなる。
-        nonisolated static func forFaceShape(_ shape: FaceShape?) -> LayerSelection {
-            let hlPrefix: String
-            switch shape ?? .tamago {
-            case .tamago, .gyaku, .base: hlPrefix = "base"
-            case .marugao:               hlPrefix = "marugao"
-            case .omonaga:               hlPrefix = "omonaga"
+        // Studio の preset 選択 + 顔型から構築する。
+        // 各 preset は target.json の prefix と対応する。
+        // eyebrowType に nil を渡すと眉描画スキップ。
+        nonisolated static func from(highlight: HighlightPreset,
+                                      shadow: ShadowPreset,
+                                      eyebrow: EyebrowApplier.BrowType?) -> LayerSelection {
+            let highlightNames: [String]
+            if let prefix = highlight.targetPrefix {
+                highlightNames = MeshAreaLibrary
+                    .areas(category: .highlight, prefix: prefix)
+                    .map(\.name)
+            } else {
+                highlightNames = []
             }
-            let highlightNames = MeshAreaLibrary
-                .areas(category: .highlight, prefix: hlPrefix)
-                .map(\.name)
-            // 全顔型で omonaga + marugao の両方を適用 (univeral contouring)
-            let shadowNames = MeshAreaLibrary.areas(category: .shadow, prefix: "omonaga").map(\.name)
-                + MeshAreaLibrary.areas(category: .shadow, prefix: "marugao").map(\.name)
+            var shadowNames: [String] = []
+            for prefix in shadow.targetPrefixes {
+                shadowNames.append(contentsOf:
+                    MeshAreaLibrary.areas(category: .shadow, prefix: prefix).map(\.name)
+                )
+            }
             return LayerSelection(
                 highlightAreaNames: highlightNames,
                 shadowAreaNames: shadowNames,
                 applyBase: true,
                 eyeAreaNames: ["eyeshadow_base", "eyeshadow_crease", "tear_bag", "lower_outer"],
                 applyEyeliner: true,
-                eyebrowType: .natural
+                eyebrowType: eyebrow ?? .natural
             )
         }
 
-        // Preview/Studio で顔判定結果が無い場合の既定値。tamago と同じ扱い。
+        // Preview/Studio で AppState が未構築な場合の既定値。
         nonisolated static let `default` = LayerSelection(
             highlightAreaNames: ["base_t-zone", "base_c-zone", "base_under-eye"],
             shadowAreaNames: ["omonaga-upper", "omonaga-lower", "marugao-side"],
@@ -124,7 +118,11 @@ nonisolated struct MakeupRenderer {
         //   eye       : 各エリア AREA_DEFAULTS × scale (元から POC 強め)
         //   eyebrow   : 0.75 × scale (POC default)
 
-        // 1.3 ベース (顔全体)
+        // 適用順は base → highlight → shadow → eye → eyebrow。
+        // ベースで肌色を均一化 → ハイライトで凸を強調 → シャドウで凹を作る、と
+        // 「平らに均してから立体感を盛る」流れにする。
+
+        // 1. ベース (顔全体)
         if selection.applyBase, intensity.base > 0 {
             let opts = BaseApplier.Options(
                 colorRGB: SIMD3<Float>(235, 200, 170),
@@ -135,25 +133,7 @@ nonisolated struct MakeupRenderer {
             }
         }
 
-        // 1.2 シャドウ
-        if intensity.shadow > 0 {
-            let scale = normalize(intensity.shadow)
-            for name in selection.shadowAreaNames {
-                guard let area = MeshAreaLibrary.lookup(category: .shadow, name: name) else { continue }
-                // POC CLI default の RGB(139, 90, 43) (ブラウン) に揃える。
-                // 関数 default の (90, 68, 50) は CLI 経由では使われない値だった。
-                let opts = ShadowApplier.Options(
-                    meshIDs: area.meshIDs,
-                    colorRGB: SIMD3<Float>(139, 90, 43),
-                    intensity: 0.50 * scale
-                )
-                if let out = ShadowApplier.apply(image: current, faceMesh: faceMesh, options: opts, skinMask: skinMask) {
-                    current = out
-                }
-            }
-        }
-
-        // 1.1 ハイライト
+        // 2. ハイライト
         if intensity.highlight > 0 {
             let scale = normalize(intensity.highlight)
             for name in selection.highlightAreaNames {
@@ -169,7 +149,24 @@ nonisolated struct MakeupRenderer {
             }
         }
 
-        // 1.4 アイメイク
+        // 3. シャドウ
+        if intensity.shadow > 0 {
+            let scale = normalize(intensity.shadow)
+            for name in selection.shadowAreaNames {
+                guard let area = MeshAreaLibrary.lookup(category: .shadow, name: name) else { continue }
+                // POC CLI default の RGB(139, 90, 43) (ブラウン) に揃える。
+                let opts = ShadowApplier.Options(
+                    meshIDs: area.meshIDs,
+                    colorRGB: SIMD3<Float>(139, 90, 43),
+                    intensity: 0.50 * scale
+                )
+                if let out = ShadowApplier.apply(image: current, faceMesh: faceMesh, options: opts, skinMask: skinMask) {
+                    current = out
+                }
+            }
+        }
+
+        // 4. アイメイク
         if intensity.eye > 0 {
             let scale = normalize(intensity.eye)
             let (meshAreas, eyeliner) = EyeApplier.loadFromTargetJSON()
@@ -202,7 +199,7 @@ nonisolated struct MakeupRenderer {
             }
         }
 
-        // 1.5 眉
+        // 5. 眉
         if intensity.eyebrow > 0 {
             let scale = normalize(intensity.eyebrow)
             let opts = EyebrowApplier.Options(

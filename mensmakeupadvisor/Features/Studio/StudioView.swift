@@ -48,10 +48,12 @@ struct StudioView: View {
         }
     }
 
-    // intensity の各値を 1 つの Hashable キーに集約して task(id:) で監視する
+    // intensity の各値 + preset 選択を 1 つの Hashable キーに集約して
+    // task(id:) で監視する。preset 切替でも再レンダリングが走る。
     private var intensityKey: String {
         let i = appState.intensity
-        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))-\(Int(i.eyebrow))"
+        let brow = appState.eyebrowType?.rawValue ?? "off"
+        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))-\(appState.highlightPreset.rawValue)-\(appState.shadowPreset.rawValue)-\(brow)"
     }
 
     // MARK: - Subviews
@@ -121,7 +123,13 @@ struct StudioView: View {
         case .compare:
             PresetPanelView(viewModel: viewModel)
         case .fineTune:
-            FineTunePanelView()
+            // FINE TUNE は要素が多い (4 slider + 2 preset 群 + brow picker) ので
+            // 高さに収まらないことがある。ScrollView でラップして上下にスワイプ
+            // できるようにする。画像プレートが潰れるのを防ぐ。
+            ScrollView(.vertical, showsIndicators: false) {
+                FineTunePanelView()
+                    .padding(.bottom, 8)
+            }
         }
     }
 

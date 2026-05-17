@@ -64,4 +64,11 @@ nonisolated enum FaceLandmarkID {
     nonisolated static let rightEyebrowLower: [Int] = [46, 53, 52, 65, 55]
     nonisolated static let leftEyebrowUpper: [Int] = [300, 293, 334, 296, 336]
     nonisolated static let leftEyebrowLower: [Int] = [276, 283, 282, 295, 285]
+
+    // MARK: - 唇外周ポリゴン（唇を化粧反映から除外するため）
+    // MediaPipe FaceMesh の standard lip outline (上唇外周 + 下唇外周を反時計回り)
+    nonisolated static let lipOuter: [Int] = [
+        61, 185, 40, 39, 37, 0, 267, 269, 270, 409,
+        291, 375, 321, 405, 314, 17, 84, 181, 91, 146,
+    ]
 }

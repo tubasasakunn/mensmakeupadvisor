@@ -13,12 +13,23 @@ final class AppState {
     var currentScreen: AppScreen = .splash
     var capturedImage: UIImage?
     var renderedImage: UIImage?
-    var analysisResult: AnalysisResult?
+    var analysisResult: AnalysisResult? {
+        didSet { applyPresetDefaultsFromAnalysisIfNeeded() }
+    }
     var tutorialStep: Int = 0
     var tutorialDone: Bool = false
     var intensity: MakeupIntensity = .init()
     var activePresetID: String?
     var isRenderingMakeup: Bool = false
+
+    // Studio で「どこに highlight/shadow を当てるか」をユーザーが切り替える
+    // ための選択状態。顔判定結果でデフォルトが入る。
+    var highlightPreset: HighlightPreset = .base
+    var shadowPreset: ShadowPreset = .both
+    // 眉は intensity slider ではなく type 選択で表現する。nil = 眉描画 OFF。
+    var eyebrowType: EyebrowApplier.BrowType? = .natural
+
+    private var presetsInitializedFromAnalysis = false
 
     // makeup_claude のアルゴリズムを移植したエンジン。
     // アプリ全体で 1 つを使い回し、AnalyzingView で初期化 + 顔検出 →
@@ -35,18 +46,36 @@ final class AppState {
         capturedImage = nil; renderedImage = nil; analysisResult = nil
         tutorialStep = 0; tutorialDone = false
         intensity = .init(); activePresetID = nil
+        highlightPreset = .base; shadowPreset = .both; eyebrowType = .natural
+        presetsInitializedFromAnalysis = false
         renderTask?.cancel(); renderTask = nil
         Task { await makeupEngine.reset() }
     }
 
+    // 顔診断完了時、ユーザーが Studio で preset を触っていなければ顔型に
+    // 応じたデフォルトを差し替える。一度でも触ったら以降は上書きしない。
+    private func applyPresetDefaultsFromAnalysisIfNeeded() {
+        guard !presetsInitializedFromAnalysis else { return }
+        let shape = analysisResult?.faceShape
+        highlightPreset = MakeupPresetDefaults.highlight(for: shape)
+        shadowPreset = MakeupPresetDefaults.shadow(for: shape)
+        presetsInitializedFromAnalysis = analysisResult != nil
+    }
+
     // 化粧反映を非同期で要求する。短時間に複数回呼ばれても直近の 1 回だけ実行する。
     func requestMakeupRender() {
-        renderLog.notice("requestMakeupRender: invoked — base=\(Int(self.intensity.base), privacy: .public) hl=\(Int(self.intensity.highlight), privacy: .public) sh=\(Int(self.intensity.shadow), privacy: .public)")
+        renderLog.notice("requestMakeupRender: invoked — base=\(Int(self.intensity.base), privacy: .public) hl=\(Int(self.intensity.highlight), privacy: .public) sh=\(Int(self.intensity.shadow), privacy: .public) brow=\(self.eyebrowType?.rawValue ?? "off", privacy: .public)")
         renderTask?.cancel()
-        let snapshot = intensity
-        // makeup_claude POC と同じく、顔判定で得た FaceShape ごとに highlight/shadow
-        // のエリア prefix を切り替える。顔判定前は tamago 相当 (LayerSelection.default)。
-        let selection = MakeupRenderer.LayerSelection.forFaceShape(self.analysisResult?.faceShape)
+        // 眉は type 選択で表現。type が nil なら eyebrow intensity を 0 にして
+        // 眉描画をスキップさせ、選択中ならフル強度 (100) で描画させる。
+        var snapshot = intensity
+        snapshot.eyebrow = eyebrowType == nil ? 0 : 100
+        // ユーザーが Studio で選んだ preset でセレクションを構築する。
+        let selection = MakeupRenderer.LayerSelection.from(
+            highlight: highlightPreset,
+            shadow: shadowPreset,
+            eyebrow: eyebrowType
+        )
         renderTask = Task { [weak self] in
             guard let self else { return }
             // 連続スライド時に過剰な再計算を抑える

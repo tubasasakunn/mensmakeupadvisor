@@ -4,6 +4,7 @@ struct TutorialStepInfoArea: View {
     let currentStep: TutorialStep
     @Binding var intensity: MakeupIntensity
     @Binding var showBeforeImage: Bool
+    @Binding var eyebrowType: EyebrowApplier.BrowType?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -31,8 +32,15 @@ struct TutorialStepInfoArea: View {
                 .lineSpacing(5)
                 .fixedSize(horizontal: false, vertical: true)
 
-            intensitySlider
-                .padding(.top, 20)
+            // 眉ステップだけは type picker、それ以外は intensity slider
+            Group {
+                if currentStep.layer == .eyebrow {
+                    eyebrowTypePicker
+                } else {
+                    intensitySlider
+                }
+            }
+            .padding(.top, 20)
 
             beforeButton
                 .padding(.top, 16)
@@ -82,6 +90,52 @@ struct TutorialStepInfoArea: View {
         }
     }
 
+    private var eyebrowTypePicker: some View {
+        let options: [(label: String, value: EyebrowApplier.BrowType?)] = [
+            ("OFF", nil),
+            ("NATURAL", .natural),
+            ("STRAIGHT", .straight),
+            ("ARCH", .arch),
+            ("PARALLEL", .parallel),
+            ("CORNER", .corner),
+        ]
+        return VStack(alignment: .leading, spacing: 10) {
+            Text("BROW TYPE")
+                .font(.system(size: 9, weight: .medium, design: .monospaced))
+                .foregroundStyle(Color.inkSecondary)
+                .kerning(2)
+
+            VStack(spacing: 6) {
+                HStack(spacing: 6) {
+                    ForEach(0..<3, id: \.self) { i in browButton(options[i]) }
+                }
+                HStack(spacing: 6) {
+                    ForEach(3..<6, id: \.self) { i in browButton(options[i]) }
+                }
+            }
+        }
+        .aid("tutorial_brow_type_picker")
+    }
+
+    private func browButton(_ entry: (label: String, value: EyebrowApplier.BrowType?)) -> some View {
+        let isActive = (entry.value == eyebrowType)
+        let aidValue = entry.value?.rawValue ?? "off"
+        return Button {
+            withAnimation(.easeInOut(duration: 0.15)) { eyebrowType = entry.value }
+        } label: {
+            Text(entry.label)
+                .font(.system(size: 9, weight: .medium, design: .monospaced))
+                .kerning(1.2)
+                .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity)
+                .background(isActive ? Color.ivory : Color.clear)
+                .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+        }
+        .aid("tutorial_brow_type_\(aidValue)")
+    }
+
     private var beforeButton: some View {
         Button {
             // ロングプレス想定だが、タップトグルで代替
@@ -114,10 +168,12 @@ struct TutorialStepInfoArea: View {
 #Preview {
     @Previewable @State var intensity = MakeupIntensity()
     @Previewable @State var showBefore = false
+    @Previewable @State var browType: EyebrowApplier.BrowType? = .natural
     TutorialStepInfoArea(
         currentStep: TutorialStep.all[0],
         intensity: $intensity,
-        showBeforeImage: $showBefore
+        showBeforeImage: $showBefore,
+        eyebrowType: $browType
     )
     .padding(28)
     .background(Color.appBackground)

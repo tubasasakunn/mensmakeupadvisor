@@ -33,7 +33,8 @@ struct TutorialView: View {
                 TutorialStepInfoArea(
                     currentStep: currentStep,
                     intensity: $bindableState.intensity,
-                    showBeforeImage: $viewModel.showBeforeImage
+                    showBeforeImage: $viewModel.showBeforeImage,
+                    eyebrowType: $bindableState.eyebrowType
                 )
                 .padding(.top, 20)
                 .padding(.horizontal, 28)
@@ -57,7 +58,8 @@ struct TutorialView: View {
 
     private var intensityKey: String {
         let i = appState.intensity
-        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))-\(Int(i.eyebrow))"
+        let brow = appState.eyebrowType?.rawValue ?? "off"
+        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))-\(appState.highlightPreset.rawValue)-\(appState.shadowPreset.rawValue)-\(brow)"
     }
 
     // MARK: - Subviews
