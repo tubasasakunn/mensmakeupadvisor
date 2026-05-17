@@ -5,7 +5,7 @@ import UIKit
 private let renderLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "Render")
 
 enum AppScreen: Equatable {
-    case splash, onboarding, capture, analyzing, diagnosis, tutorial, studio, archive
+    case splash, onboarding, home, capture, analyzing, diagnosis, tutorial, studio, archive
 }
 
 @Observable @MainActor
@@ -34,6 +34,10 @@ final class AppState {
     // 選ぶまでは眉描画が走らないようにする (顔診断直後の画面で勝手に
     // 眉が描き換えられないように)。
     var eyebrowType: EyebrowApplier.BrowType? = nil
+
+    // Home → Create フローでは Tutorial をスキップして直接 Studio に行く。
+    // AnalyzingView 完了時の navigate 分岐で参照する。
+    var skipTutorialOnNextFlow: Bool = false
 
     private var presetsInitializedFromAnalysis = false
 

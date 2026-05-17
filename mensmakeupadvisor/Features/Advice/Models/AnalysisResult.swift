@@ -9,18 +9,23 @@ nonisolated struct AnalysisResult: Sendable {
     var imageWidthPx: Int? = nil
     var imageHeightPx: Int? = nil
     var metrics: FaceMetrics? = nil
+    // engine.prepare で顔周辺に切り出した結果。AnalyzingView で
+    // appState.capturedImage を差し替えるのに使う。
+    var croppedImage: UIImage? = nil
 
     init(faceShape: FaceShape, scores: [FaceScore],
          landmarksNormalized: [CGPoint]? = nil,
          imageWidthPx: Int? = nil,
          imageHeightPx: Int? = nil,
-         metrics: FaceMetrics? = nil) {
+         metrics: FaceMetrics? = nil,
+         croppedImage: UIImage? = nil) {
         self.faceShape = faceShape
         self.scores = scores
         self.landmarksNormalized = landmarksNormalized
         self.imageWidthPx = imageWidthPx
         self.imageHeightPx = imageHeightPx
         self.metrics = metrics
+        self.croppedImage = croppedImage
     }
 
     var totalScore: Int {

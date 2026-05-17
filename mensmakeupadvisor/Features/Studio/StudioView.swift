@@ -84,14 +84,14 @@ struct StudioView: View {
             Spacer()
 
             Button {
-                appState.navigate(to: .archive)
+                appState.navigate(to: .home)
             } label: {
-                Text("SAVED →")
+                Text("HOME →")
                     .font(.system(size: 11, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(1.5)
             }
-            .aid("studio_header_saved_button")
+            .aid("studio_header_home_button")
         }
         .padding(.horizontal, 28)
     }

@@ -151,8 +151,15 @@ struct AnalyzingView: View {
             phase = "COMPLETE"
             try? await Task.sleep(for: .milliseconds(400))
 
+            // 顔まわりに切り抜いた画像を以降の表示・レンダリングの基準にする。
+            if let cropped = result.croppedImage {
+                appState.capturedImage = cropped
+            }
             appState.analysisResult = result
             appState.navigate(to: .diagnosis)
+            // ホームからの再撮影 (skipTutorialOnNextFlow=true) のときは、
+            // Diagnosis を表示してもユーザーはすぐ次に進めるよう変わらない動線。
+            // 実際の Tutorial スキップは Diagnosis 側の「COMPOSE」ボタンが行う。
         } catch {
             errorMessage = "解析に失敗しました"
         }

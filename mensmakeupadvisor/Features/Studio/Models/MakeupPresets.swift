@@ -1,32 +1,32 @@
 import Foundation
 
 // target.json の area name を「人が読める短いラベル」に変換するテーブル。
-// FINE TUNE の選択チップに表示する用途。
+// チューニング画面の選択チップに表示する用途。
 nonisolated enum MakeupAreaLabel {
     nonisolated static func display(_ areaName: String) -> String {
         switch areaName {
         // highlight
-        case "base_t-zone":     return "T-ZONE"
-        case "base_c-zone":     return "C-ZONE"
-        case "base_under-eye":  return "目下"
+        case "base_t-zone":     return "Tゾーン（額・鼻筋）"
+        case "base_c-zone":     return "Cゾーン（頬骨）"
+        case "base_under-eye":  return "目の下"
         case "base_megasira":   return "目頭"
-        case "base_zintyuu":    return "人中"
-        case "marugao_t-zone":  return "丸 T"
-        case "marugao_c-zone":  return "丸 C"
-        case "marugao_ago":     return "顎先"
-        case "omonaga_t-zone":  return "面 T"
-        case "omonaga_c-zone":  return "面 C"
+        case "base_zintyuu":    return "鼻の下"
+        case "marugao_t-zone":  return "Tゾーン（丸顔）"
+        case "marugao_c-zone":  return "Cゾーン（丸顔）"
+        case "marugao_ago":     return "あご先"
+        case "omonaga_t-zone":  return "Tゾーン（面長）"
+        case "omonaga_c-zone":  return "Cゾーン（面長）"
         // shadow
-        case "omonaga-upper":   return "額"
-        case "omonaga-lower":   return "顎"
-        case "marugao-side":    return "頬輪郭"
+        case "omonaga-upper":   return "額のシェード"
+        case "omonaga-lower":   return "あごのシェード"
+        case "marugao-side":    return "頬の輪郭"
         // eye
-        case "eyeshadow_base":   return "ベース"
-        case "eyeshadow_crease": return "クリーズ"
+        case "eyeshadow_base":   return "まぶた全体"
+        case "eyeshadow_crease": return "二重ライン"
         case "tear_bag":         return "涙袋"
-        case "lower_outer":      return "下まぶた"
-        case "eyeliner":         return "ライナー"
-        default: return areaName.uppercased()
+        case "lower_outer":      return "下まぶた外側"
+        case "eyeliner":         return "アイライン"
+        default: return areaName
         }
     }
 }

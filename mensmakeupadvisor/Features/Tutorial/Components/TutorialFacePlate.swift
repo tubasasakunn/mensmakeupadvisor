@@ -27,9 +27,6 @@ struct TutorialFacePlate: View {
                         .frame(width: width, height: height)
                         .clipped()
                 } else if let after = renderedImage {
-                    // MakeupRenderer が出力した実 after 画像をそのまま表示する。
-                    // 以前は LinearGradient(下→上の色グラデ)を被せるだけだったため
-                    // ユーザーには「画像の上の方が色変わるだけ」に見えていた。
                     Image(uiImage: after)
                         .resizable()
                         .scaledToFill()
@@ -82,7 +79,7 @@ struct TutorialFacePlate: View {
 
             VStack(spacing: 4) {
                 Spacer()
-                Text("ACT \(currentStep.tag) · \(currentStep.label.uppercased())")
+                Text("ACT \(currentStep.tag) · \(currentStep.titleJP)")
                     .font(.system(size: 8, weight: .light, design: .monospaced))
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(2)
@@ -94,7 +91,7 @@ struct TutorialFacePlate: View {
 
 #Preview {
     TutorialFacePlate(
-        currentStep: TutorialStep.all[0],
+        currentStep: TutorialStep.sequence(for: .tamago)[0],
         capturedImage: nil,
         showBeforeImage: false,
         intensity: MakeupIntensity(),

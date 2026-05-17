@@ -53,8 +53,9 @@ final class AnalysisService: AnalysisServiceProtocol, Sendable {
         let engine = sharedEngine ?? MakeupEngineService()
         let started = Date()
         do {
-            try await engine.prepare(image: image)
-            let result = try await engine.analyze()
+            let cropped = try await engine.prepare(image: image)
+            var result = try await engine.analyze()
+            result.croppedImage = cropped
             let ms = Int(Date().timeIntervalSince(started) * 1000)
             analysisLog.notice("analyze: MediaPipe ok in \(ms, privacy: .public)ms — faceShape=\(String(describing: result.faceShape), privacy: .public) total=\(result.totalScore, privacy: .public)")
             return result

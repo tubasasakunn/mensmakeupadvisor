@@ -4,7 +4,7 @@ import UIKit
 @Observable
 @MainActor
 final class AdviceViewModel {
-    var showImagePicker = false
+    var showCamera = false
     var errorMessage: String?
 
     func selectImage(_ image: UIImage, appState: AppState) {

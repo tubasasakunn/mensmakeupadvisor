@@ -1,37 +1,37 @@
-struct TutorialStep: Identifiable, Sendable {
-    let id: Int
-    let tag: String
-    let label: String
-    let labelJP: String
-    let desc: String
-    let layer: MakeupLayer
+import Foundation
 
-    // 新しい順序: base → highlight → shadow → eye → eyebrow
-    static let all: [TutorialStep] = [
-        .init(
-            id: 0, tag: "I", label: "Base", labelJP: "ベース",
-            desc: "肌のトーンを整える土台。色ムラやくすみを抑えて、均一な肌感を演出。",
-            layer: .base
-        ),
-        .init(
-            id: 1, tag: "II", label: "Highlight", labelJP: "ハイライト",
-            desc: "Tゾーン・Cゾーンに光を入れて立体感を演出。鼻筋・頬骨・あごに、自然な輝きをプラス。",
-            layer: .highlight
-        ),
-        .init(
-            id: 2, tag: "III", label: "Shadow", labelJP: "シェーディング",
-            desc: "小顔効果のための影。輪郭・こめかみに陰影を入れて顔をシャープに。",
-            layer: .shadow
-        ),
-        .init(
-            id: 3, tag: "IV", label: "Eye", labelJP: "アイ",
-            desc: "アイシャドウ・アイライナー・涙袋で目元を強調。印象に残る目元に。",
-            layer: .eye
-        ),
-        .init(
-            id: 4, tag: "V", label: "Brow", labelJP: "眉",
-            desc: "顔の印象を決める眉。形を選んで全体の雰囲気を整える。",
-            layer: .eyebrow
-        ),
-    ]
+// Tutorial の 1 ステップ。レイヤー (base / highlight / shadow / eye / eyebrow) +
+// 部位 (area name / 眉 type) の組み合わせで「1 ステップ = 1 ゾーン」を表す。
+// 顔型ごとに、その人に提案するゾーンだけを並べる。
+struct TutorialStep: Identifiable, Sendable {
+    let id: String
+    let tag: String
+    let layer: MakeupLayer
+    // area name (target.json の name) or eyebrow type rawValue。base ステップは nil。
+    let areaName: String?
+    let titleJP: String
+    // パーソナライズされた効果説明 (顔型ごとに違う本文)
+    let explanation: String
+    let oneLiner: String
+
+    // 顔型に応じた tutorial シーケンス。tag は出現順で振り直す。
+    static func sequence(for shape: FaceShape?) -> [TutorialStep] {
+        let f = shape ?? .tamago
+        var steps: [TutorialStep] = []
+        steps.append(TutorialStepFactory.baseStep(for: f))
+        steps.append(contentsOf: TutorialStepFactory.highlightSteps(for: f))
+        steps.append(contentsOf: TutorialStepFactory.shadowSteps(for: f))
+        steps.append(contentsOf: TutorialStepFactory.eyeSteps(for: f))
+        steps.append(TutorialStepFactory.browStep(for: f))
+        return steps.enumerated().map { idx, s in
+            TutorialStep(id: s.id, tag: romanNumeral(idx + 1), layer: s.layer,
+                         areaName: s.areaName, titleJP: s.titleJP,
+                         explanation: s.explanation, oneLiner: s.oneLiner)
+        }
+    }
+
+    private static func romanNumeral(_ n: Int) -> String {
+        let romans = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV"]
+        return n <= romans.count ? romans[n - 1] : "\(n)"
+    }
 }

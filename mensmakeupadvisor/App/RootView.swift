@@ -12,6 +12,7 @@ struct RootView: View {
                 switch appState.currentScreen {
                 case .splash:     SplashView()
                 case .onboarding: OnboardingView()
+                case .home:       HomeView()
                 case .capture:    AdviceView()
                 case .analyzing:  AnalyzingView()
                 case .diagnosis:  DiagnosisView()

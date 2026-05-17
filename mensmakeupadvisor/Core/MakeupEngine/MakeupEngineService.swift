@@ -24,17 +24,50 @@ actor MakeupEngineService {
     private var mesh: FaceMesh?
     private var sourceImage: UIImage?
 
-    func prepare(image: UIImage) async throws {
+    // 1 段目で顔検出 → bbox 周辺で切り抜き → 切り抜いた画像で再検出、までを 1 回の
+    // `prepare` で実行する。戻り値は実際に下流 (analyze / render) で使われる
+    // 「顔まわりにトリミング済みの」画像。
+    @discardableResult
+    func prepare(image: UIImage) async throws -> UIImage {
         let path = try await FaceMeshResources.ensureModelDownloaded()
-        let newMesh = FaceMesh(subdivisionLevel: 1)
-        try newMesh.initialize(modelPath: path)
+        let firstMesh = FaceMesh(subdivisionLevel: 1)
+        try firstMesh.initialize(modelPath: path)
+
+        let upright = image.uprightOriented()
+        let firstDetection: FaceMesh.DetectionResult
         do {
-            _ = try newMesh.detect(image: image)
+            firstDetection = try firstMesh.detect(image: upright)
         } catch FaceMesh.FaceMeshError.faceNotDetected {
             throw EngineError.faceNotDetected
         }
-        self.mesh = newMesh
-        self.sourceImage = image
+
+        // bbox で顔まわりに切り抜く。元画像と大差ない時は元画像を使う。
+        let working: UIImage = FaceCropper.crop(
+            image: upright,
+            landmarksPx: firstDetection.landmarksPx
+        ) ?? upright
+
+        // 切り抜いた画像で再検出し、以降の座標系をクロップ後に揃える。
+        // (元画像のままだとは Diagnosis / Studio の表示も元のまま広くなる)
+        let finalMesh: FaceMesh
+        if working === upright {
+            finalMesh = firstMesh
+        } else {
+            finalMesh = FaceMesh(subdivisionLevel: 1)
+            try finalMesh.initialize(modelPath: path)
+            do {
+                _ = try finalMesh.detect(image: working)
+            } catch FaceMesh.FaceMeshError.faceNotDetected {
+                // 切り抜きで失敗する稀ケースは元画像にフォールバック
+                self.mesh = firstMesh
+                self.sourceImage = upright
+                return upright
+            }
+        }
+
+        self.mesh = finalMesh
+        self.sourceImage = working
+        return working
     }
 
     func analyze() throws -> AnalysisResult {

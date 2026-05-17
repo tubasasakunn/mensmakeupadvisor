@@ -52,7 +52,7 @@ struct DiagnosisView: View {
                             .padding(.top, 24)
                             .padding(.horizontal, 24)
 
-                        DiagnosisScoreListSection(result: result)
+                        DiagnosisScoreListSection(result: result, capturedImage: appState.capturedImage)
                             .padding(.top, 4)
                             .padding(.horizontal, 24)
 
@@ -142,10 +142,16 @@ struct DiagnosisView: View {
     private var bottomButtons: some View {
         VStack(spacing: 12) {
             Button {
-                appState.navigate(to: .tutorial)
+                // Home → CREATE で来た場合は tutorial をスキップ
+                if appState.skipTutorialOnNextFlow {
+                    appState.skipTutorialOnNextFlow = false
+                    appState.navigate(to: .studio)
+                } else {
+                    appState.navigate(to: .tutorial)
+                }
             } label: {
                 HStack(spacing: 8) {
-                    Text("BEGIN COMPOSITION")
+                    Text(appState.skipTutorialOnNextFlow ? "OPEN STUDIO" : "BEGIN COMPOSITION")
                         .font(.system(size: 14, weight: .semibold, design: .monospaced))
                         .kerning(0.5)
                     Text("→")

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DiagnosisScoreListSection: View {
     let result: AnalysisResult
+    var capturedImage: UIImage? = nil
 
     var body: some View {
         VStack(spacing: 0) {
@@ -66,7 +67,12 @@ struct DiagnosisScoreListSection: View {
             .padding(.bottom, 4)
 
             ForEach(Array(result.scores.enumerated()), id: \.element.id) { index, score in
-                ScoreCardView(score: score, index: index)
+                ScoreCardView(
+                    score: score,
+                    index: index,
+                    capturedImage: capturedImage,
+                    landmarks: result.landmarksNormalized
+                )
             }
         }
         .aid("diagnosis_score_list")

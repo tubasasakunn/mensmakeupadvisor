@@ -4,8 +4,16 @@ import SwiftUI
 struct TutorialView: View {
     @Environment(AppState.self) private var appState
     @State private var viewModel = TutorialViewModel()
+    @State private var didInitialize = false
 
-    private var currentStep: TutorialStep { TutorialStep.all[appState.tutorialStep] }
+    private var steps: [TutorialStep] { viewModel.steps(for: appState) }
+
+    private var currentStep: TutorialStep {
+        let i = max(0, min(appState.tutorialStep, steps.count - 1))
+        return steps.isEmpty
+            ? TutorialStep.sequence(for: .tamago)[0]
+            : steps[i]
+    }
 
     var body: some View {
         @Bindable var bindableState = appState
@@ -30,33 +38,36 @@ struct TutorialView: View {
                 )
                 .padding(.horizontal, 28)
 
-                TutorialStepInfoArea(
-                    currentStep: currentStep,
-                    intensity: $bindableState.intensity,
-                    showBeforeImage: $viewModel.showBeforeImage,
-                    eyebrowType: $bindableState.eyebrowType
-                )
-                .padding(.top, 20)
-                .padding(.horizontal, 28)
-
-                Spacer()
+                ScrollView(.vertical, showsIndicators: false) {
+                    TutorialStepInfoArea(
+                        currentStep: currentStep,
+                        showBeforeImage: $viewModel.showBeforeImage
+                    )
+                    .padding(.top, 20)
+                    .padding(.horizontal, 28)
+                    .padding(.bottom, 8)
+                }
 
                 navigationBar
                     .padding(.bottom, 32)
                     .padding(.horizontal, 28)
             }
         }
-        // 親 identifier "tutorial_view" が子の Button/Slider 等に継承されないようにする
         .accessibilityElement(children: .contain)
         .aid("tutorial_view")
-        // Studio 側と同じく intensity 変化で実エンジンに渡して renderedImage を
-        // 更新する。これでスライダーの動きが顔写真上に反映される。
-        .task(id: intensityKey) {
+        .task {
+            // 初回入場時に「step 0 まで」適用してから render を要求する。
+            if !didInitialize {
+                viewModel.resetToFirstStep(appState: appState)
+                didInitialize = true
+            }
+        }
+        .task(id: stateKey) {
             await MainActor.run { appState.requestMakeupRender() }
         }
     }
 
-    private var intensityKey: String {
+    private var stateKey: String {
         let i = appState.intensity
         let brow = appState.eyebrowType?.rawValue ?? "off"
         let hl = appState.highlightAreas.sorted().joined(separator: ",")
@@ -81,7 +92,7 @@ struct TutorialView: View {
 
             Spacer()
 
-            Text("ACT \(romanNumeral(appState.tutorialStep + 1)) OF V")
+            Text("ACT \(currentStep.tag) OF \(steps.count)")
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
                 .foregroundStyle(Color.ivory)
                 .kerning(1.5)
@@ -102,21 +113,32 @@ struct TutorialView: View {
     }
 
     private var stepDots: some View {
-        HStack(spacing: 8) {
-            ForEach(TutorialStep.all) { step in
+        // 多くなりがちなのでドットは小さく、レイヤー切り替わりで色を変える
+        HStack(spacing: 5) {
+            ForEach(Array(steps.enumerated()), id: \.offset) { idx, step in
                 Circle()
-                    .fill(step.id <= appState.tutorialStep ? Color.ivory : Color.lineColor)
+                    .fill(idx <= appState.tutorialStep ? layerColor(step.layer) : Color.lineColor)
                     .frame(
-                        width: step.id == appState.tutorialStep ? 8 : 5,
-                        height: step.id == appState.tutorialStep ? 8 : 5
+                        width: idx == appState.tutorialStep ? 7 : 4,
+                        height: idx == appState.tutorialStep ? 7 : 4
                     )
                     .animation(.easeInOut(duration: 0.2), value: appState.tutorialStep)
             }
         }
     }
 
+    private func layerColor(_ layer: MakeupLayer) -> Color {
+        switch layer {
+        case .base:      return Color.ivory.opacity(0.5)
+        case .highlight: return Color.ivory
+        case .shadow:    return Color.brandPrimary
+        case .eye:       return Color.sulphur
+        case .eyebrow:   return Color(red: 0.55, green: 0.35, blue: 0.20)
+        }
+    }
+
     private var navigationBar: some View {
-        let isLast = appState.tutorialStep == TutorialStep.all.count - 1
+        let isLast = appState.tutorialStep == max(0, steps.count - 1)
 
         return HStack {
             Spacer()
@@ -135,22 +157,7 @@ struct TutorialView: View {
             .aid("tutorial_next_button")
         }
     }
-
-    // MARK: - Helpers
-
-    private func romanNumeral(_ n: Int) -> String {
-        switch n {
-        case 1: "I"
-        case 2: "II"
-        case 3: "III"
-        case 4: "IV"
-        case 5: "V"
-        default: "\(n)"
-        }
-    }
 }
-
-// MARK: - Preview
 
 #Preview {
     TutorialView()

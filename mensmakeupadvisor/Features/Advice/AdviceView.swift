@@ -49,11 +49,16 @@ struct AdviceView: View {
                 }
             }
         }
-        .sheet(isPresented: $viewModel.showImagePicker) {
-            ImagePickerView { image in
-                viewModel.selectImage(image, appState: appState)
-                viewModel.showImagePicker = false
-            }
+        .fullScreenCover(isPresented: $viewModel.showCamera) {
+            CameraCaptureView(
+                onCapture: { image in
+                    viewModel.selectImage(image, appState: appState)
+                    viewModel.showCamera = false
+                },
+                onCancel: {
+                    viewModel.showCamera = false
+                }
+            )
             .ignoresSafeArea()
         }
         .aid("advice_capture_view")
@@ -136,10 +141,12 @@ struct AdviceView: View {
 
     private var primaryButton: some View {
         Button {
-            viewModel.showImagePicker = true
+            viewModel.showCamera = true
         } label: {
             HStack(spacing: 8) {
-                Text("写真を選ぶ / 撮る")
+                Image(systemName: "camera.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                Text("カメラで撮影する")
                     .font(.system(size: 14, weight: .semibold, design: .monospaced))
                     .kerning(0.5)
                 Text("→")
@@ -151,7 +158,7 @@ struct AdviceView: View {
             .background(Color.ivory)
             .clipShape(RoundedRectangle(cornerRadius: 2))
         }
-        .aid("advice_photo_picker_button")
+        .aid("advice_camera_button")
     }
 
     private var sampleButton: some View {

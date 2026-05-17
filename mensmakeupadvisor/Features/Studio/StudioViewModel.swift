@@ -27,14 +27,20 @@ final class StudioViewModel {
             highlight: appState.intensity.highlight,
             shadow: appState.intensity.shadow,
             eye: appState.intensity.eye,
-            eyebrow: appState.intensity.eyebrow
+            eyebrow: appState.intensity.eyebrow,
+            highlightAreas: appState.highlightAreas,
+            shadowAreas: appState.shadowAreas,
+            eyeAreas: appState.eyeAreas,
+            eyebrowTypeRaw: appState.eyebrowType?.rawValue
         )
         modelContext.insert(look)
         try? modelContext.save()
         withAnimation(.easeInOut(duration: 0.25)) { showSavedNotification = true }
         Task {
-            try? await Task.sleep(for: .seconds(1.6))
+            try? await Task.sleep(for: .seconds(1.4))
             withAnimation(.easeInOut(duration: 0.25)) { showSavedNotification = false }
+            // 保存完了で home へ。CREATE フローも同じ動線になる。
+            appState.navigate(to: .home)
         }
     }
 }
