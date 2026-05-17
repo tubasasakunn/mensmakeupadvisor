@@ -52,8 +52,7 @@ nonisolated enum EyeApplier {
         ))
         let ksize = Int(Double(faceH) * 0.03 * Double(config.blurScale))
         GaussianBlur.apply(soft, ksize: ksize)
-        // 目周り色が頬まで滲み出すのを抑える
-        BufferNormalize.multiply(soft, with: hard)
+        _ = hard  // POC は blur 後にクランプしない。soft mask のまま合成する。
         return composite(image: image, mask: soft, color: config.colorRGB, intensity: config.intensity, blend: config.blend)
     }
 

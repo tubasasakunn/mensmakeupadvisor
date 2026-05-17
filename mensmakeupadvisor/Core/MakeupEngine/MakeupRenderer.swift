@@ -20,42 +20,31 @@ nonisolated struct MakeupRenderer {
         var eyebrowType: EyebrowApplier.BrowType
 
         // makeup_claude/loadmap/1-virtual-makeup/{1-1-highlight,1-2-shadow}/run_all.py
-        // の PRESET_MAP に揃える。highlight/shadow とも prefix で target.json から
-        // matching する POC のロジックそのままを Swift 側で再現する:
+        // の PRESET_MAP に基本準拠する。highlight は POC と完全一致。
         //
-        //   tamago (卵)   : highlight=base   shadow=なし
-        //   marugao (丸顔) : highlight=marugao shadow=marugao
-        //   omonaga (面長) : highlight=omonaga shadow=omonaga
-        //   gyaku (逆三角) : highlight=base   shadow=なし
-        //   base (ベース)  : highlight=base   shadow=なし
+        //   tamago (卵)   : highlight=base
+        //   marugao (丸顔) : highlight=marugao
+        //   omonaga (面長) : highlight=omonaga
+        //   gyaku (逆三角) : highlight=base
+        //   base (ベース)  : highlight=base
         //
-        // 顔判定結果が手に入る前 (Studio 単独 Preview など) は tamago と同じ扱いに
-        // する (PRESET_MAP の "base" 行に相当)。
+        // shadow は POC では face shape ごとに 1 preset だけだが、Studio FINE TUNE
+        // のシャドウスライダーで「ガッツリ陰影を入れる」UX を成立させるため、
+        // どの顔型でも omonaga (顎下) + marugao (頬の輪郭) を併用する。これで
+        // 顔の上下と左右両方に陰が乗り、視認性が高くなる。
         nonisolated static func forFaceShape(_ shape: FaceShape?) -> LayerSelection {
             let hlPrefix: String
-            let shPrefix: String?
             switch shape ?? .tamago {
-            case .tamago, .gyaku, .base:
-                hlPrefix = "base"
-                shPrefix = nil
-            case .marugao:
-                hlPrefix = "marugao"
-                shPrefix = "marugao"
-            case .omonaga:
-                hlPrefix = "omonaga"
-                shPrefix = "omonaga"
+            case .tamago, .gyaku, .base: hlPrefix = "base"
+            case .marugao:               hlPrefix = "marugao"
+            case .omonaga:               hlPrefix = "omonaga"
             }
             let highlightNames = MeshAreaLibrary
                 .areas(category: .highlight, prefix: hlPrefix)
                 .map(\.name)
-            let shadowNames: [String]
-            if let prefix = shPrefix {
-                shadowNames = MeshAreaLibrary
-                    .areas(category: .shadow, prefix: prefix)
-                    .map(\.name)
-            } else {
-                shadowNames = []
-            }
+            // 全顔型で omonaga + marugao の両方を適用 (univeral contouring)
+            let shadowNames = MeshAreaLibrary.areas(category: .shadow, prefix: "omonaga").map(\.name)
+                + MeshAreaLibrary.areas(category: .shadow, prefix: "marugao").map(\.name)
             return LayerSelection(
                 highlightAreaNames: highlightNames,
                 shadowAreaNames: shadowNames,
@@ -66,10 +55,10 @@ nonisolated struct MakeupRenderer {
             )
         }
 
-        // Preview/Studio で顔判定結果が無い場合の既定値。tamago 相当 (=base prefix)。
+        // Preview/Studio で顔判定結果が無い場合の既定値。tamago と同じ扱い。
         nonisolated static let `default` = LayerSelection(
             highlightAreaNames: ["base_t-zone", "base_c-zone", "base_under-eye"],
-            shadowAreaNames: [],
+            shadowAreaNames: ["omonaga-upper", "omonaga-lower", "marugao-side"],
             applyBase: true,
             eyeAreaNames: ["eyeshadow_base", "eyeshadow_crease", "tear_bag", "lower_outer"],
             applyEyeliner: true,
@@ -81,6 +70,12 @@ nonisolated struct MakeupRenderer {
     private nonisolated static func normalize(_ value: Double) -> Float {
         Float(max(0.0, min(100.0, value)) / 100.0)
     }
+
+    // Studio 表示では UIImage を 4:5 で約 320pt × 400pt 表示 = 3x で 1200x600
+    // 程度しか必要ない。それより大きい入力画像はピクセル単位の compositing /
+    // GaussianBlur がボトルネックになりリアルタイム反映できないため、
+    // 内部処理用にここまで縮小する。
+    private nonisolated static let maxWorkWidth = 800
 
     nonisolated static func render(image rawImage: UIImage, faceMesh: FaceMesh,
                        intensity: MakeupIntensity,
@@ -94,25 +89,36 @@ nonisolated struct MakeupRenderer {
            intensity.eye <= 0, intensity.eyebrow <= 0 {
             return image
         }
-        guard var current = image.safeCGImage else { return image }
+        guard let srcCG = image.safeCGImage else { return image }
         // 顔検出が失敗していて三角形が無い場合は元画像を返す
         guard !faceMesh.triangles.isEmpty else { return image }
 
-        // 各レイヤーの強度は makeup_claude POC (run_all.py の --intensity default)
-        // と完全一致させる。slider 100 で POC の default、50 で半分、と直感的に
-        // 対応するようにする。
+        // ── 入力画像が大きい場合は内部処理だけ縮小して走らせる。landmarks は
+        // 正規化 0-1 で持っているので、どの解像度でも mask の幾何は同じ位置に
+        // 一致する。Studio 画面の表示にはこの縮小サイズで十分。
+        var current: CGImage = srcCG
+        if srcCG.width > maxWorkWidth {
+            if let downsized = downsample(image: srcCG, targetWidth: maxWorkWidth) {
+                current = downsized
+            }
+        }
+
+        // 強度マッピング: slider 100 = POC default の 2x (UI で派手にいじったときに
+        // 「ガッツリ盛った」見た目になる)、slider 50 で POC default 相当、と
+        // 直感的に対応させる。色や合成式 (alpha_composite_*) はすべて POC 完全
+        // 一致のままで、倍率だけ UI 用に底上げする。
         //
-        //   highlight : 0.12  (1-1-highlight/run_all.py default)
-        //   shadow    : 0.25  (1-2-shadow/run_all.py default)
-        //   base      : 0.30  (1-3-base/main.py default)
-        //   eye       : 各エリア毎の AREA_DEFAULTS (eyeshadow_base=0.35 etc) × scale
-        //   eyebrow   : 0.75  (DEFAULT_EYEBROW_INTENSITY)
+        //   highlight : 0.12 × 2 = 0.24 × scale  (POC default = scale=0.5 相当)
+        //   shadow    : 0.25 × 2 = 0.50 × scale
+        //   base      : 0.30 × 2 = 0.60 × scale
+        //   eye       : 各エリア AREA_DEFAULTS × scale (元から POC 強め)
+        //   eyebrow   : 0.75 × scale (POC default)
 
         // 1.3 ベース (顔全体)
         if selection.applyBase, intensity.base > 0 {
             let opts = BaseApplier.Options(
                 colorRGB: SIMD3<Float>(235, 200, 170),
-                intensity: 0.30 * normalize(intensity.base)
+                intensity: 0.60 * normalize(intensity.base)
             )
             if let out = BaseApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
                 current = out
@@ -125,11 +131,11 @@ nonisolated struct MakeupRenderer {
             for name in selection.shadowAreaNames {
                 guard let area = MeshAreaLibrary.lookup(category: .shadow, name: name) else { continue }
                 // POC CLI default の RGB(139, 90, 43) (ブラウン) に揃える。
-                // 関数 default の (90, 68, 50) は実利用されない値だった。
+                // 関数 default の (90, 68, 50) は CLI 経由では使われない値だった。
                 let opts = ShadowApplier.Options(
                     meshIDs: area.meshIDs,
                     colorRGB: SIMD3<Float>(139, 90, 43),
-                    intensity: 0.25 * scale
+                    intensity: 0.50 * scale
                 )
                 if let out = ShadowApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
                     current = out
@@ -145,7 +151,7 @@ nonisolated struct MakeupRenderer {
                 let opts = HighlightApplier.Options(
                     meshIDs: area.meshIDs,
                     colorRGB: SIMD3<Float>(255, 255, 255),
-                    intensity: 0.12 * scale
+                    intensity: 0.24 * scale
                 )
                 if let out = HighlightApplier.apply(image: current, faceMesh: faceMesh, options: opts) {
                     current = out
@@ -203,5 +209,32 @@ nonisolated struct MakeupRenderer {
         }
 
         return UIImage(cgImage: current, scale: image.scale, orientation: image.imageOrientation)
+    }
+
+    // 高速処理のための縮小コピー。 CGImage は scale 情報を持たないので
+    // CGContext で targetWidth × (h/w × targetWidth) 比率にレンダリングする。
+    private nonisolated static func downsample(image: CGImage, targetWidth: Int) -> CGImage? {
+        let w = image.width
+        let h = image.height
+        guard w > targetWidth else { return image }
+        let tw = targetWidth
+        let th = Int(Double(h) * Double(tw) / Double(w))
+        let bytesPerRow = tw * 4
+        let info: CGBitmapInfo = [
+            CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+            CGBitmapInfo.byteOrder32Big,
+        ]
+        guard let ctx = CGContext(
+            data: nil,
+            width: tw,
+            height: th,
+            bitsPerComponent: 8,
+            bytesPerRow: bytesPerRow,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: info.rawValue
+        ) else { return nil }
+        ctx.interpolationQuality = .high
+        ctx.draw(image, in: CGRect(x: 0, y: 0, width: tw, height: th))
+        return ctx.makeImage()
     }
 }

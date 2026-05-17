@@ -35,8 +35,8 @@ nonisolated enum ShadowApplier {
         GaussianBlur.apply(dist, ksize: kInner)
         let kOuter = Int(Double(faceH) * 0.02 * Double(options.blurScale))
         GaussianBlur.apply(dist, ksize: kOuter)
-        // Blur で顎/頬の輪郭外まで shadow が滲み出して背景が暗くなるのを止める。
-        BufferNormalize.multiply(dist, with: maskF)
+        // POC (apply_shadow) は blur 後に再クランプしない。Swift で押し戻すと
+        // 輪郭が硬くなりブラー感が失われるためここでは行わない。
 
         return Compositing.multiply(image: image, mask: dist, color: options.colorRGB, intensity: options.intensity)
     }

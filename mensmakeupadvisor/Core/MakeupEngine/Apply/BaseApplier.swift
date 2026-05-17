@@ -37,9 +37,10 @@ nonisolated enum BaseApplier {
         ))
         let ksize = Int(Double(faceH) * 0.05 * Double(options.blurScale))
         GaussianBlur.apply(dist, ksize: ksize)
-        // Blur が顔範囲外まで滲み出して背景にベース色が乗るのを抑える。
-        // distance transform で輪郭近くは元から値が小さいので、急峻なカットにはならない。
-        BufferNormalize.multiply(dist, with: maskF)
+        // POC (apply_base) は blur 後の再クランプを行っていない。Swift 側でも
+        // 押し戻すとマスクの輪郭がシャープに残ってブラーが効いていない見た目に
+        // なるため、ここでは clamp を入れない。distance transform で既に輪郭近くは
+        // 値が小さく、blur で滲み出る量も顔の外周ぶんで自然にフェードする。
 
         return Compositing.normal(image: image, mask: dist, color: options.colorRGB, intensity: options.intensity)
     }

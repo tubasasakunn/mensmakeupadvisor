@@ -169,6 +169,7 @@ nonisolated enum DistanceTransform {
 nonisolated enum GaussianBlur {
     // 入力 FloatBuffer (0-1) を Gaussian で平滑化する。
     // OpenCV の `cv2.GaussianBlur(src, (k,k), sigma=k/3)` 相当。
+    // vDSP_F5x5 / vDSP_conv で Accelerate framework によるベクトル化を使う。
     nonisolated static func apply(_ buffer: FloatBuffer, ksize: Int) {
         var k = max(3, ksize)
         if k.isMultiple(of: 2) { k += 1 }
@@ -180,28 +181,59 @@ nonisolated enum GaussianBlur {
         let h = buffer.height
 
         let temp = FloatBuffer(width: w, height: h)
+        let stride = vDSP_Stride(1)
+        let n = vDSP_Length(w + 2 * half)
 
-        // Horizontal pass
+        // ─── Horizontal pass (row-wise convolution via vDSP_conv)
+        // 各行を端折り返しで pad → vDSP_conv で 1D 畳み込み
+        var padded = [Float](repeating: 0, count: w + 2 * half)
         for y in 0..<h {
-            for x in 0..<w {
-                var sum: Float = 0
-                for i in -half...half {
-                    let xi = min(max(x + i, 0), w - 1)
-                    sum += buffer[xi, y] * kernel[i + half]
-                }
-                temp[x, y] = sum
+            let rowBase = buffer.pointer.advanced(by: y * w)
+            // pad left edge (replicate buffer[0,y])
+            let left = rowBase[0]
+            for i in 0..<half { padded[i] = left }
+            // copy row
+            padded.withUnsafeMutableBufferPointer { dst in
+                for x in 0..<w { dst[x + half] = rowBase[x] }
             }
+            // pad right edge
+            let right = rowBase[w - 1]
+            for i in 0..<half { padded[w + half + i] = right }
+            // convolve into temp row
+            let tempRow = temp.pointer.advanced(by: y * w)
+            padded.withUnsafeBufferPointer { src in
+                kernel.withUnsafeBufferPointer { kp in
+                    vDSP_conv(src.baseAddress!, stride,
+                              kp.baseAddress!, stride,
+                              tempRow, stride,
+                              vDSP_Length(w), vDSP_Length(k))
+                }
+            }
+            _ = n
         }
-        // Vertical pass
-        for y in 0..<h {
-            for x in 0..<w {
-                var sum: Float = 0
-                for i in -half...half {
-                    let yi = min(max(y + i, 0), h - 1)
-                    sum += temp[x, yi] * kernel[i + half]
+
+        // ─── Vertical pass: 列方向。列を抜き出して同様に conv → 戻す。
+        var col = [Float](repeating: 0, count: h)
+        var paddedCol = [Float](repeating: 0, count: h + 2 * half)
+        var resultCol = [Float](repeating: 0, count: h)
+        for x in 0..<w {
+            for y in 0..<h { col[y] = temp.pointer[y * w + x] }
+            let top = col[0]
+            for i in 0..<half { paddedCol[i] = top }
+            for y in 0..<h { paddedCol[y + half] = col[y] }
+            let bot = col[h - 1]
+            for i in 0..<half { paddedCol[h + half + i] = bot }
+            paddedCol.withUnsafeBufferPointer { src in
+                kernel.withUnsafeBufferPointer { kp in
+                    resultCol.withUnsafeMutableBufferPointer { dst in
+                        vDSP_conv(src.baseAddress!, stride,
+                                  kp.baseAddress!, stride,
+                                  dst.baseAddress!, stride,
+                                  vDSP_Length(h), vDSP_Length(k))
+                    }
                 }
-                buffer[x, y] = sum
             }
+            for y in 0..<h { buffer.pointer[y * w + x] = resultCol[y] }
         }
     }
 
