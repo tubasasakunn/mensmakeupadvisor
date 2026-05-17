@@ -112,7 +112,7 @@ struct DiagnosisFaceMeshPlate: View {
         }
     }
 
-    nonisolated(unsafe) private static var cachedEdges: [(Int, Int)] = FaceMesh.tesselationConnections()
+    nonisolated(unsafe) private static var cachedEdges: [(Int, Int)] = FaceMeshResources.tesselationConnections()
 }
 
 #Preview {

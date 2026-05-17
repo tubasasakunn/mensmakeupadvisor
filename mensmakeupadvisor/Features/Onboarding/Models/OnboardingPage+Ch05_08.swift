@@ -1,8 +1,6 @@
 import Foundation
 
 extension OnboardingPage {
-    static var all: [OnboardingPage] { ch01_04 + ch05_08 }
-
     static var ch05_08: [OnboardingPage] {
         [
             // ─────────────────────────────────────────────

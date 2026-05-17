@@ -20,15 +20,4 @@ enum MakeupLayer: String, CaseIterable, Sendable {
         case .eyebrow:   "眉"
         }
     }
-
-    // Roman numeral tags I–V corresponding to CaseIterable order
-    var tag: String {
-        switch self {
-        case .highlight: "I"
-        case .shadow:    "II"
-        case .base:      "III"
-        case .eye:       "IV"
-        case .eyebrow:   "V"
-        }
-    }
 }

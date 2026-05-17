@@ -4,7 +4,7 @@ import MediaPipeTasksVision
 import OSLog
 import UIKit
 
-private let faceMeshLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "FaceMesh")
+private nonisolated let faceMeshLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "FaceMesh")
 
 // MediaPipe FaceLandmarker (478点) を呼び出し、テッセレーション三角形を抽出して
 // 中点分割でメッシュを細かくする。
@@ -31,7 +31,6 @@ nonisolated final class FaceMesh {
 
     nonisolated enum FaceMeshError: Error {
         case modelMissing
-        case tesselationMissing
         case faceNotDetected
     }
 
@@ -64,7 +63,7 @@ nonisolated final class FaceMesh {
         } else if let bundled = Bundle.main.path(forResource: "face_landmarker", ofType: "task") {
             resolvedPath = bundled
             source = "bundle"
-        } else if let cached = Self.cachedModelPath() {
+        } else if let cached = FaceMeshResources.cachedModelPath() {
             resolvedPath = cached
             source = "cache"
         } else {
@@ -107,7 +106,7 @@ nonisolated final class FaceMesh {
         landmarksPx = rawPoints.map { CGPoint(x: $0.x * Double(w), y: $0.y * Double(h)) }
 
         // Tesselation 接続リストを JSON リソースから取得して三角形を組み立てる
-        let connections = try Self.loadTesselationConnections()
+        let connections = try FaceMeshResources.loadTesselationConnections()
         rawTriangles = Self.extractTriangles(connections: connections)
 
         // Working copy
@@ -301,62 +300,6 @@ nonisolated final class FaceMesh {
         return result
     }
 
-    // MARK: - Resources
-
-    // FaceMesh のテッセレーション接続リスト (2556 個) を読み込む。
-    // MediaPipe Python ソリューションの FACEMESH_TESSELATION から事前に抽出済みで、
-    // バンドル内 `face_mesh_tesselation.json` に格納している。
-    nonisolated(unsafe) private static var cachedTesselation: [(Int, Int)] = []
-    private static let tesselationLock = NSLock()
-
-    nonisolated static func tesselationConnections() -> [(Int, Int)] {
-        (try? loadTesselationConnections()) ?? []
-    }
-
-    private nonisolated static func loadTesselationConnections() throws -> [(Int, Int)] {
-        tesselationLock.lock()
-        defer { tesselationLock.unlock() }
-        if !cachedTesselation.isEmpty { return cachedTesselation }
-
-        guard let url = Bundle.main.url(forResource: "face_mesh_tesselation", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let arr = try? JSONSerialization.jsonObject(with: data) as? [[Int]]
-        else {
-            throw FaceMeshError.tesselationMissing
-        }
-        cachedTesselation = arr.compactMap { pair in
-            pair.count == 2 ? (pair[0], pair[1]) : nil
-        }
-        return cachedTesselation
-    }
-
-    nonisolated static func cachedModelPath() -> String? {
-        guard let cache = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
-            return nil
-        }
-        let target = cache.appendingPathComponent("face_landmarker.task")
-        return FileManager.default.fileExists(atPath: target.path) ? target.path : nil
-    }
-
-    // Google 公式 CDN から face_landmarker.task をダウンロード (初回のみ)
-    nonisolated static func ensureModelDownloaded() async throws -> String {
-        if let bundled = Bundle.main.path(forResource: "face_landmarker", ofType: "task") {
-            return bundled
-        }
-        guard let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
-            throw FaceMeshError.modelMissing
-        }
-        let target = cacheDir.appendingPathComponent("face_landmarker.task")
-        if FileManager.default.fileExists(atPath: target.path) {
-            return target.path
-        }
-        guard let url = URL(string: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task") else {
-            throw FaceMeshError.modelMissing
-        }
-        let (tmp, _) = try await URLSession.shared.download(from: url)
-        try FileManager.default.moveItem(at: tmp, to: target)
-        return target.path
-    }
 }
 
 private nonisolated struct TriKey: Hashable {

@@ -9,10 +9,6 @@ enum AppEnvironment {
         ProcessInfo.processInfo.arguments.contains("--mock-image-picker")
     }
 
-    static var useMockCamera: Bool {
-        ProcessInfo.processInfo.arguments.contains("--mock-camera")
-    }
-
     static var isScreenshotMode: Bool {
         ProcessInfo.processInfo.arguments.contains("--screenshot-mode")
     }

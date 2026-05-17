@@ -5,7 +5,6 @@ struct StudioView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = StudioViewModel()
-    @State private var isRenderingShare = false
 
     var body: some View {
         ZStack {
@@ -29,13 +28,15 @@ struct StudioView: View {
 
                 Spacer()
 
-                bottomActions
-                    .padding(.horizontal, 28)
-                    .padding(.bottom, 32)
+                StudioBottomBar {
+                    viewModel.saveLook(appState: appState, modelContext: modelContext)
+                }
+                .padding(.horizontal, 28)
+                .padding(.bottom, 32)
             }
 
             if viewModel.showSavedNotification {
-                savedNotification
+                StudioSavedToast()
             }
         }
         // 親 identifier が子の Button/Toggle 等に継承されないようにする
@@ -136,83 +137,6 @@ struct StudioView: View {
         }
     }
 
-    private var bottomActions: some View {
-        HStack(spacing: 10) {
-            archiveButton
-            shareButton.frame(width: 52)
-        }
-    }
-
-    private var archiveButton: some View {
-        Button {
-            viewModel.saveLook(appState: appState, modelContext: modelContext)
-        } label: {
-            HStack(spacing: 8) {
-                Text("♥")
-                    .font(.system(size: 14))
-                Text("ARCHIVE THIS LOOK")
-                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                    .kerning(2)
-            }
-            .foregroundStyle(Color.ivory)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .overlay(
-                Rectangle().stroke(Color.lineStrong, lineWidth: 1)
-            )
-        }
-        .aid("studio_save_button")
-    }
-
-    private var shareButton: some View {
-        Button {
-            Task { await shareCurrentLook() }
-        } label: {
-            Group {
-                if isRenderingShare {
-                    ProgressView()
-                        .tint(Color.inkSecondary)
-                        .scaleEffect(0.7)
-                } else {
-                    Text("↑")
-                        .font(.system(size: 18, weight: .light, design: .monospaced))
-                        .foregroundStyle(Color.ivory)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .overlay(Rectangle().stroke(Color.lineStrong, lineWidth: 1))
-        }
-        .aid("studio_share_button")
-        .disabled(isRenderingShare)
-    }
-
-    private func shareCurrentLook() async {
-        guard let result = appState.analysisResult else { return }
-        isRenderingShare = true
-        defer { isRenderingShare = false }
-        let card = DiagnosisShareCardView(result: result)
-        if let image = ShareHelper.render(card) {
-            ShareHelper.present([image])
-        }
-    }
-
-    private var savedNotification: some View {
-        VStack {
-            Spacer()
-            Text("✓ LOOK ARCHIVED")
-                .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                .foregroundStyle(Color.appBackground)
-                .kerning(2)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
-                .background(Color.ivory)
-                .frame(maxWidth: .infinity)
-                .padding(.bottom, 100)
-        }
-        .aid("studio_saved_notification")
-        .transition(.opacity.combined(with: .move(edge: .bottom)))
-    }
 }
 
 // MARK: - Preview

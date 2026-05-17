@@ -25,7 +25,7 @@ actor MakeupEngineService {
     private var sourceImage: UIImage?
 
     func prepare(image: UIImage) async throws {
-        let path = try await FaceMesh.ensureModelDownloaded()
+        let path = try await FaceMeshResources.ensureModelDownloaded()
         let newMesh = FaceMesh(subdivisionLevel: 1)
         try newMesh.initialize(modelPath: path)
         do {
@@ -53,8 +53,6 @@ actor MakeupEngineService {
         mesh = nil
         sourceImage = nil
     }
-
-    var isPrepared: Bool { mesh != nil }
 }
 
 // MARK: - Environment

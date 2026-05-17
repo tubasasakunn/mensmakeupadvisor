@@ -25,7 +25,6 @@ nonisolated enum HowtoKeyframes {
 
 nonisolated enum HowtoEasing {
     nonisolated static func easeInOut(_ x: Double) -> Double { -(cos(.pi * x) - 1) / 2 }
-    nonisolated static func linear(_ x: Double) -> Double { x }
 }
 
 // SVG の 500x500 ローカル座標で描いたコンテンツを親フレームにフィットさせる
