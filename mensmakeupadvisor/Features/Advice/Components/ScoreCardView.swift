@@ -18,19 +18,21 @@ struct ScoreCardView: View {
             adviceText
 
             if isExpanded {
+                // 親 VStack の高さ変化で自然に下方向に展開させ、内容は
+                // fade in だけにする。.move(edge: .top) を入れていた
+                // ときは「上から滑り落ちて来る」見た目で違和感があった。
                 expandedAnnotation
                     .padding(.top, 6)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .transition(.opacity)
             }
         }
         .padding(.vertical, 18)
         .padding(.leading, score.score >= 75 ? 10 : 0)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .animation(.easeInOut(duration: 0.28), value: isExpanded)
         .contentShape(Rectangle())
         .onTapGesture {
-            withAnimation(.spring(duration: 0.35, bounce: 0.1)) {
-                isExpanded.toggle()
-            }
+            isExpanded.toggle()
         }
         .overlay(alignment: .leading) {
             if score.score >= 75 {

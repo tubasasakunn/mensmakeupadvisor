@@ -1,0 +1,71 @@
+import SwiftUI
+
+// Tutorial の眉ステップで表示する type picker。
+// 顔型からのおすすめタイプは小さく「★ おすすめ」ラベルで示す。
+struct TutorialEyebrowPicker: View {
+    @Binding var eyebrowType: EyebrowApplier.BrowType?
+    let recommended: String?
+
+    private let options: [(label: String, value: EyebrowApplier.BrowType?)] = [
+        ("OFF", nil),
+        ("NATURAL", .natural),
+        ("STRAIGHT", .straight),
+        ("ARCH", .arch),
+        ("PARALLEL", .parallel),
+        ("CORNER", .corner),
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("BROW TYPE")
+                .font(.system(size: 9, weight: .medium, design: .monospaced))
+                .foregroundStyle(Color.inkSecondary)
+                .kerning(2)
+
+            VStack(spacing: 6) {
+                HStack(spacing: 6) {
+                    ForEach(0..<3, id: \.self) { i in browButton(options[i]) }
+                }
+                HStack(spacing: 6) {
+                    ForEach(3..<6, id: \.self) { i in browButton(options[i]) }
+                }
+            }
+        }
+        .aid("tutorial_brow_type_picker")
+    }
+
+    private func browButton(_ entry: (label: String, value: EyebrowApplier.BrowType?)) -> some View {
+        let isActive = (entry.value == eyebrowType)
+        let isRecommended = (entry.value?.rawValue == recommended)
+        let aidValue = entry.value?.rawValue ?? "off"
+
+        return Button {
+            withAnimation(.easeInOut(duration: 0.15)) { eyebrowType = entry.value }
+        } label: {
+            VStack(spacing: 2) {
+                Text(entry.label)
+                    .font(.system(size: 9, weight: .medium, design: .monospaced))
+                    .kerning(1.2)
+                if isRecommended {
+                    Text("★ おすすめ")
+                        .font(.system(size: 7, weight: .medium, design: .monospaced))
+                        .kerning(0.5)
+                }
+            }
+            .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
+            .background(isActive ? Color.ivory : Color.clear)
+            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+        }
+        .aid("tutorial_brow_type_\(aidValue)")
+    }
+}
+
+#Preview {
+    @Previewable @State var b: EyebrowApplier.BrowType? = .natural
+    return TutorialEyebrowPicker(eyebrowType: $b, recommended: "natural")
+        .padding()
+        .background(Color.appBackground)
+}

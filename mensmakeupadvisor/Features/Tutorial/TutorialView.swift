@@ -41,6 +41,8 @@ struct TutorialView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     TutorialStepInfoArea(
                         currentStep: currentStep,
+                        intensity: $bindableState.intensity,
+                        eyebrowType: $bindableState.eyebrowType,
                         showBeforeImage: $viewModel.showBeforeImage
                     )
                     .padding(.top, 20)

@@ -9,25 +9,57 @@ final class TutorialViewModel {
         TutorialStep.sequence(for: appState.analysisResult?.faceShape)
     }
 
-    // ステップ index を渡されたら、その index までを累積適用して
-    // appState の intensity / area set / eyebrowType を再構成する。
-    // 戻る (prev) でも次に進む (next) でも同じ関数で reset → rebuild。
-    func rebuildCumulativeState(upTo index: Int, appState: AppState) {
-        let seq = steps(for: appState)
-        guard !seq.isEmpty else { return }
-        let target = min(max(index, 0), seq.count - 1)
-
-        // reset
+    // Tutorial 入場時の初期化。全状態を一度クリアして step 0 (base) を適用する。
+    func resetToFirstStep(appState: AppState) {
+        appState.tutorialStep = 0
         appState.intensity = MakeupIntensity()
         appState.highlightAreas = []
         appState.shadowAreas = []
         appState.eyeAreas = []
         appState.eyebrowType = nil
-
-        for i in 0...target {
-            apply(step: seq[i], appState: appState)
+        if let first = steps(for: appState).first {
+            apply(step: first, appState: appState)
         }
     }
+
+    func nextStep(appState: AppState) {
+        let seq = steps(for: appState)
+        // 最終ステップで次へ → Studio で保存できる状態にしてから遷移
+        guard appState.tutorialStep < seq.count - 1 else {
+            appState.tutorialDone = true
+            appState.navigate(to: .studio)
+            return
+        }
+        withAnimation(.easeInOut(duration: 0.25)) {
+            appState.tutorialStep += 1
+        }
+        apply(step: seq[appState.tutorialStep], appState: appState)
+    }
+
+    func prevStep(appState: AppState) {
+        let seq = steps(for: appState)
+        guard appState.tutorialStep > 0 else {
+            appState.navigate(to: .diagnosis)
+            return
+        }
+        // 「今の step を打ち消してから」前に戻る。intensity はユーザーが
+        // 調整した値を保持するため、resetToFirstStep のような全消しはしない。
+        unapply(step: seq[appState.tutorialStep], appState: appState)
+        withAnimation(.easeInOut(duration: 0.25)) {
+            appState.tutorialStep -= 1
+        }
+    }
+
+    func skip(appState: AppState) {
+        // 全 step を一括適用してから Studio へ
+        for step in steps(for: appState) {
+            apply(step: step, appState: appState)
+        }
+        appState.tutorialDone = true
+        appState.navigate(to: .studio)
+    }
+
+    // MARK: - Apply / Unapply
 
     private func apply(step: TutorialStep, appState: AppState) {
         switch step.layer {
@@ -49,44 +81,21 @@ final class TutorialViewModel {
         }
     }
 
-    func nextStep(appState: AppState) {
-        let seq = steps(for: appState)
-        if appState.tutorialStep < seq.count - 1 {
-            withAnimation(.easeInOut(duration: 0.25)) {
-                appState.tutorialStep += 1
-            }
-            rebuildCumulativeState(upTo: appState.tutorialStep, appState: appState)
-        } else {
-            // 最終ステップで NEXT → Studio へ。Studio で保存後に home に飛ばす。
-            appState.tutorialDone = true
-            appState.navigate(to: .studio)
+    private func unapply(step: TutorialStep, appState: AppState) {
+        switch step.layer {
+        case .base:
+            appState.intensity.base = 0
+        case .highlight:
+            if let area = step.areaName { appState.highlightAreas.remove(area) }
+            if appState.highlightAreas.isEmpty { appState.intensity.highlight = 0 }
+        case .shadow:
+            if let area = step.areaName { appState.shadowAreas.remove(area) }
+            if appState.shadowAreas.isEmpty { appState.intensity.shadow = 0 }
+        case .eye:
+            if let area = step.areaName { appState.eyeAreas.remove(area) }
+            if appState.eyeAreas.isEmpty { appState.intensity.eye = 0 }
+        case .eyebrow:
+            appState.eyebrowType = nil
         }
-    }
-
-    func prevStep(appState: AppState) {
-        if appState.tutorialStep > 0 {
-            withAnimation(.easeInOut(duration: 0.25)) {
-                appState.tutorialStep -= 1
-            }
-            rebuildCumulativeState(upTo: appState.tutorialStep, appState: appState)
-        } else {
-            appState.navigate(to: .diagnosis)
-        }
-    }
-
-    func skip(appState: AppState) {
-        // 全部入りの最終形を Studio に持ち越す
-        let seq = steps(for: appState)
-        if !seq.isEmpty {
-            rebuildCumulativeState(upTo: seq.count - 1, appState: appState)
-        }
-        appState.tutorialDone = true
-        appState.navigate(to: .studio)
-    }
-
-    // Tutorial 画面に入ったタイミングで「step 0 まで」の状態に初期化する。
-    func resetToFirstStep(appState: AppState) {
-        appState.tutorialStep = 0
-        rebuildCumulativeState(upTo: 0, appState: appState)
     }
 }
