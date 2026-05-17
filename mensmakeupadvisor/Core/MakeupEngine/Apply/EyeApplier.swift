@@ -45,14 +45,11 @@ nonisolated enum EyeApplier {
         let h = image.height
         let mask = faceMesh.buildMask(meshIDs: meshIDs, width: w, height: h)
         let soft = FloatBuffer.fromMask(mask)
-        let hard = FloatBuffer.fromMask(mask)
-        let faceH = max(1.0, hypot(
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].x - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].x,
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].y - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].y
-        ))
+        let top = faceMesh.landmark(FaceLandmarkID.foreheadTop, width: w, height: h)
+        let chin = faceMesh.landmark(FaceLandmarkID.chinBottom, width: w, height: h)
+        let faceH = max(1.0, hypot(top.x - chin.x, top.y - chin.y))
         let ksize = Int(Double(faceH) * 0.03 * Double(config.blurScale))
         GaussianBlur.apply(soft, ksize: ksize)
-        _ = hard  // POC は blur 後にクランプしない。soft mask のまま合成する。
         return composite(image: image, mask: soft, color: config.colorRGB, intensity: config.intensity, blend: config.blend)
     }
 
@@ -71,12 +68,14 @@ nonisolated enum EyeApplier {
             space: CGColorSpaceCreateDeviceGray(),
             bitmapInfo: CGImageAlphaInfo.none.rawValue
         ) else { return image }
-        // landmarksPx は画像座標(Y-DOWN)。CGContext は Y-UP なので CTM を反転して
+        // landmark 座標は画像座標(Y-DOWN)。CGContext は Y-UP なので CTM を反転して
         // 画像座標で stroke を描けるようにする (詳細は FaceMesh.buildMask のコメント参照)。
         ctx.translateBy(x: 0, y: CGFloat(h))
         ctx.scaleBy(x: 1, y: -1)
 
-        let faceWPx = abs(faceMesh.landmarksPx[FaceLandmarkID.templeR].x - faceMesh.landmarksPx[FaceLandmarkID.templeL].x)
+        let templeR = faceMesh.landmark(FaceLandmarkID.templeR, width: w, height: h)
+        let templeL = faceMesh.landmark(FaceLandmarkID.templeL, width: w, height: h)
+        let faceWPx = abs(templeR.x - templeL.x)
         let thickness = max(2.0, Double(faceWPx) * 0.012 * data.thickness * Double(data.thicknessScale))
         let offsetPx = thickness / 2 + 1
 
@@ -92,20 +91,17 @@ nonisolated enum EyeApplier {
 
         for side in sides {
             let allIDs = side.upper + side.lower
-            let cx = allIDs.compactMap { id -> Double? in
-                guard faceMesh.landmarksPx.indices.contains(id) else { return nil }
-                return Double(faceMesh.landmarksPx[id].x)
-            }.reduce(0, +) / Double(allIDs.count)
-            let cy = allIDs.compactMap { id -> Double? in
-                guard faceMesh.landmarksPx.indices.contains(id) else { return nil }
-                return Double(faceMesh.landmarksPx[id].y)
-            }.reduce(0, +) / Double(allIDs.count)
+            let validIDs = allIDs.filter { faceMesh.points.indices.contains($0) }
+            guard !validIDs.isEmpty else { continue }
+            let cx = validIDs.map { Double(faceMesh.landmark($0, width: w, height: h).x) }.reduce(0, +) / Double(validIDs.count)
+            let cy = validIDs.map { Double(faceMesh.landmark($0, width: w, height: h).y) }.reduce(0, +) / Double(validIDs.count)
 
             for landmarkIDs in [side.upper, side.lower] {
                 var pts: [CGPoint] = []
-                for lid in landmarkIDs where faceMesh.landmarksPx.indices.contains(lid) {
-                    var px = Double(faceMesh.landmarksPx[lid].x)
-                    var py = Double(faceMesh.landmarksPx[lid].y)
+                for lid in landmarkIDs where faceMesh.points.indices.contains(lid) {
+                    let lp = faceMesh.landmark(lid, width: w, height: h)
+                    var px = Double(lp.x)
+                    var py = Double(lp.y)
                     let dx = px - cx
                     let dy = py - cy
                     let len = max(sqrt(dx * dx + dy * dy), 1e-6)
@@ -124,10 +120,9 @@ nonisolated enum EyeApplier {
         }
 
         let soft = FloatBuffer.fromMask(mask)
-        let faceH = max(1.0, hypot(
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].x - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].x,
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].y - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].y
-        ))
+        let top = faceMesh.landmark(FaceLandmarkID.foreheadTop, width: w, height: h)
+        let chin = faceMesh.landmark(FaceLandmarkID.chinBottom, width: w, height: h)
+        let faceH = max(1.0, hypot(top.x - chin.x, top.y - chin.y))
         let ksize = Int(Double(faceH) * 0.03 * Double(config.blurScale))
         GaussianBlur.apply(soft, ksize: ksize)
         return composite(image: image, mask: soft, color: config.colorRGB, intensity: config.intensity, blend: config.blend)

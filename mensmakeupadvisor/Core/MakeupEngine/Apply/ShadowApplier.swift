@@ -27,10 +27,9 @@ nonisolated enum ShadowApplier {
         BufferNormalize.invertWithin(dist, mask: maskF)
         PowerCurve.apply(dist, exponent: 1.5)
 
-        let faceH = max(1.0, hypot(
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].x - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].x,
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].y - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].y
-        ))
+        let top = faceMesh.landmark(FaceLandmarkID.foreheadTop, width: w, height: h)
+        let chin = faceMesh.landmark(FaceLandmarkID.chinBottom, width: w, height: h)
+        let faceH = max(1.0, hypot(top.x - chin.x, top.y - chin.y))
         let kInner = Int(Double(faceH) * 0.04 * Double(options.blurScale))
         GaussianBlur.apply(dist, ksize: kInner)
         let kOuter = Int(Double(faceH) * 0.02 * Double(options.blurScale))

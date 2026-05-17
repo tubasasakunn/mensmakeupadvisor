@@ -31,10 +31,9 @@ nonisolated enum BaseApplier {
         let maskF = FloatBuffer.fromMask(mask)
         BufferNormalize.multiply(dist, with: maskF)
 
-        let faceH = max(1.0, hypot(
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].x - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].x,
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].y - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].y
-        ))
+        let top = faceMesh.landmark(FaceLandmarkID.foreheadTop, width: w, height: h)
+        let chin = faceMesh.landmark(FaceLandmarkID.chinBottom, width: w, height: h)
+        let faceH = max(1.0, hypot(top.x - chin.x, top.y - chin.y))
         let ksize = Int(Double(faceH) * 0.05 * Double(options.blurScale))
         GaussianBlur.apply(dist, ksize: ksize)
         // POC (apply_base) は blur 後の再クランプを行っていない。Swift 側でも

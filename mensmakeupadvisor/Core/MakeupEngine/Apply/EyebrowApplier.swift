@@ -67,11 +67,11 @@ nonisolated enum EyebrowApplier {
         ]
         for (upper, lower) in pairs {
             var pts: [CGPoint] = []
-            for id in upper where faceMesh.landmarksPx.indices.contains(id) {
-                pts.append(faceMesh.landmarksPx[id])
+            for id in upper where faceMesh.points.indices.contains(id) {
+                pts.append(faceMesh.landmark(id, width: width, height: height))
             }
-            for id in lower.reversed() where faceMesh.landmarksPx.indices.contains(id) {
-                pts.append(faceMesh.landmarksPx[id])
+            for id in lower.reversed() where faceMesh.points.indices.contains(id) {
+                pts.append(faceMesh.landmark(id, width: width, height: height))
             }
             guard pts.count >= 3 else { continue }
             ctx.beginPath()
@@ -94,10 +94,9 @@ nonisolated enum EyebrowApplier {
     private nonisolated static func eraseEyebrows(image: CGImage, faceMesh: FaceMesh) -> CGImage? {
         let w = image.width
         let h = image.height
-        let faceH = max(1.0, hypot(
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].x - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].x,
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].y - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].y
-        ))
+        let top = faceMesh.landmark(FaceLandmarkID.foreheadTop, width: w, height: h)
+        let chin = faceMesh.landmark(FaceLandmarkID.chinBottom, width: w, height: h)
+        let faceH = max(1.0, hypot(top.x - chin.x, top.y - chin.y))
         let expandPx = max(5, Int(Double(faceH) * 0.025))
         let mask = buildEyebrowPolygonMask(faceMesh: faceMesh, width: w, height: h, expandPx: expandPx)
 
@@ -165,8 +164,27 @@ nonisolated enum EyebrowApplier {
         var browLength: Double
     }
 
+    // 全 landmark を「指定された canvas サイズ」の pixel 座標で取得するためのヘルパー。
+    // FaceMetricsCalculator.p は元画像 (検出時) サイズで固定の landmarksPx を返すため、
+    // MakeupRenderer が downsample した canvas で使うと座標がズレる。
+    private nonisolated static func lm(_ fm: FaceMesh, _ id: Int, _ width: Int, _ height: Int) -> CGPoint {
+        fm.landmark(id, width: width, height: height)
+    }
+    private nonisolated static func meanLm(_ fm: FaceMesh, ids: [Int], width: Int, height: Int) -> CGPoint {
+        guard !ids.isEmpty else { return .zero }
+        var sx = 0.0, sy = 0.0, cnt = 0
+        for i in ids where fm.points.indices.contains(i) {
+            let p = fm.landmark(i, width: width, height: height)
+            sx += Double(p.x); sy += Double(p.y); cnt += 1
+        }
+        guard cnt > 0 else { return .zero }
+        return CGPoint(x: sx / Double(cnt), y: sy / Double(cnt))
+    }
+
     // Python `compute_brow_anchors` の対称化ロジックを忠実に移植。
-    private nonisolated static func anchors(faceMesh: FaceMesh, side: Side) -> Anchors {
+    // canvas サイズ(width/height)に応じて landmark を計算する。
+    private nonisolated static func anchors(faceMesh: FaceMesh, side: Side,
+                                            width: Int, height: Int) -> Anchors {
         struct SideData {
             var noseWing: CGPoint
             var innerEye: CGPoint
@@ -181,30 +199,30 @@ nonisolated enum EyebrowApplier {
         func load(_ side: Side) -> SideData {
             switch side {
             case .right:
-                let irisCenter = FaceMetricsCalculator.mean(faceMesh, ids: FaceLandmarkID.irisR)
-                let top = FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.eyeTopR)
-                let bot = FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.eyeBotR)
+                let irisCenter = meanLm(faceMesh, ids: FaceLandmarkID.irisR, width: width, height: height)
+                let top = lm(faceMesh, FaceLandmarkID.eyeTopR, width, height)
+                let bot = lm(faceMesh, FaceLandmarkID.eyeBotR, width, height)
                 return SideData(
-                    noseWing: FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.noseWingR),
-                    innerEye: FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.eyeInnerR),
-                    outerEye: FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.eyeOuterR),
+                    noseWing: lm(faceMesh, FaceLandmarkID.noseWingR, width, height),
+                    innerEye: lm(faceMesh, FaceLandmarkID.eyeInnerR, width, height),
+                    outerEye: lm(faceMesh, FaceLandmarkID.eyeOuterR, width, height),
                     eyeTop: top, eyeBot: bot,
-                    browHead: FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.browHeadR),
-                    browTail: FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.browTailR),
+                    browHead: lm(faceMesh, FaceLandmarkID.browHeadR, width, height),
+                    browTail: lm(faceMesh, FaceLandmarkID.browTailR, width, height),
                     irisCenter: irisCenter,
                     eyeHeight: abs(Double(top.y - bot.y))
                 )
             case .left:
-                let irisCenter = FaceMetricsCalculator.mean(faceMesh, ids: FaceLandmarkID.irisL)
-                let top = FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.eyeTopL)
-                let bot = FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.eyeBotL)
+                let irisCenter = meanLm(faceMesh, ids: FaceLandmarkID.irisL, width: width, height: height)
+                let top = lm(faceMesh, FaceLandmarkID.eyeTopL, width, height)
+                let bot = lm(faceMesh, FaceLandmarkID.eyeBotL, width, height)
                 return SideData(
-                    noseWing: FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.noseWingL),
-                    innerEye: FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.eyeInnerL),
-                    outerEye: FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.eyeOuterL),
+                    noseWing: lm(faceMesh, FaceLandmarkID.noseWingL, width, height),
+                    innerEye: lm(faceMesh, FaceLandmarkID.eyeInnerL, width, height),
+                    outerEye: lm(faceMesh, FaceLandmarkID.eyeOuterL, width, height),
                     eyeTop: top, eyeBot: bot,
-                    browHead: FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.browHeadL),
-                    browTail: FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.browTailL),
+                    browHead: lm(faceMesh, FaceLandmarkID.browHeadL, width, height),
+                    browTail: lm(faceMesh, FaceLandmarkID.browTailL, width, height),
                     irisCenter: irisCenter,
                     eyeHeight: abs(Double(top.y - bot.y))
                 )
@@ -212,7 +230,7 @@ nonisolated enum EyebrowApplier {
         }
         let r = load(.right)
         let l = load(.left)
-        let faceCx = Double(FaceMetricsCalculator.p(faceMesh, FaceLandmarkID.noseTip).x)
+        let faceCx = Double(lm(faceMesh, FaceLandmarkID.noseTip, width, height).x)
         let avgEyeHeight = (r.eyeHeight + l.eyeHeight) / 2
         let avgEyeTopY = (Double(r.eyeTop.y) + Double(l.eyeTop.y)) / 2
         let headY = avgEyeTopY - avgEyeHeight * 1.85
@@ -357,7 +375,7 @@ nonisolated enum EyebrowApplier {
         ctx.setFillColor(gray: 1.0, alpha: 1.0)
 
         for side in [Side.right, .left] {
-            let a = anchors(faceMesh: faceMesh, side: side)
+            let a = anchors(faceMesh: faceMesh, side: side, width: w, height: h)
             let poly = polygonFromShape(anchors: a, shape: shape,
                                         thicknessScale: Double(options.thicknessScale))
             guard poly.count >= 3 else { continue }
@@ -369,10 +387,9 @@ nonisolated enum EyebrowApplier {
         }
 
         let soft = FloatBuffer.fromMask(mask)
-        let faceH = max(1.0, hypot(
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].x - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].x,
-            faceMesh.landmarksPx[FaceLandmarkID.foreheadTop].y - faceMesh.landmarksPx[FaceLandmarkID.chinBottom].y
-        ))
+        let top = faceMesh.landmark(FaceLandmarkID.foreheadTop, width: w, height: h)
+        let chin = faceMesh.landmark(FaceLandmarkID.chinBottom, width: w, height: h)
+        let faceH = max(1.0, hypot(top.x - chin.x, top.y - chin.y))
         let ksize = max(3, Int(Double(faceH) * 0.005))
         GaussianBlur.apply(soft, ksize: ksize)
         return Compositing.normal(image: image, mask: soft, color: options.colorRGB, intensity: options.intensity)

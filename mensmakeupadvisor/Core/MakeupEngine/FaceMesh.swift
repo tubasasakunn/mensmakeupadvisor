@@ -142,6 +142,17 @@ nonisolated final class FaceMesh {
         }
     }
 
+    // 指定された画像サイズ(=各 Applier が実際に作業する canvas の幅・高さ)に
+    // 対するランドマーク pixel 座標を返す。`landmarksPx` は元画像 (検出時) 解像度
+    // で固定だが、MakeupRenderer が大画像を downsample すると、Applier が使う
+    // canvas のサイズと合わなくなる。`points` (正規化 0-1) から都度計算することで
+    // 作業サイズに依存しない座標系を提供する。
+    nonisolated func landmark(_ id: Int, width: Int, height: Int) -> CGPoint {
+        guard points.indices.contains(id) else { return .zero }
+        let p = points[id]
+        return CGPoint(x: p.x * Double(width), y: p.y * Double(height))
+    }
+
     // OpenCV `cv2.fillPoly(mask, [pts], 1.0)` 相当。
     nonisolated func buildMask(meshIDs: [Int], width: Int, height: Int) -> MaskBuffer {
         let mask = MaskBuffer(width: width, height: height)
