@@ -5,8 +5,6 @@ import UIKit
 struct TutorialFacePlate: View {
     let currentStep: TutorialStep
     let capturedImage: UIImage?
-    let showBeforeImage: Bool
-    let intensity: MakeupIntensity
     // 実エンジンが出力した after 画像。nil の間は capturedImage を表示。
     let renderedImage: UIImage?
 
@@ -28,7 +26,6 @@ struct TutorialFacePlate: View {
                 Color.black
                 faceImage(width: width, height: height)
                 stepTag
-                if showBeforeImage { beforeLabel }
             }
             .frame(width: width, height: height)
             .clipped()
@@ -38,13 +35,7 @@ struct TutorialFacePlate: View {
 
     @ViewBuilder
     private func faceImage(width: CGFloat, height: CGFloat) -> some View {
-        if showBeforeImage, let img = capturedImage {
-            Image(uiImage: img)
-                .resizable()
-                .scaledToFill()
-                .frame(width: width, height: height)
-                .clipped()
-        } else if let after = renderedImage {
+        if let after = renderedImage {
             Image(uiImage: after)
                 .resizable()
                 .scaledToFill()
@@ -66,21 +57,6 @@ struct TutorialFacePlate: View {
             .font(.system(size: 11, weight: .light, design: .monospaced))
             .foregroundStyle(Color.ivory.opacity(0.6))
             .padding(10)
-    }
-
-    private var beforeLabel: some View {
-        VStack {
-            Spacer()
-            HStack {
-                Text("FIG. A — BEFORE")
-                    .font(.system(size: 9, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.ivory.opacity(0.7))
-                    .kerning(1.5)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                Spacer()
-            }
-        }
     }
 
     @ViewBuilder
@@ -108,8 +84,6 @@ struct TutorialFacePlate: View {
     TutorialFacePlate(
         currentStep: TutorialStep.sequence(for: .tamago)[0],
         capturedImage: nil,
-        showBeforeImage: false,
-        intensity: MakeupIntensity(),
         renderedImage: nil
     )
     .padding(28)

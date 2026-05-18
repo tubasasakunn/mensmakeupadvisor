@@ -32,50 +32,71 @@ struct TutorialView: View {
                 TutorialFacePlate(
                     currentStep: currentStep,
                     capturedImage: appState.capturedImage,
-                    showBeforeImage: viewModel.showBeforeImage,
-                    intensity: appState.intensity,
                     renderedImage: appState.renderedImage
                 )
                 .padding(.horizontal, 28)
+                .frame(maxHeight: .infinity)
 
-                ScrollView(.vertical, showsIndicators: false) {
-                    TutorialStepInfoArea(
-                        currentStep: currentStep,
-                        intensity: $bindableState.intensity,
-                        eyebrowType: $bindableState.eyebrowType,
-                        showBeforeImage: $viewModel.showBeforeImage
-                    )
-                    .padding(.top, 20)
-                    .padding(.horizontal, 28)
-                    .padding(.bottom, 8)
-                }
+                TutorialStepInfoArea(
+                    currentStep: currentStep,
+                    intensity: intensityBinding,
+                    eyebrowType: $bindableState.eyebrowType
+                )
+                .padding(.top, 16)
+                .padding(.horizontal, 28)
 
                 navigationBar
+                    .padding(.top, 12)
                     .padding(.bottom, 32)
                     .padding(.horizontal, 28)
             }
         }
+        // 進む / 戻るは左右スワイプでも操作できる。
+        .contentShape(Rectangle())
+        .gesture(swipeGesture)
         .accessibilityElement(children: .contain)
         .aid("tutorial_view")
         .task {
-            // 初回入場時に「step 0 まで」適用してから render を要求する。
             if !didInitialize {
                 viewModel.resetToFirstStep(appState: appState)
                 didInitialize = true
             }
         }
-        .task(id: stateKey) {
-            await MainActor.run { appState.requestMakeupRender() }
+        .task(id: renderKey) {
+            await viewModel.render(appState: appState)
         }
     }
 
-    private var stateKey: String {
-        let i = appState.intensity
+    // 現在 step の部位だけを調整するスライダー用 binding。
+    private var intensityBinding: Binding<Double> {
+        Binding(
+            get: { viewModel.intensity(for: currentStep) },
+            set: { viewModel.setIntensity($0, for: currentStep) }
+        )
+    }
+
+    // 到達済み step とその強度・眉タイプが変わるたびに再描画する。
+    private var renderKey: String {
+        let idx = appState.tutorialStep
         let brow = appState.eyebrowType?.rawValue ?? "off"
-        let hl = appState.highlightAreas.sorted().joined(separator: ",")
-        let sh = appState.shadowAreas.sorted().joined(separator: ",")
-        let ey = appState.eyeAreas.sorted().joined(separator: ",")
-        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))|hl:\(hl)|sh:\(sh)|ey:\(ey)|br:\(brow)"
+        let vals = steps.prefix(idx + 1)
+            .map { String(Int(viewModel.intensity(for: $0))) }
+            .joined(separator: ",")
+        return "\(idx)|\(brow)|\(vals)"
+    }
+
+    private var swipeGesture: some Gesture {
+        DragGesture(minimumDistance: 24)
+            .onEnded { value in
+                let dx = value.translation.width
+                let dy = value.translation.height
+                guard abs(dx) > abs(dy), abs(dx) > 56 else { return }
+                if dx < 0 {
+                    viewModel.nextStep(appState: appState)
+                } else {
+                    viewModel.prevStep(appState: appState)
+                }
+            }
     }
 
     // MARK: - Subviews

@@ -1,14 +1,11 @@
 import SwiftUI
 
 // Tutorial の各ステップの本文エリア。
-// チップ (area 選択) は出さない (オンボーディングでは選択不要)、
-// が強度スライダーは入れて、効果の見え方を比較しながら学べるようにする。
-// 眉ステップは type picker。
+// 強度スライダーはその step の部位だけを調整する。眉ステップは type picker。
 struct TutorialStepInfoArea: View {
     let currentStep: TutorialStep
-    @Binding var intensity: MakeupIntensity
+    @Binding var intensity: Double
     @Binding var eyebrowType: EyebrowApplier.BrowType?
-    @Binding var showBeforeImage: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -18,8 +15,6 @@ struct TutorialStepInfoArea: View {
             explanationText
             controlBlock
                 .padding(.top, 22)
-            beforeButton
-                .padding(.top, 16)
         }
     }
 
@@ -61,6 +56,8 @@ struct TutorialStepInfoArea: View {
             .font(.system(size: 12, weight: .regular))
             .foregroundStyle(Color.inkSecondary)
             .lineSpacing(6)
+            .lineLimit(6)
+            .minimumScaleFactor(0.85)
             .fixedSize(horizontal: false, vertical: true)
     }
 
@@ -70,52 +67,18 @@ struct TutorialStepInfoArea: View {
             TutorialEyebrowPicker(eyebrowType: $eyebrowType,
                                   recommended: currentStep.areaName)
         } else {
-            TutorialIntensitySlider(layer: currentStep.layer,
-                                    value: Binding(
-                                        get: { intensity[currentStep.layer] },
-                                        set: { intensity[currentStep.layer] = $0 }
-                                    ))
+            TutorialIntensitySlider(layer: currentStep.layer, value: $intensity)
         }
-    }
-
-    private var beforeButton: some View {
-        Button {
-            // ロングプレス想定。タップでも同じ振る舞いをガード
-        } label: {
-            Text("HOLD → BEFORE")
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .foregroundStyle(showBeforeImage ? Color.appBackground : Color.ivory)
-                .kerning(1.5)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(showBeforeImage ? Color.ivory : Color.clear)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 2)
-                        .stroke(Color.lineStrong, lineWidth: 1)
-                )
-        }
-        .simultaneousGesture(
-            LongPressGesture(minimumDuration: 0.1)
-                .onChanged { _ in showBeforeImage = true }
-                .onEnded { _ in showBeforeImage = false }
-        )
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onEnded { _ in showBeforeImage = false }
-        )
-        .aid("tutorial_before_button")
     }
 }
 
 #Preview {
-    @Previewable @State var intensity = MakeupIntensity(base: 40, highlight: 50)
+    @Previewable @State var intensity: Double = 50
     @Previewable @State var brow: EyebrowApplier.BrowType? = .natural
-    @Previewable @State var showBefore = false
     return TutorialStepInfoArea(
         currentStep: TutorialStep.sequence(for: .marugao)[1],
         intensity: $intensity,
-        eyebrowType: $brow,
-        showBeforeImage: $showBefore
+        eyebrowType: $brow
     )
     .padding(28)
     .background(Color.appBackground)

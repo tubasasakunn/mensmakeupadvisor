@@ -26,48 +26,39 @@ appId: com.tubasasakun.mensmakeupadvisor
 - assertVisible:
     id: "tutorial_view"
 
-# ステップ情報を確認
 - assertVisible:
     id: "tutorial_step_info"
 
-# インテンシティスライダーの確認
+# その部位の強度スライダーを確認
 - assertVisible:
     id: "tutorial_intensity_slider"
 
-# Act I → Act II
-- tapOn:
-    id: "tutorial_next_button"
+# スワイプで次の部位へ進む
+- swipe:
+    direction: LEFT
 
 - waitForAnimationToEnd:
-    timeout: 1000
+    timeout: 800
 
-# Act II → Act III
-- tapOn:
-    id: "tutorial_next_button"
+- assertVisible:
+    id: "tutorial_step_info"
 
-- waitForAnimationToEnd:
-    timeout: 1000
-
-# Act III → Act IV
-- tapOn:
-    id: "tutorial_next_button"
+# スワイプで前の部位へ戻る
+- swipe:
+    direction: RIGHT
 
 - waitForAnimationToEnd:
-    timeout: 1000
+    timeout: 800
 
-# Act IV → Act V
-- tapOn:
-    id: "tutorial_next_button"
-
-- waitForAnimationToEnd:
-    timeout: 1000
-
-# 最終ステップで COMPOSE → をタップしてスタジオへ
-- tapOn:
-    id: "tutorial_next_button"
-
-- waitForAnimationToEnd:
-    timeout: 1000
+# 残りの部位は NEXT ボタンで最後まで進める (部位数は顔型で変わる)
+- repeat:
+    times: 20
+    commands:
+      - tapOn:
+          id: "tutorial_next_button"
+          optional: true
+      - waitForAnimationToEnd:
+          timeout: 600
 
 - assertVisible:
     id: "studio_view"

@@ -18,6 +18,9 @@ nonisolated struct MakeupRenderer {
         var eyeAreaNames: [String]
         var applyEyeliner: Bool
         var eyebrowType: EyebrowApplier.BrowType
+        // チュートリアル用: area 名ごとの個別強度 (0-1)。指定が無い area は
+        // レイヤー強度をそのまま使う。Studio は nil のまま (レイヤー単位)。
+        var areaIntensities: [String: Float]? = nil
 
         // Studio で選択された個別 area set からセレクションを構築する。
         // eyebrow=nil なら眉描画スキップ、それ以外は指定 type で描く。
@@ -121,8 +124,10 @@ nonisolated struct MakeupRenderer {
 
         // 2. ハイライト
         if intensity.highlight > 0 {
-            let scale = normalize(intensity.highlight)
+            let layerScale = normalize(intensity.highlight)
             for name in selection.highlightAreaNames {
+                let scale = selection.areaIntensities?[name] ?? layerScale
+                guard scale > 0 else { continue }
                 guard let area = MeshAreaLibrary.lookup(category: .highlight, name: name) else { continue }
                 let opts = HighlightApplier.Options(
                     meshIDs: area.meshIDs,
@@ -137,8 +142,10 @@ nonisolated struct MakeupRenderer {
 
         // 3. シャドウ
         if intensity.shadow > 0 {
-            let scale = normalize(intensity.shadow)
+            let layerScale = normalize(intensity.shadow)
             for name in selection.shadowAreaNames {
+                let scale = selection.areaIntensities?[name] ?? layerScale
+                guard scale > 0 else { continue }
                 guard let area = MeshAreaLibrary.lookup(category: .shadow, name: name) else { continue }
                 // POC CLI default の RGB(139, 90, 43) (ブラウン) に揃える。
                 let opts = ShadowApplier.Options(
@@ -154,9 +161,11 @@ nonisolated struct MakeupRenderer {
 
         // 4. アイメイク
         if intensity.eye > 0 {
-            let scale = normalize(intensity.eye)
+            let layerScale = normalize(intensity.eye)
             let (meshAreas, eyeliner) = EyeApplier.loadFromTargetJSON()
             for name in selection.eyeAreaNames {
+                let scale = selection.areaIntensities?[name] ?? layerScale
+                guard scale > 0 else { continue }
                 guard let area = meshAreas.first(where: { $0.name == name }),
                       var cfg = EyeApplier.defaultConfigs[name] else { continue }
                 cfg = EyeApplier.AreaConfig(
@@ -170,12 +179,13 @@ nonisolated struct MakeupRenderer {
                     current = out
                 }
             }
-            if selection.applyEyeliner, let data = eyeliner,
+            let eyelinerScale = selection.areaIntensities?["eyeliner"] ?? layerScale
+            if selection.applyEyeliner, eyelinerScale > 0, let data = eyeliner,
                var lineCfg = EyeApplier.defaultConfigs["eyeliner"] {
                 lineCfg = EyeApplier.AreaConfig(
                     name: lineCfg.name,
                     colorRGB: lineCfg.colorRGB,
-                    intensity: lineCfg.intensity * scale,
+                    intensity: lineCfg.intensity * eyelinerScale,
                     blurScale: lineCfg.blurScale,
                     blend: lineCfg.blend
                 )
