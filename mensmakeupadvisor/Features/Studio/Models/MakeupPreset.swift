@@ -1,13 +1,29 @@
+// エディターズプリセット。各化粧単位に強度 (0–1) を適用する。
+// composition の各 unit が持つメッシュはそのままに、強度だけ書き換える。
 struct MakeupPreset: Identifiable, Sendable {
     let id: String
     let label: String
     let tag: String
-    let intensity: MakeupIntensity
+    let intensities: [MakeupKind: Float]
+
+    func apply(to composition: inout MakeupComposition) {
+        for (kind, value) in intensities {
+            composition.setIntensity(value, for: kind)
+        }
+    }
 
     static let all: [MakeupPreset] = [
-        .init(id: "natural",  label: "ナチュラル", tag: "バレない",  intensity: .init(base: 22, highlight: 18, shadow: 14, eye: 12, eyebrow: 28)),
-        .init(id: "kireime",  label: "キレイめ",   tag: "オフィス",  intensity: .init(base: 30, highlight: 25, shadow: 22, eye: 20, eyebrow: 38)),
-        .init(id: "mode",     label: "モード",     tag: "クール",    intensity: .init(base: 28, highlight: 32, shadow: 35, eye: 32, eyebrow: 45)),
-        .init(id: "k-style",  label: "Kスタイル",  tag: "SNS映え",  intensity: .init(base: 35, highlight: 40, shadow: 28, eye: 42, eyebrow: 55)),
+        .init(id: "natural", label: "ナチュラル", tag: "バレない",
+              intensities: [.base: 0.22, .highlight: 0.18, .shadow: 0.14,
+                            .eyeshadow: 0.12, .tearbag: 0.12, .eyeliner: 0.12]),
+        .init(id: "kireime", label: "キレイめ", tag: "オフィス",
+              intensities: [.base: 0.30, .highlight: 0.25, .shadow: 0.22,
+                            .eyeshadow: 0.20, .tearbag: 0.18, .eyeliner: 0.20]),
+        .init(id: "mode", label: "モード", tag: "クール",
+              intensities: [.base: 0.28, .highlight: 0.32, .shadow: 0.35,
+                            .eyeshadow: 0.32, .tearbag: 0.22, .eyeliner: 0.35]),
+        .init(id: "k-style", label: "Kスタイル", tag: "SNS映え",
+              intensities: [.base: 0.35, .highlight: 0.40, .shadow: 0.28,
+                            .eyeshadow: 0.42, .tearbag: 0.35, .eyeliner: 0.42]),
     ]
 }

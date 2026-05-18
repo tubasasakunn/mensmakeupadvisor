@@ -75,11 +75,9 @@ actor MakeupEngineService {
         return FaceScoringEngine.evaluate(faceMesh: mesh)
     }
 
-    func render(intensity: MakeupIntensity,
-                selection: MakeupRenderer.LayerSelection = .default) throws -> UIImage {
+    func render(composition: MakeupComposition) throws -> UIImage {
         guard let mesh, let source = sourceImage else { throw EngineError.notPrepared }
-        return MakeupRenderer.render(image: source, faceMesh: mesh,
-                                     intensity: intensity, selection: selection)
+        return MakeupRenderer.render(image: source, faceMesh: mesh, composition: composition)
     }
 
     func reset() {

@@ -12,6 +12,9 @@ nonisolated struct MeshColor: Sendable, Hashable {
 
     var isVisible: Bool { a > 0 }
 
+    // Applier に渡す RGB ベクトル (0–255)。
+    var simd: SIMD3<Float> { SIMD3<Float>(r, g, b) }
+
     // self を base の上に source-over 合成した色。
     // 複数の化粧を同じメッシュに重ねた「合計した色」を求めるのに使う。
     func composited(over base: MeshColor) -> MeshColor {

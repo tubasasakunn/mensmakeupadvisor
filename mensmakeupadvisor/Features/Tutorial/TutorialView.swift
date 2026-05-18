@@ -16,7 +16,7 @@ struct TutorialView: View {
     }
 
     var body: some View {
-        @Bindable var bindableState = appState
+        @Bindable var bindableVM = viewModel
 
         ZStack {
             Color.appBackground.ignoresSafeArea()
@@ -40,7 +40,7 @@ struct TutorialView: View {
                 TutorialStepInfoArea(
                     currentStep: currentStep,
                     intensity: intensityBinding,
-                    eyebrowType: $bindableState.eyebrowType
+                    eyebrowType: $bindableVM.eyebrowType
                 )
                 .padding(.top, 16)
                 .padding(.horizontal, 28)
@@ -78,7 +78,7 @@ struct TutorialView: View {
     // 到達済み step とその強度・眉タイプが変わるたびに再描画する。
     private var renderKey: String {
         let idx = appState.tutorialStep
-        let brow = appState.eyebrowType?.rawValue ?? "off"
+        let brow = viewModel.eyebrowType?.rawValue ?? "off"
         let vals = steps.prefix(idx + 1)
             .map { String(Int(viewModel.intensity(for: $0))) }
             .joined(separator: ",")

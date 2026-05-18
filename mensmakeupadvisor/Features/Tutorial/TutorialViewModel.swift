@@ -6,6 +6,9 @@ final class TutorialViewModel {
     // 1 step = 1 部位なので、スライダーはその step の部位だけを調整する。
     private var stepIntensity: [String: Double] = [:]
 
+    // 眉ステップで選んだタイプ。render と最終 composition に使う。
+    var eyebrowType: EyebrowApplier.BrowType?
+
     // 顔型に応じた tutorial シーケンス。AppState.analysisResult から都度引く。
     func steps(for appState: AppState) -> [TutorialStep] {
         TutorialStep.sequence(for: appState.analysisResult?.faceShape)
@@ -36,14 +39,13 @@ final class TutorialViewModel {
     // Tutorial 入場時の初期化。step 0 に戻し、化粧プレビューも素の状態に戻す。
     func resetToFirstStep(appState: AppState) {
         stepIntensity = [:]
+        eyebrowType = nil
         appState.tutorialStep = 0
-        appState.eyebrowType = nil
         appState.renderedImage = nil
     }
 
     func nextStep(appState: AppState) {
         let seq = steps(for: appState)
-        // 最終ステップで次へ → Studio に渡す状態を確定してから遷移
         guard appState.tutorialStep < seq.count - 1 else {
             finishToStudio(appState: appState)
             return
@@ -69,7 +71,15 @@ final class TutorialViewModel {
     }
 
     private func finishToStudio(appState: AppState) {
-        finalizeForStudio(appState: appState)
+        let seq = steps(for: appState)
+        // skip 時など眉未選択ならおすすめタイプを既定で入れる。
+        if eyebrowType == nil,
+           let browStep = seq.last(where: { $0.layer == .eyebrow }),
+           let raw = browStep.areaName,
+           let bt = EyebrowApplier.BrowType(rawValue: raw) {
+            eyebrowType = bt
+        }
+        appState.composition = buildComposition(appState: appState, upto: seq.count - 1)
         appState.tutorialDone = true
         appState.navigate(to: .studio)
     }
@@ -79,10 +89,9 @@ final class TutorialViewModel {
         let seq = steps(for: appState)
         let idx = appState.tutorialStep
         guard idx >= 0, idx < seq.count, seq[idx].layer == .eyebrow else { return }
-        let step = seq[idx]
-        if appState.eyebrowType == nil, let raw = step.areaName,
+        if eyebrowType == nil, let raw = seq[idx].areaName,
            let bt = EyebrowApplier.BrowType(rawValue: raw) {
-            appState.eyebrowType = bt
+            eyebrowType = bt
         }
     }
 
@@ -93,103 +102,67 @@ final class TutorialViewModel {
         // 連続スライド時に過剰な再計算を抑える
         try? await Task.sleep(for: .milliseconds(80))
         if Task.isCancelled { return }
-        let (intensities, selection) = buildRender(appState: appState)
-        guard let img = try? await appState.makeupEngine.render(
-            intensity: intensities, selection: selection
-        ) else { return }
+        let composition = buildComposition(appState: appState, upto: appState.tutorialStep)
+        guard let img = try? await appState.makeupEngine.render(composition: composition) else { return }
         if Task.isCancelled { return }
         appState.renderedImage = img
     }
 
-    // 到達済みの step (0...current) だけを使って描画指示を組み立てる。
-    private func buildRender(appState: AppState) -> (MakeupIntensity, MakeupRenderer.LayerSelection) {
+    // 到達済みの step (0...upto) だけを 1 部位ずつ重ねた composition を組む。
+    private func buildComposition(appState: AppState, upto rawUpto: Int) -> MakeupComposition {
         let seq = steps(for: appState)
-        guard !seq.isEmpty else { return (MakeupIntensity(), .default) }
-        let upto = max(0, min(appState.tutorialStep, seq.count - 1))
-
-        var intensities = MakeupIntensity()
-        var highlightAreas: [String] = []
-        var shadowAreas: [String] = []
-        var eyeAreas: [String] = []
-        var areaIntensities: [String: Float] = [:]
+        guard !seq.isEmpty else { return MakeupComposition() }
+        let upto = max(0, min(rawUpto, seq.count - 1))
+        var comp = MakeupComposition()
         var eyebrowReached = false
 
         for step in seq.prefix(upto + 1) {
-            let value = intensity(for: step)
-            let scale = Float(max(0, min(100, value)) / 100)
+            let alpha = Float(max(0, min(100, intensity(for: step))) / 100)
             switch step.layer {
             case .base:
-                intensities.base = value
+                comp.setUnit(MakeupUnit(kind: .base, tint: MakeupKind.base.color(intensity: alpha)))
             case .highlight:
                 if let area = step.areaName {
-                    highlightAreas.append(area)
-                    areaIntensities[area] = scale
+                    addMeshColors(&comp, kind: .highlight,
+                                  meshIDs: MakeupCompositionBuilder.meshIDs(.highlight, names: [area]),
+                                  alpha: alpha)
                 }
-                intensities.highlight = 100
             case .shadow:
                 if let area = step.areaName {
-                    shadowAreas.append(area)
-                    areaIntensities[area] = scale
+                    addMeshColors(&comp, kind: .shadow,
+                                  meshIDs: MakeupCompositionBuilder.meshIDs(.shadow, names: [area]),
+                                  alpha: alpha)
                 }
-                intensities.shadow = 100
             case .eye:
                 if let area = step.areaName {
-                    eyeAreas.append(area)
-                    areaIntensities[area] = scale
+                    let kind = MakeupKind.eyeKind(forArea: area)
+                    if kind == .eyeliner {
+                        comp.setUnit(MakeupUnit(kind: .eyeliner,
+                                                tint: MakeupKind.eyeliner.color(intensity: alpha)))
+                    } else {
+                        addMeshColors(&comp, kind: kind,
+                                      meshIDs: MakeupCompositionBuilder.eyeMeshIDs(kind: kind, names: [area]),
+                                      alpha: alpha)
+                    }
                 }
-                intensities.eye = 100
             case .eyebrow:
                 eyebrowReached = true
             }
         }
 
-        if eyebrowReached, appState.eyebrowType != nil {
-            intensities.eyebrow = 100
+        if eyebrowReached, let browType = eyebrowType {
+            var brow = MakeupUnit(kind: .eyebrow, tint: MakeupKind.eyebrow.color(intensity: 1))
+            brow.browType = browType
+            comp.setUnit(brow)
         }
-
-        let selection = MakeupRenderer.LayerSelection(
-            highlightAreaNames: highlightAreas,
-            shadowAreaNames: shadowAreas,
-            applyBase: true,
-            eyeAreaNames: eyeAreas,
-            applyEyeliner: eyeAreas.contains("eyeliner"),
-            eyebrowType: appState.eyebrowType ?? .natural,
-            areaIntensities: areaIntensities
-        )
-        return (intensities, selection)
+        return comp
     }
 
-    // Studio はレイヤー単位の強度で動くため、tutorial の全 step を集約して
-    // AppState に書き戻す。部位ごとの差は各レイヤーの最大値に丸める。
-    private func finalizeForStudio(appState: AppState) {
-        let seq = steps(for: appState)
-        var intensities = MakeupIntensity()
-        var highlightAreas: Set<String> = []
-        var shadowAreas: Set<String> = []
-        var eyeAreas: Set<String> = []
-
-        for step in seq {
-            let value = intensity(for: step)
-            switch step.layer {
-            case .base:
-                intensities.base = value
-            case .highlight:
-                if let area = step.areaName { highlightAreas.insert(area) }
-                intensities.highlight = max(intensities.highlight, value)
-            case .shadow:
-                if let area = step.areaName { shadowAreas.insert(area) }
-                intensities.shadow = max(intensities.shadow, value)
-            case .eye:
-                if let area = step.areaName { eyeAreas.insert(area) }
-                intensities.eye = max(intensities.eye, value)
-            case .eyebrow:
-                break
-            }
-        }
-
-        appState.intensity = intensities
-        appState.highlightAreas = highlightAreas
-        appState.shadowAreas = shadowAreas
-        appState.eyeAreas = eyeAreas
+    private func addMeshColors(_ comp: inout MakeupComposition, kind: MakeupKind,
+                               meshIDs: [Int], alpha: Float) {
+        var unit = comp.unit(kind) ?? MakeupUnit(kind: kind)
+        let color = kind.color(intensity: alpha)
+        for id in meshIDs { unit.meshColors[id] = color }
+        comp.setUnit(unit)
     }
 }
