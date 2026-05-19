@@ -18,7 +18,8 @@ final class AdviceViewModel {
     func useSample(appState: AppState) {
         // サンプル画像でも MediaPipe を実走させたいので AnalyzingView に流す。
         // 検出失敗時は AnalysisService が .fallback を返す。
-        let sampleImage = (UIImage(named: "sample_face") ?? makeSamplePlaceholderImage()).uprightOriented()
+        // オンボーディングと同じ実写の顔写真を使う（イラストだと顔検出に失敗するため）。
+        let sampleImage = (UIImage(named: "onboarding_face_before") ?? makeSamplePlaceholderImage()).uprightOriented()
         appState.capturedImage = sampleImage
         appState.navigate(to: .analyzing)
     }

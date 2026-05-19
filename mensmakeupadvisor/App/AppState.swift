@@ -14,7 +14,13 @@ final class AppState {
     var capturedImage: UIImage?
     var renderedImage: UIImage?
     var analysisResult: AnalysisResult? {
-        didSet { applyPresetDefaultsFromAnalysisIfNeeded() }
+        didSet {
+            applyPresetDefaultsFromAnalysisIfNeeded()
+            // アーカイブのサムネイルが下地に使う「最新メッシュ」を永続化する。
+            if let landmarks = analysisResult?.landmarksNormalized, !landmarks.isEmpty {
+                LatestFaceMeshStore.save(landmarksNormalized: landmarks)
+            }
+        }
     }
     var tutorialStep: Int = 0
     var tutorialDone: Bool = false

@@ -18,9 +18,7 @@ struct ScoreCardView: View {
             adviceText
 
             if isExpanded {
-                // 親 VStack の高さ変化で自然に下方向に展開させ、内容は
-                // fade in だけにする。.move(edge: .top) を入れていた
-                // ときは「上から滑り落ちて来る」見た目で違和感があった。
+                // 親 VStack の高さ変化で下方向に展開させ、内容は fade のみ。
                 expandedAnnotation
                     .padding(.top, 6)
                     .transition(.opacity)
@@ -29,6 +27,9 @@ struct ScoreCardView: View {
         .padding(.vertical, 18)
         .padding(.leading, score.score >= 75 ? 10 : 0)
         .frame(maxWidth: .infinity, alignment: .leading)
+        // 閉じる途中、fade out 中の内容が縮むカード枠から下のカードへはみ出して
+        // 「半透明が残る」ように見えていた。枠でクリップして閉じきる。
+        .clipped()
         .animation(.easeInOut(duration: 0.28), value: isExpanded)
         .contentShape(Rectangle())
         .onTapGesture {
