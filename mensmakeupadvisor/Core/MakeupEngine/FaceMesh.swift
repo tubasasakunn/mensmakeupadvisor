@@ -130,6 +130,37 @@ nonisolated final class FaceMesh {
         )
     }
 
+    // MediaPipe 検出を介さず、保存済み 478 正規化ランドマークから細分化メッシュ
+    // (頂点 + 三角形) だけを復元する。Archive のサムネイルが target.json の
+    // mesh ID (= 細分化三角形 index) を解決するには detect と同じ三角形分割を
+    // 共有する必要があるため。
+    nonisolated func buildGeometry(fromNormalizedLandmarks landmarks: [CGPoint]) -> DetectionResult? {
+        guard landmarks.count >= 478,
+              let connections = try? FaceMeshResources.loadTesselationConnections() else {
+            return nil
+        }
+        rawPoints = landmarks.map { Point(x: Double($0.x), y: Double($0.y), z: 0) }
+        landmarksPx = []
+        rawTriangles = Self.extractTriangles(connections: connections)
+
+        points = rawPoints
+        triangles = rawTriangles
+        midpointCache.removeAll(keepingCapacity: true)
+        reverseCache.removeAll(keepingCapacity: true)
+
+        for _ in 0..<subdivisionLevel {
+            subdivideAll()
+        }
+        imageSize = .zero
+        return DetectionResult(
+            points: points,
+            triangles: triangles,
+            landmarksPx: [],
+            imageWidth: 0,
+            imageHeight: 0
+        )
+    }
+
     // MARK: - Mesh utilities
 
     nonisolated func trianglePixels(triangleID: Int, width: Int, height: Int) -> [CGPoint] {
