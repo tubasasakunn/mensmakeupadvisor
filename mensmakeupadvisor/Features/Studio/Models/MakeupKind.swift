@@ -81,7 +81,9 @@ nonisolated enum MakeupKind: String, CaseIterable, Sendable, Hashable {
         case .base:      0.60
         case .highlight: 0.24
         case .shadow:    0.50
-        case .eyeshadow: 0.35
+        // アイシャドウの既定色は肌色に近く、.normal 合成では低ゲインだと
+        // 肌との差がほぼ出ない。視認できる発色になるまでゲインを上げる。
+        case .eyeshadow: 0.60
         case .tearbag:   0.12
         case .eyeliner:  0.55
         case .eyebrow:   0.75

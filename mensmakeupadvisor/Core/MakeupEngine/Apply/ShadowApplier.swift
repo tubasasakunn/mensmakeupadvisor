@@ -14,7 +14,11 @@ nonisolated enum ShadowApplier {
         var meshIDs: [Int]
         var colorRGB: SIMD3<Float> = SIMD3<Float>(90, 68, 50)
         var intensity: Float = 0.25
-        var blurScale: Float = 2.5
+        // シャドウ領域 (こめかみ/エラ/フェイスライン) は輪郭沿いの細い帯。
+        // 2.5 では 2 段ブラーのカーネルが顔の高さの 10% に達し、細い帯が
+        // 拡散しきって効果がほぼ消える。highlight (blobby・2.0) より細い帯を
+        // 扱うため、より小さい値で「柔らかいが視認できる」状態にする。
+        var blurScale: Float = 1.4
     }
 
     nonisolated static func apply(image: CGImage, faceMesh: FaceMesh, options: Options,

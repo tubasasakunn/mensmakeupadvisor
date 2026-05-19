@@ -114,7 +114,12 @@ struct SavedLookMeshDrawer {
             path.addLine(to: layout.pts[c])
             path.closeSubpath()
         }
-        ctx.fill(path, with: .color(makeupColor(kind, alpha: alpha)))
+        // 実際の Applier と同じく化粧をぼかす。三角形のベタ塗りでは出ない
+        // 「パウダーが肌に溶けた柔らかい縁」を再現する。ぼかし量は Applier の
+        // Gaussian カーネル (顔の高さ基準) に合わせて化粧ごとに変える。
+        var blurred = ctx
+        blurred.addFilter(.blur(radius: blurRadius(kind, faceH: layout.faceH)))
+        blurred.fill(path, with: .color(makeupColor(kind, alpha: alpha)))
     }
 
     // アイラインは mesh 領域ではなく目際のランドマークを結ぶポリライン。
@@ -125,14 +130,18 @@ struct SavedLookMeshDrawer {
         let alpha = max(0.55, makeupAlpha(look.eye))
         let color = makeupColor(.eyeliner, alpha: alpha)
         let width = max(0.9, layout.faceW * 0.013)
+        // アイラインは輪郭をぼかす実手順 (blurScale 0.3) に合わせ、ごく薄くだけ
+        // ぼかす。線として視認できる程度のシャープさは保つ。
+        var blurred = ctx
+        blurred.addFilter(.blur(radius: blurRadius(.eyeliner, faceH: layout.faceH)))
         for indices in [data.upperRight, data.upperLeft] {
             let pts = indices.compactMap { layout.pts.indices.contains($0) ? layout.pts[$0] : nil }
             guard pts.count >= 2 else { continue }
             var path = Path()
             path.move(to: pts[0])
             for p in pts.dropFirst() { path.addLine(to: p) }
-            ctx.stroke(path, with: .color(color),
-                       style: StrokeStyle(lineWidth: width, lineCap: .round, lineJoin: .round))
+            blurred.stroke(path, with: .color(color),
+                           style: StrokeStyle(lineWidth: width, lineCap: .round, lineJoin: .round))
         }
     }
 
@@ -142,6 +151,22 @@ struct SavedLookMeshDrawer {
     // 上限を 0.9 に抑える。
     private func makeupAlpha(_ intensity: Double) -> Double {
         min(0.9, max(0, intensity / 100))
+    }
+
+    // Applier の Gaussian ブラー量 (faceH 基準) をサムネ座標へ写したぼかし半径。
+    // highlight / shadow は 2 段ブラーで広く溶かし、eye 系は 1 段で控えめ、
+    // eyeliner は線を残すため最小限。
+    private func blurRadius(_ kind: MakeupKind, faceH: CGFloat) -> CGFloat {
+        let scale: CGFloat = switch kind {
+        case .highlight:      0.05
+        case .shadow:         0.06
+        case .eyeshadow:      0.025
+        case .tearbag:        0.018
+        case .eyebrow:        0.02
+        case .eyeliner:       0.01
+        case .base:           0.03
+        }
+        return faceH * scale
     }
 
     private func makeupColor(_ kind: MakeupKind, alpha: Double) -> Color {
