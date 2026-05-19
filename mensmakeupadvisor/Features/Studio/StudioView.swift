@@ -42,22 +42,19 @@ struct StudioView: View {
         // 親 identifier が子の Button/Toggle 等に継承されないようにする
         .accessibilityElement(children: .contain)
         .aid("studio_view")
-        // makeup_claude の MakeupRenderer に強度変更を流す。
-        // intensity の値変化で task が再起動 → AppState 側で debounce している。
-        .task(id: intensityKey) {
+        // composition の変化で task が再起動 → AppState 側で debounce している。
+        .task(id: compositionKey) {
             await MainActor.run { appState.requestMakeupRender() }
         }
     }
 
-    // intensity + area 選択 + 眉 type を 1 つの Hashable キーに集約して
-    // task(id:) で監視する。area チェック切替や type 切替でも再レンダリングが走る。
-    private var intensityKey: String {
-        let i = appState.intensity
-        let brow = appState.eyebrowType?.rawValue ?? "off"
-        let hl = appState.highlightAreas.sorted().joined(separator: ",")
-        let sh = appState.shadowAreas.sorted().joined(separator: ",")
-        let ey = appState.eyeAreas.sorted().joined(separator: ",")
-        return "\(Int(i.base))-\(Int(i.highlight))-\(Int(i.shadow))-\(Int(i.eye))|hl:\(hl)|sh:\(sh)|ey:\(ey)|br:\(brow)"
+    // 全化粧単位の強度 + 眉 type を 1 つのキーに集約して task(id:) で監視する。
+    private var compositionKey: String {
+        let comp = appState.composition
+        let parts = MakeupKind.allCases.map {
+            "\($0.rawValue):\(Int(comp.intensity(of: $0) * 100))"
+        }
+        return parts.joined(separator: "|") + "|brow:\(comp.browType?.rawValue ?? "off")"
     }
 
     // MARK: - Subviews

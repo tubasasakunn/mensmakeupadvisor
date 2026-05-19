@@ -18,22 +18,11 @@ final class AppState {
     }
     var tutorialStep: Int = 0
     var tutorialDone: Bool = false
-    var intensity: MakeupIntensity = .init()
+    // Studio の化粧状態。化粧単位 (MakeupUnit) ごとに meshID→色 を持つ唯一の真実。
+    // 顔判定結果で初期値が決まり、ユーザーが一度でも触ったら以降は上書きしない。
+    var composition: MakeupComposition = MakeupComposition()
     var activePresetID: String?
     var isRenderingMakeup: Bool = false
-
-    // Studio で「どの highlight / shadow / eye エリアを当てるか」を multi-select
-    // で持つ。target.json の area name (例: "base_t-zone") の集合。顔判定結果で
-    // 初期値が決まり、ユーザーが一度でも触ったら以降は自動上書きしない。
-    var highlightAreas: Set<String> = []
-    var shadowAreas: Set<String> = []
-    var eyeAreas: Set<String> = []
-
-    // 眉は intensity slider ではなく type 選択で表現する。
-    // nil = 眉描画 OFF。デフォルトを nil にして、ユーザーが BROW TYPE を
-    // 選ぶまでは眉描画が走らないようにする (顔診断直後の画面で勝手に
-    // 眉が描き換えられないように)。
-    var eyebrowType: EyebrowApplier.BrowType? = nil
 
     // Home → Create フローでは Tutorial をスキップして直接 Studio に行く。
     // AnalyzingView 完了時の navigate 分岐で参照する。
@@ -55,41 +44,25 @@ final class AppState {
     func reset() {
         capturedImage = nil; renderedImage = nil; analysisResult = nil
         tutorialStep = 0; tutorialDone = false
-        intensity = .init(); activePresetID = nil
-        highlightAreas = []; shadowAreas = []; eyeAreas = []
-        eyebrowType = nil
+        composition = MakeupComposition(); activePresetID = nil
         skipTutorialOnNextFlow = false
         presetsInitializedFromAnalysis = false
         renderTask?.cancel(); renderTask = nil
         Task { await makeupEngine.reset() }
     }
 
-    // 顔診断完了時、ユーザーが Studio で area を触っていなければ顔型に
-    // 応じたデフォルト集合を入れる。一度でも触ったら以降は上書きしない。
+    // 顔診断完了時、ユーザーがまだ化粧を触っていなければ顔型に応じた
+    // 既定 composition を入れる。一度でも触ったら以降は上書きしない。
     private func applyPresetDefaultsFromAnalysisIfNeeded() {
         guard !presetsInitializedFromAnalysis else { return }
-        let shape = analysisResult?.faceShape
-        highlightAreas = MakeupAreaDefaults.highlight(for: shape)
-        shadowAreas = MakeupAreaDefaults.shadow(for: shape)
-        eyeAreas = MakeupAreaDefaults.eye(for: shape)
+        composition = MakeupCompositionBuilder.makeDefault(for: analysisResult?.faceShape)
         presetsInitializedFromAnalysis = analysisResult != nil
     }
 
     // 化粧反映を非同期で要求する。短時間に複数回呼ばれても直近の 1 回だけ実行する。
     func requestMakeupRender() {
-        renderLog.notice("requestMakeupRender: invoked — base=\(Int(self.intensity.base), privacy: .public) hl=\(Int(self.intensity.highlight), privacy: .public) sh=\(Int(self.intensity.shadow), privacy: .public) brow=\(self.eyebrowType?.rawValue ?? "off", privacy: .public)")
         renderTask?.cancel()
-        // 眉は type 選択で表現。type が nil なら eyebrow intensity を 0 にして
-        // 眉描画をスキップさせ、選択中ならフル強度 (100) で描画させる。
-        var snapshot = intensity
-        snapshot.eyebrow = eyebrowType == nil ? 0 : 100
-        // ユーザーが Studio で選んだ area 集合からセレクションを構築する。
-        let selection = MakeupRenderer.LayerSelection.from(
-            highlightAreas: highlightAreas,
-            shadowAreas: shadowAreas,
-            eyeAreas: eyeAreas,
-            eyebrow: eyebrowType
-        )
+        let snapshot = composition
         renderTask = Task { [weak self] in
             guard let self else { return }
             // 連続スライド時に過剰な再計算を抑える
@@ -99,11 +72,11 @@ final class AppState {
             defer { self.isRenderingMakeup = false }
             let started = Date()
             do {
-                let img = try await self.makeupEngine.render(intensity: snapshot, selection: selection)
+                let img = try await self.makeupEngine.render(composition: snapshot)
                 if Task.isCancelled { return }
                 self.renderedImage = img
                 let ms = Int(Date().timeIntervalSince(started) * 1000)
-                renderLog.notice("render: ok in \(ms, privacy: .public)ms — base=\(Int(snapshot.base), privacy: .public) hl=\(Int(snapshot.highlight), privacy: .public) sh=\(Int(snapshot.shadow), privacy: .public) eye=\(Int(snapshot.eye), privacy: .public) brow=\(Int(snapshot.eyebrow), privacy: .public)")
+                renderLog.notice("render: ok in \(ms, privacy: .public)ms")
             } catch {
                 renderLog.error("render: failed — \(String(describing: error), privacy: .public)")
             }

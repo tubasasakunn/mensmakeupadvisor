@@ -1,14 +1,16 @@
 import SwiftUI
 
+// FINE TUNE: 化粧単位ごとの強度スライダー + 眉タイプ選択。
+// 各スライダーはその化粧単位の全メッシュに一律の強度を適用する。
 struct FineTunePanelView: View {
     @Environment(AppState.self) private var appState
 
-    private let sliderLayers: [MakeupLayer] = [.base, .highlight, .shadow, .eye]
+    private let sliderKinds: [MakeupKind] = [
+        .base, .highlight, .shadow, .eyeshadow, .tearbag, .eyeliner,
+    ]
 
     var body: some View {
-        @Bindable var bindable = appState
-
-        return VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
             Text("FINE TUNE")
                 .font(.system(.caption, design: .monospaced))
                 .foregroundStyle(Color.inkSecondary)
@@ -16,52 +18,24 @@ struct FineTunePanelView: View {
                 .padding(.bottom, 16)
 
             VStack(spacing: 20) {
-                ForEach(sliderLayers, id: \.self) { layer in
-                    layerSliderRow(layer)
-                    if layer == .highlight {
-                        MakeupAreaChipsSection(
-                            title: "HIGHLIGHT AREAS",
-                            layer: .highlight,
-                            selected: $bindable.highlightAreas,
-                            aidPrefix: "studio_highlight_area"
-                        )
-                        .padding(.top, 4)
-                    }
-                    if layer == .shadow {
-                        MakeupAreaChipsSection(
-                            title: "SHADOW AREAS",
-                            layer: .shadow,
-                            selected: $bindable.shadowAreas,
-                            aidPrefix: "studio_shadow_area"
-                        )
-                        .padding(.top, 4)
-                    }
-                    if layer == .eye {
-                        MakeupAreaChipsSection(
-                            title: "EYE AREAS",
-                            layer: .eye,
-                            selected: $bindable.eyeAreas,
-                            aidPrefix: "studio_eye_area"
-                        )
-                        .padding(.top, 4)
-                    }
+                ForEach(sliderKinds, id: \.self) { kind in
+                    kindSliderRow(kind)
                 }
-
-                browTypeRow(bindable: bindable)
+                browTypeRow
             }
         }
     }
 
-    private func layerSliderRow(_ layer: MakeupLayer) -> some View {
-        let value = appState.intensity[layer]
+    private func kindSliderRow(_ kind: MakeupKind) -> some View {
+        let value = Double(appState.composition.intensity(of: kind)) * 100
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .lastTextBaseline) {
-                Text(layer.label.uppercased())
+                Text(kind.label.uppercased())
                     .font(.system(size: 9, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(2)
-                    .frame(width: 70, alignment: .leading)
+                    .frame(width: 88, alignment: .leading)
 
                 Spacer()
 
@@ -74,16 +48,16 @@ struct FineTunePanelView: View {
 
             StudioSlider(
                 value: Binding(
-                    get: { appState.intensity[layer] },
-                    set: { appState.intensity[layer] = $0 }
+                    get: { Double(appState.composition.intensity(of: kind)) * 100 },
+                    set: { appState.composition.setIntensity(Float($0 / 100), for: kind) }
                 ),
                 range: 0...100
             )
-            .aid("studio_intensity_\(layer.rawValue)")
+            .aid("studio_intensity_\(kind.rawValue)")
         }
     }
 
-    private func browTypeRow(bindable: AppState) -> some View {
+    private var browTypeRow: some View {
         let options: [(label: String, value: EyebrowApplier.BrowType?)] = [
             ("OFF", nil),
             ("NATURAL", .natural),
@@ -100,23 +74,20 @@ struct FineTunePanelView: View {
 
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 88), spacing: 6)], spacing: 6) {
                 ForEach(0..<options.count, id: \.self) { i in
-                    let entry = options[i]
-                    browTypeButton(entry: entry,
-                                   current: appState.eyebrowType,
-                                   select: { bindable.eyebrowType = $0 })
+                    browTypeButton(options[i])
                 }
             }
         }
         .padding(.top, 4)
     }
 
-    private func browTypeButton(entry: (label: String, value: EyebrowApplier.BrowType?),
-                                current: EyebrowApplier.BrowType?,
-                                select: @escaping (EyebrowApplier.BrowType?) -> Void) -> some View {
-        let isActive = (entry.value == current)
+    private func browTypeButton(_ entry: (label: String, value: EyebrowApplier.BrowType?)) -> some View {
+        let isActive = (entry.value == appState.composition.browType)
         let aidValue = entry.value?.rawValue ?? "off"
         return Button {
-            withAnimation(.easeInOut(duration: 0.15)) { select(entry.value) }
+            withAnimation(.easeInOut(duration: 0.15)) {
+                appState.composition.setBrowType(entry.value)
+            }
         } label: {
             Text(entry.label)
                 .font(.system(size: 9, weight: .medium, design: .monospaced))
