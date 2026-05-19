@@ -1,14 +1,15 @@
 import SwiftUI
 
-// SavedLook がどの部位に化粧を入れたかを、汎用的な顔ダイアグラム上に
-// ハイライト/シェード/アイ/眉の色で塗り分けて表示する。
-// 実画像は持たないので Canvas でプログラム描画。Archive のグリッドサムネ用。
+// SavedLook の化粧を、直近診断の facemesh の上に色付きで重ねて表示する。
+// 顔写真は持たず Canvas でプログラム描画。Archive のグリッドサムネ用。
 struct SavedLookMeshThumbnail: View {
     let look: SavedLook
+    // 最新メッシュ。HomeArchiveTab が一度ロードして全セルへ渡す。
+    var mesh: [CGPoint]? = nil
 
     var body: some View {
         Canvas { ctx, size in
-            let drawer = SavedLookMeshDrawer(context: ctx, size: size, look: look)
+            let drawer = SavedLookMeshDrawer(context: ctx, size: size, look: look, mesh: mesh)
             drawer.draw()
         }
         .aspectRatio(1, contentMode: .fit)
