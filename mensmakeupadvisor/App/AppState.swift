@@ -18,7 +18,10 @@ final class AppState {
             applyPresetDefaultsFromAnalysisIfNeeded()
             // アーカイブのサムネイルが下地に使う「最新メッシュ」を永続化する。
             if let landmarks = analysisResult?.landmarksNormalized, !landmarks.isEmpty {
-                LatestFaceMeshStore.save(landmarksNormalized: landmarks)
+                let w = analysisResult?.imageWidthPx ?? 0
+                let h = analysisResult?.imageHeightPx ?? 0
+                let aspect = (w > 0 && h > 0) ? CGFloat(w) / CGFloat(h) : 4.0 / 5.0
+                LatestFaceMeshStore.save(landmarksNormalized: landmarks, imageAspect: aspect)
             }
         }
     }

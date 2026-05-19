@@ -9,8 +9,8 @@ struct HomeArchiveTab: View {
     @Query(sort: \SavedLook.createdAt, order: .reverse) private var savedLooks: [SavedLook]
     @State private var viewModel = ArchiveViewModel()
     @State private var selected: SavedLook?
-    // 最新メッシュは一度だけ読み、全グリッドセルのサムネ下地に使い回す。
-    @State private var faceMesh: [CGPoint]? = LatestFaceMeshStore.load()
+    // 最新メッシュは一度だけ復元し、全グリッドセルのサムネ下地に使い回す。
+    @State private var geometry: SavedLookMeshGeometry? = SavedLookMeshGeometry.makeLatest()
 
     private let columns: [GridItem] = [
         GridItem(.flexible(), spacing: 2),
@@ -107,7 +107,7 @@ struct HomeArchiveTab: View {
 
     private func gridCell(for look: SavedLook) -> some View {
         Button { selected = look } label: {
-            SavedLookMeshThumbnail(look: look, mesh: faceMesh)
+            SavedLookMeshThumbnail(look: look, geometry: geometry)
                 .overlay(alignment: .bottomTrailing) {
                     if look.totalScore > 0 {
                         Text(grade(for: look.totalScore))

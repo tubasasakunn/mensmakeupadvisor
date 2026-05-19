@@ -40,7 +40,7 @@ struct SavedLookDetailSheet: View {
     }
 
     private var thumbnail: some View {
-        SavedLookMeshThumbnail(look: look, mesh: LatestFaceMeshStore.load())
+        SavedLookMeshThumbnail(look: look, geometry: SavedLookMeshGeometry.makeLatest())
             .frame(maxWidth: 320)
             .frame(maxWidth: .infinity)
             .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
