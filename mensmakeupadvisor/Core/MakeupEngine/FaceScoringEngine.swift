@@ -52,11 +52,17 @@ nonisolated enum FaceScoringEngine {
         // 対称性
         let symScore = (symmetry.overallSym * 0.7 + symmetry.jawLineSharpness * 0.3) * 100.0
 
+        // 比率の向きでアドバイスを出し分けるため metrics を先に算出する。
+        let metrics = FaceMetricsCalculator.measure(faceMesh: faceMesh)
+
         let names = ["骨格バランス", "三分割比率", "五分割比率", "目の比率", "鼻のバランス", "口の比率", "左右対称性"]
         let raw = [skeletalScore, verticalScore, horizScore, eyeScore, noseScore, mouthScore, symScore]
         let scores = zip(names, raw).map { name, value in
-            let intScore = Int(value.rounded())
-            return FaceScore(name: name, score: clampInt(intScore), advice: FaceScore.pickAdvice(name: name, score: clampInt(intScore)))
+            let intScore = clampInt(Int(value.rounded()))
+            return FaceScore(
+                name: name, score: intScore,
+                advice: FaceScore.pickAdvice(name: name, score: intScore, sub: sub, metrics: metrics)
+            )
         }
 
         // DiagnosisView でメッシュと比率線を描画するために、478 ランドマークと
@@ -66,7 +72,6 @@ nonisolated enum FaceScoringEngine {
         let normalized = faceMesh.landmarksPx.map { px in
             CGPoint(x: Double(px.x) / w, y: Double(px.y) / h)
         }
-        let metrics = FaceMetricsCalculator.measure(faceMesh: faceMesh)
 
         return AnalysisResult(
             faceShape: bestType.faceShape,
