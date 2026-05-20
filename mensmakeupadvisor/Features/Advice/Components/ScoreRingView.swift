@@ -63,7 +63,7 @@ struct ScoreRingView: View {
                 var path = Path()
                 path.move(to: CGPoint(x: x1, y: y1))
                 path.addLine(to: CGPoint(x: x2, y: y2))
-                context.stroke(path, with: .color(Color.ivory.opacity(0.15)), lineWidth: 0.5)
+                context.stroke(path, with: .color(Theme.Mesh.tickMark), lineWidth: 0.5)
             }
         }
     }

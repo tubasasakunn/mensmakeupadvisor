@@ -173,7 +173,7 @@ struct AdviceView: View {
                 .background(Color.clear)
                 .overlay(
                     RoundedRectangle(cornerRadius: 2)
-                        .stroke(Color.ivory.opacity(0.35), lineWidth: 1)
+                        .stroke(Theme.Line.outlineIvory, lineWidth: 1)
                 )
         }
         .aid("advice_sample_button")

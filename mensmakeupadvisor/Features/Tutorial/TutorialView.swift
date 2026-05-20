@@ -156,7 +156,7 @@ struct TutorialView: View {
 
     private func layerColor(_ layer: MakeupLayer) -> Color {
         switch layer {
-        case .base:      return Color.ivory.opacity(0.5)
+        case .base:      return Theme.Step.baseDot
         case .highlight: return Color.ivory
         case .shadow:    return Color.brandPrimary
         case .eye:       return Color.sulphur

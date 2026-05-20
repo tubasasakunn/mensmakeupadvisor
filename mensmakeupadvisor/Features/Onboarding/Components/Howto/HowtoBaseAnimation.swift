@@ -59,7 +59,7 @@ struct HowtoBaseAnimation: View {
             (0.00, 0), (0.05, 1.2), (0.08, 1), (0.75, 1), (0.80, 0), (1.00, 0)
         ])
         return Circle()
-            .fill(Color(red: 0.913, green: 0.118, blue: 0.388))
+            .fill(Theme.Howto.basePink)
             .frame(width: dot.r * 2, height: dot.r * 2)
             .scaleEffect(scale)
             .opacity(opacity)
@@ -80,7 +80,7 @@ struct HowtoBaseAnimation: View {
         let dx = arrow.to.x - arrow.control.x
         let dy = arrow.to.y - arrow.control.y
         let angle = Angle(radians: atan2(dy, dx))
-        let color = Color(red: 0, green: 0.737, blue: 0.831)
+        let color = Theme.Howto.baseCyan
 
         return ZStack {
             Path { p in
@@ -116,5 +116,5 @@ private struct ArrowTipShape: Shape {
 #Preview {
     HowtoBaseAnimation()
         .frame(width: 260, height: 260)
-        .background(Color.gray.opacity(0.1))
+        .background(Theme.Howto.canvas)
 }

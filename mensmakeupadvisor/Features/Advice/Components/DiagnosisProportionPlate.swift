@@ -69,7 +69,7 @@ struct DiagnosisProportionPlate: View {
             let subnasalY = pt(FaceLandmarkID.subnasal).y
             let chinY     = pt(FaceLandmarkID.chinBottom).y
 
-            let thirdsColor = Color.brandPrimary.opacity(0.85)
+            let thirdsColor = Theme.Accent.primaryFaded
             for y in [foreheadY, glabellaY, subnasalY, chinY] {
                 var p = Path()
                 p.move(to: CGPoint(x: 0, y: y))
@@ -98,7 +98,7 @@ struct DiagnosisProportionPlate: View {
                 pt(FaceLandmarkID.eyeOuterL).x,
                 pt(FaceLandmarkID.templeL).x,
             ]
-            let fifthsColor = Color.sulphur.opacity(0.85)
+            let fifthsColor = Theme.Annotation.fifthsLine
             // 縦線は顔の高さ全体ではなく、額〜顎の範囲で描く
             for x in xs {
                 var p = Path()
@@ -108,7 +108,7 @@ struct DiagnosisProportionPlate: View {
             }
 
             // ─── 目幅・口幅・鼻幅 ───
-            let highlight = Color.ivory.opacity(0.95)
+            let highlight = Theme.Annotation.primary
 
             // 目幅（左右）
             drawRange(context: &context,

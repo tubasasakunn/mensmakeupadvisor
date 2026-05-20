@@ -37,7 +37,7 @@ struct ConceptPageView: View {
             if let source = page.source {
                 Text(source)
                     .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(Color.inkSecondary.opacity(0.6))
+                    .foregroundStyle(Theme.Text.secondaryDim)
             }
 
             Spacer(minLength: 0)

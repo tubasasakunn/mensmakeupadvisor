@@ -53,7 +53,7 @@ struct AnalyzingView: View {
                 .foregroundStyle(Color.appBackground)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
-                .background(errorMessage == nil ? Color.ivory.opacity(0.85) : Color.brandPrimary)
+                .background(errorMessage == nil ? Theme.Plate.renderingTint : Color.brandPrimary)
                 .clipShape(RoundedRectangle(cornerRadius: 2))
 
             Spacer()
@@ -140,7 +140,7 @@ struct AnalyzingView: View {
                         .padding(.vertical, 12)
                         .overlay(
                             RoundedRectangle(cornerRadius: 2)
-                                .stroke(Color.inkSecondary.opacity(0.35), lineWidth: 1)
+                                .stroke(Theme.Line.outlineSoft, lineWidth: 1)
                         )
                 }
                 .aid("analyzing_back_button")
@@ -242,7 +242,7 @@ struct AnalyzingView: View {
         let state = AppState()
         let r = UIGraphicsImageRenderer(size: CGSize(width: 300, height: 400))
         state.capturedImage = r.image { ctx in
-            UIColor(red: 0.2, green: 0.18, blue: 0.15, alpha: 1).setFill()
+            Theme.UIKitColor.previewCanvas.setFill()
             ctx.fill(CGRect(x: 0, y: 0, width: 300, height: 400))
         }
         return state

@@ -45,13 +45,13 @@ struct BeforeAfterSlider: View {
 
             ZStack(alignment: .leading) {
                 // After — 底レイヤー: 常に full size で固定
-                sliderImageLayer(img: afterImage, w: w, h: h, placeholder: Color(white: 0.26))
+                sliderImageLayer(img: afterImage, w: w, h: h, placeholder: Theme.Placeholder.stepAfterMed)
                     .overlay(alignment: .bottomTrailing) {
-                        sliderBadge("AFTER", color: Color.ivory.opacity(0.8))
+                        sliderBadge("AFTER", color: Theme.Plate.beforeAfterDivider)
                     }
 
                 // Before — 上レイヤー: full size だが左端からクリップ
-                sliderImageLayer(img: beforeImage, w: w, h: h, placeholder: Color(white: 0.18))
+                sliderImageLayer(img: beforeImage, w: w, h: h, placeholder: Theme.Placeholder.stepBeforeMed)
                     .overlay(alignment: .bottomLeading) {
                         sliderBadge("BEFORE", color: Color.inkSecondary)
                     }
@@ -96,7 +96,7 @@ struct BeforeAfterSlider: View {
     private func dragHandle(h: CGFloat, x: CGFloat) -> some View {
         ZStack {
             Rectangle()
-                .fill(Color.ivory.opacity(0.9))
+                .fill(Theme.Plate.labelText)
                 .frame(width: 2)
             Circle()
                 .fill(Color.ivory)

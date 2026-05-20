@@ -119,7 +119,7 @@ struct SavedLookDetailSheet: View {
                 .foregroundStyle(Color.inkSecondary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .overlay(Rectangle().stroke(Color.inkSecondary.opacity(0.35), lineWidth: 1))
+                .overlay(Rectangle().stroke(Theme.Line.outlineSoft, lineWidth: 1))
             }
             .accessibilityLabel("このルックを削除")
             .aid("home_archive_detail_delete")

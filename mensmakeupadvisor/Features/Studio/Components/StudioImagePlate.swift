@@ -122,7 +122,7 @@ struct StudioImagePlate: View {
                     )
 
                 Rectangle()
-                    .fill(Color.ivory.opacity(0.8))
+                    .fill(Theme.Plate.beforeAfterDivider)
                     .frame(width: 1, height: height)
                     .offset(x: viewModel.comparePosition * width - 0.5)
             } else {
@@ -134,7 +134,7 @@ struct StudioImagePlate: View {
                 HStack {
                     Text("Before · 素のまま")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(Color.ivory.opacity(0.9))
+                        .foregroundStyle(Theme.Plate.labelText)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(Theme.Surface.labelBackdrop)
@@ -150,7 +150,7 @@ struct StudioImagePlate: View {
                     Spacer()
                     Text("After · メイク後")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(Color.ivory.opacity(0.9))
+                        .foregroundStyle(Theme.Plate.labelText)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(Theme.Surface.labelBackdrop)
@@ -175,7 +175,7 @@ struct StudioImagePlate: View {
 
     private func afterView(width: CGFloat, height: CGFloat) -> some View {
         ZStack {
-            Color.black
+            Theme.Surface.imageBackdrop
 
             // makeup_claude の MakeupRenderer で実際に化粧が乗った画像があればそれを、
             // まだなければ撮影画像 + 簡易グラデーションを表示。
@@ -199,7 +199,7 @@ struct StudioImagePlate: View {
                     Theme.Surface.raised
                     VStack(spacing: 8) {
                         Ellipse()
-                            .stroke(Color.ivory.opacity(0.25), lineWidth: 1)
+                            .stroke(Theme.Plate.placeholderEllipse, lineWidth: 1)
                             .frame(width: width * 0.55, height: height * 0.68)
                         Text("メイク後のプレビュー")
                             .font(.system(size: 11))
@@ -221,10 +221,10 @@ struct StudioImagePlate: View {
                 HStack(spacing: 6) {
                     ProgressView()
                         .scaleEffect(0.6)
-                        .tint(Color.ivory.opacity(0.85))
+                        .tint(Theme.Plate.renderingTint)
                     Text("反映中…")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Color.ivory.opacity(0.85))
+                        .foregroundStyle(Theme.Plate.renderingTint)
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)

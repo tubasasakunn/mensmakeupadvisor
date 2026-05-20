@@ -32,5 +32,5 @@ struct HowtoBrowsAnimation: View {
 #Preview {
     HowtoBrowsAnimation()
         .frame(width: 260, height: 260)
-        .background(Color.gray.opacity(0.1))
+        .background(Theme.Howto.canvas)
 }

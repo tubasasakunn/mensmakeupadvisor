@@ -130,7 +130,7 @@ struct HomeReportTab: View {
                 .foregroundStyle(Color.ivory)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .overlay(Rectangle().stroke(Color.ivory.opacity(0.35), lineWidth: 1))
+                .overlay(Rectangle().stroke(Theme.Line.outlineIvory, lineWidth: 1))
             }
             .aid("home_report_open_button")
 

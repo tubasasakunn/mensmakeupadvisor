@@ -116,31 +116,30 @@ struct SplashView: View {
         GeometryReader { geo in
             let size = geo.size
             let offset: CGFloat = 20
-            let markOpacity = 0.25
 
             ZStack {
                 // 左上
                 CrossMark()
                     .frame(width: 10, height: 10)
-                    .foregroundStyle(Color.ivory.opacity(markOpacity))
+                    .foregroundStyle(Theme.Splash.cornerMark)
                     .position(x: offset, y: offset)
 
                 // 右上
                 CrossMark()
                     .frame(width: 10, height: 10)
-                    .foregroundStyle(Color.ivory.opacity(markOpacity))
+                    .foregroundStyle(Theme.Splash.cornerMark)
                     .position(x: size.width - offset, y: offset)
 
                 // 左下
                 CrossMark()
                     .frame(width: 10, height: 10)
-                    .foregroundStyle(Color.ivory.opacity(markOpacity))
+                    .foregroundStyle(Theme.Splash.cornerMark)
                     .position(x: offset, y: size.height - offset)
 
                 // 右下
                 CrossMark()
                     .frame(width: 10, height: 10)
-                    .foregroundStyle(Color.ivory.opacity(markOpacity))
+                    .foregroundStyle(Theme.Splash.cornerMark)
                     .position(x: size.width - offset, y: size.height - offset)
             }
         }

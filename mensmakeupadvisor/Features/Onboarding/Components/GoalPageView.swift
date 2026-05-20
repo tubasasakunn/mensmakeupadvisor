@@ -71,7 +71,7 @@ struct GoalPageView: View {
         VStack(spacing: 8) {
             Image(systemName: symbol)
                 .font(.system(size: 26))
-                .foregroundStyle(Color.brandPrimary.opacity(0.85))
+                .foregroundStyle(Theme.Accent.primaryFaded)
                 .frame(width: 56, height: 56)
                 .background(Theme.Surface.glassWeak)
                 .clipShape(Circle())

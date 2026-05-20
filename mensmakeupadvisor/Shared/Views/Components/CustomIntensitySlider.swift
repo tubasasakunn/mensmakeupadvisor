@@ -16,7 +16,7 @@ struct CustomIntensitySlider: View {
                     .frame(height: 1)
 
                 Rectangle()
-                    .fill(Color.ivory.opacity(0.6))
+                    .fill(Theme.Step.labelTag)
                     .frame(width: handleX, height: 1)
 
                 Rectangle()

@@ -109,7 +109,7 @@ struct HomeArchiveTab: View {
                         Text(grade(for: look.totalScore))
                             .font(.system(size: 11, weight: .light, design: .serif))
                             .italic()
-                            .foregroundStyle(Color.ivory.opacity(0.6))
+                            .foregroundStyle(Theme.Step.labelTag)
                             .padding(6)
                     }
                 }

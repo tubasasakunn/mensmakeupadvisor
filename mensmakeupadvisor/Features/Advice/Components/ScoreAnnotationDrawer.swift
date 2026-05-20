@@ -7,9 +7,9 @@ struct ScoreAnnotationDrawer {
     let size: CGSize
     let landmarks: [CGPoint]
 
-    private let primary = Color.ivory.opacity(0.95)
-    private let accent  = Color.brandPrimary.opacity(0.9)
-    private let sub     = Color.sulphur.opacity(0.9)
+    private let primary = Theme.Annotation.primary
+    private let accent  = Theme.Annotation.accent
+    private let sub     = Theme.Annotation.sub
 
     func point(_ id: Int) -> CGPoint {
         let p = landmarks[id]

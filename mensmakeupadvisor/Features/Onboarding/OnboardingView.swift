@@ -72,7 +72,7 @@ struct OnboardingView: View {
             .padding(.vertical, 6)
             .overlay(
                 RoundedRectangle(cornerRadius: 2)
-                    .stroke(Color.inkSecondary.opacity(0.35), lineWidth: 1)
+                    .stroke(Theme.Line.outlineSoft, lineWidth: 1)
             )
         }
         .accessibilityLabel("目次を開く")
@@ -96,7 +96,7 @@ struct OnboardingView: View {
                 .padding(.vertical, 6)
                 .overlay(
                     RoundedRectangle(cornerRadius: 2)
-                        .stroke(Color.inkSecondary.opacity(0.4), lineWidth: 1)
+                        .stroke(Theme.Line.outlineMedium, lineWidth: 1)
                 )
         }
         .accessibilityElement(children: .combine)
@@ -113,7 +113,7 @@ struct OnboardingView: View {
                     .fill(Color.lineColor)
                     .frame(height: 1.5)
                 Rectangle()
-                    .fill(Color.ivory.opacity(0.7))
+                    .fill(Theme.Text.primaryFaded)
                     .frame(width: geo.size.width * CGFloat(currentPage + 1) / CGFloat(pages.count), height: 1.5)
                     .animation(.easeInOut(duration: 0.25), value: currentPage)
             }
@@ -131,7 +131,7 @@ struct OnboardingView: View {
             Spacer()
             Text("\(currentPage + 1) / \(pages.count) ページ")
                 .font(.system(size: 11))
-                .foregroundStyle(Color.inkSecondary.opacity(0.7))
+                .foregroundStyle(Theme.Text.secondaryFaded)
                 .accessibilityLabel("\(currentPage + 1) ページ目、全 \(pages.count) ページ中")
                 .accessibilityIdentifier("onboarding_folio_label")
         }

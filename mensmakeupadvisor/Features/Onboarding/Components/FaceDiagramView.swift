@@ -36,7 +36,7 @@ struct FaceDiagramView: View {
 
                 let faceRect = CGRect(x: faceLeft, y: faceTop, width: faceW, height: faceH)
                 let facePath = Path(ellipseIn: faceRect)
-                ctx.stroke(facePath, with: .color(Color.ivory.opacity(0.55)), lineWidth: 1.2)
+                ctx.stroke(facePath, with: .color(Theme.Diagram.faceOutline), lineWidth: 1.2)
 
                 let jawTop = faceTop + faceH * 0.65
                 var jawPath = Path()
@@ -50,7 +50,7 @@ struct FaceDiagramView: View {
                     to: CGPoint(x: cx, y: faceBottom),
                     control: CGPoint(x: faceRight - faceW * 0.04, y: faceBottom - faceH * 0.06)
                 )
-                ctx.stroke(jawPath, with: .color(Color.ivory.opacity(0.4)), lineWidth: 0.8)
+                ctx.stroke(jawPath, with: .color(Theme.Diagram.jawLine), lineWidth: 0.8)
 
                 let browY = faceTop + faceH * 0.26
                 let browSpread = faceW * 0.24
@@ -66,7 +66,7 @@ struct FaceDiagramView: View {
                     to: CGPoint(x: cx + browSpread + browHalf, y: browY + 3),
                     control: CGPoint(x: cx + browSpread, y: browY - 6)
                 )
-                let browColor: Color = region == "brows" ? Color.brandPrimary : Color.ivory.opacity(0.6)
+                let browColor: Color = region == "brows" ? Color.brandPrimary : Theme.Step.labelTag
                 let browWidth: CGFloat = region == "brows" ? 3.0 : 1.4
                 ctx.stroke(browsPath, with: .color(browColor), lineWidth: browWidth)
 
@@ -74,7 +74,7 @@ struct FaceDiagramView: View {
                 let eyeSpread = faceW * 0.22
                 let eyeRx: CGFloat = faceW * 0.10
                 let eyeRy: CGFloat = faceH * 0.048
-                let eyeColor: Color = region == "eyes" ? Color.brandPrimary.opacity(0.9) : Color.ivory.opacity(0.55)
+                let eyeColor: Color = region == "eyes" ? Theme.Annotation.accent : Theme.Diagram.faceOutline
                 let leftEyeRect = CGRect(x: cx - eyeSpread - eyeRx, y: eyeY - eyeRy, width: eyeRx * 2, height: eyeRy * 2)
                 let rightEyeRect = CGRect(x: cx + eyeSpread - eyeRx, y: eyeY - eyeRy, width: eyeRx * 2, height: eyeRy * 2)
                 ctx.stroke(Path(ellipseIn: leftEyeRect), with: .color(eyeColor), lineWidth: region == "eyes" ? 1.8 : 1.0)
@@ -95,7 +95,7 @@ struct FaceDiagramView: View {
                     to: CGPoint(x: cx - noseW, y: noseTipY - 2),
                     control: CGPoint(x: cx - noseW * 0.5, y: noseTipY + 5)
                 )
-                ctx.stroke(nosePath, with: .color(Color.ivory.opacity(0.45)), lineWidth: 0.9)
+                ctx.stroke(nosePath, with: .color(Theme.Diagram.nose), lineWidth: 0.9)
 
                 let mouthY = faceTop + faceH * 0.71
                 let mouthW = faceW * 0.22
@@ -105,14 +105,14 @@ struct FaceDiagramView: View {
                     to: CGPoint(x: cx + mouthW, y: mouthY),
                     control: CGPoint(x: cx, y: mouthY + 5)
                 )
-                ctx.stroke(mouthPath, with: .color(Color.ivory.opacity(0.4)), lineWidth: 0.9)
+                ctx.stroke(mouthPath, with: .color(Theme.Diagram.jawLine), lineWidth: 0.9)
 
                 var centerLine = Path()
                 centerLine.move(to: CGPoint(x: cx, y: faceTop + faceH * 0.04))
                 centerLine.addLine(to: CGPoint(x: cx, y: faceTop + faceH * 0.22))
                 ctx.stroke(
                     centerLine,
-                    with: .color(Color.ivory.opacity(0.12)),
+                    with: .color(Theme.Mesh.placeholderGrid),
                     style: StrokeStyle(lineWidth: 0.5, dash: [3, 4])
                 )
 

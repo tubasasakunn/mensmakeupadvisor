@@ -179,7 +179,7 @@ struct DiagnosisView: View {
                             .font(.system(size: 14, weight: .medium))
                         Text("メイクの経験がある方向け")
                             .font(.system(size: 11, weight: .regular))
-                            .foregroundStyle(Color.inkSecondary.opacity(0.7))
+                            .foregroundStyle(Theme.Text.secondaryFaded)
                     }
                     .foregroundStyle(Color.inkSecondary)
                     .frame(maxWidth: .infinity)
@@ -187,7 +187,7 @@ struct DiagnosisView: View {
                     .background(Color.clear)
                     .overlay(
                         RoundedRectangle(cornerRadius: 2)
-                            .stroke(Color.inkSecondary.opacity(0.35), lineWidth: 1)
+                            .stroke(Theme.Line.outlineSoft, lineWidth: 1)
                     )
                 }
                 .accessibilityLabel("ガイドを飛ばしてスタジオへ。メイクの経験がある方向け")
@@ -205,7 +205,7 @@ struct DiagnosisView: View {
         state.analysisResult = .mock
         let r = UIGraphicsImageRenderer(size: CGSize(width: 300, height: 400))
         state.capturedImage = r.image { ctx in
-            UIColor(red: 0.2, green: 0.18, blue: 0.15, alpha: 1).setFill()
+            Theme.UIKitColor.previewCanvas.setFill()
             ctx.fill(CGRect(x: 0, y: 0, width: 300, height: 400))
         }
         return state

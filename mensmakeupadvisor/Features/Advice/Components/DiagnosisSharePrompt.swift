@@ -78,7 +78,7 @@ struct DiagnosisSharePrompt: View {
                 Text(result.faceShape.label)
                     .font(.system(size: 7, weight: .bold, design: .serif))
                     .italic()
-                    .foregroundStyle(Color.ivory.opacity(0.7))
+                    .foregroundStyle(Theme.Text.primaryFaded)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 6)
                     .padding(.bottom, 6)

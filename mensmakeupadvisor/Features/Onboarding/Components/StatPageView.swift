@@ -25,7 +25,7 @@ struct StatPageView: View {
             if let label = page.statLabel {
                 Text(label)
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(Color.ivory.opacity(0.85))
+                    .foregroundStyle(Theme.Plate.renderingTint)
                     .lineSpacing(5)
                     .padding(.bottom, 26)
             }
@@ -46,7 +46,7 @@ struct StatPageView: View {
             if let source = page.source {
                 Text(source)
                     .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(Color.inkSecondary.opacity(0.6))
+                    .foregroundStyle(Theme.Text.secondaryDim)
                     .kerning(0.5)
             }
 
