@@ -19,7 +19,7 @@ struct TutorialView: View {
         @Bindable var bindableVM = viewModel
 
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground()
 
             VStack(spacing: 0) {
                 headerBar
@@ -107,22 +107,29 @@ struct TutorialView: View {
             Button {
                 viewModel.prevStep(appState: appState)
             } label: {
-                HStack(spacing: 4) {
+                HStack(spacing: 5) {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 11, weight: .semibold))
                     Text(isFirst ? "診断結果へ" : "前へ")
-                        .font(.system(size: 13, weight: .regular))
+                        .font(.system(size: 12, weight: .medium))
                 }
-                .foregroundStyle(Color.inkSecondary)
+                .foregroundStyle(Theme.Text.primarySoft)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, 7)
+                .glassEffect(.clear, in: .capsule)
             }
             .accessibilityLabel(isFirst ? "診断結果に戻る" : "前のステップに戻る")
             .aid("tutorial_back_button")
 
             Spacer()
 
-            Text("ステップ \(appState.tutorialStep + 1) / \(steps.count)")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.ivory)
+            Text("\(appState.tutorialStep + 1) / \(steps.count)")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .kerning(1.5)
+                .foregroundStyle(Theme.Text.primaryFaded)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, 7)
+                .glassEffect(.regular, in: .capsule)
 
             Spacer()
 
@@ -130,13 +137,16 @@ struct TutorialView: View {
                 viewModel.skip(appState: appState)
             } label: {
                 Text("あとで")
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundStyle(Color.inkSecondary)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Theme.Text.primarySoft)
+                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.vertical, 7)
+                    .glassEffect(.clear, in: .capsule)
             }
             .accessibilityLabel("ガイドを終了してスタジオへ")
             .aid("tutorial_skip_button")
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, Theme.Spacing.xxl)
     }
 
     private var stepDots: some View {
@@ -167,25 +177,12 @@ struct TutorialView: View {
     private var navigationBar: some View {
         let isLast = appState.tutorialStep == max(0, steps.count - 1)
 
-        return HStack {
-            Spacer()
-
-            Button {
-                viewModel.nextStep(appState: appState)
-            } label: {
-                HStack(spacing: 8) {
-                    Text(isLast ? "スタジオで仕上げる" : "次のステップへ")
-                        .font(.system(size: 15, weight: .semibold))
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 13, weight: .semibold))
-                }
-                .foregroundStyle(Color.appBackground)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 14)
-                .background(Color.ivory)
-            }
-            .accessibilityLabel(isLast ? "スタジオで仕上げる" : "次のステップへ")
-            .aid("tutorial_next_button")
+        return GlassPrimaryButton(
+            title: isLast ? "スタジオで仕上げる" : "次のステップへ",
+            icon: isLast ? "paintbrush.pointed.fill" : nil,
+            accessibilityID: "tutorial_next_button"
+        ) {
+            viewModel.nextStep(appState: appState)
         }
     }
 }

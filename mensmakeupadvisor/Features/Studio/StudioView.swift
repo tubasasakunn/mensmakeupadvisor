@@ -9,31 +9,31 @@ struct StudioView: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground()
 
             VStack(spacing: 0) {
                 headerBar
-                    .padding(.top, 8)
+                    .padding(.top, Theme.Spacing.sm)
 
                 StudioImagePlate(viewModel: viewModel)
-                    .padding(.horizontal, 28)
-                    .padding(.top, 12)
+                    .padding(.horizontal, Theme.Spacing.xxl)
+                    .padding(.top, Theme.Spacing.md)
 
                 modeRow
-                    .padding(.top, 16)
-                    .padding(.horizontal, 28)
+                    .padding(.top, Theme.Spacing.lg)
+                    .padding(.horizontal, Theme.Spacing.xxl)
 
                 controlPanel
-                    .padding(.top, 16)
-                    .padding(.horizontal, 28)
+                    .padding(.top, Theme.Spacing.lg)
+                    .padding(.horizontal, Theme.Spacing.xxl)
 
                 Spacer()
 
                 StudioBottomBar {
                     viewModel.saveLook(appState: appState, modelContext: modelContext)
                 }
-                .padding(.horizontal, 28)
-                .padding(.bottom, 32)
+                .padding(.horizontal, Theme.Spacing.xxl)
+                .padding(.bottom, Theme.Spacing.xxxl)
             }
 
             if viewModel.showSavedNotification {
@@ -84,47 +84,69 @@ struct StudioView: View {
 
     private var headerBar: some View {
         HStack {
-            Button {
+            backChip(
+                label: "診断結果",
+                aid: "studio_back_button",
+                accessibilityLabel: "診断結果に戻る"
+            ) {
                 appState.navigate(to: .diagnosis)
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 12, weight: .semibold))
-                    Text("診断結果")
-                        .font(.system(size: 13, weight: .regular))
-                }
-                .foregroundStyle(Color.inkSecondary)
             }
-            .accessibilityLabel("診断結果に戻る")
-            .aid("studio_back_button")
 
             Spacer()
 
-            Text("スタジオ")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(Color.ivory)
+            Text("STUDIO")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .kerning(3)
+                .foregroundStyle(Theme.Text.primaryFaded)
 
             Spacer()
 
-            Button {
+            backChip(
+                label: "ホーム",
+                aid: "studio_header_home_button",
+                accessibilityLabel: "ホームに戻る",
+                icon: "house.fill",
+                trailing: true
+            ) {
                 appState.navigate(to: .home)
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "house.fill")
-                        .font(.system(size: 12, weight: .semibold))
-                    Text("ホーム")
-                        .font(.system(size: 13, weight: .regular))
-                }
-                .foregroundStyle(Color.inkSecondary)
             }
-            .accessibilityLabel("ホームに戻る")
-            .aid("studio_header_home_button")
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, Theme.Spacing.xxl)
+    }
+
+    // Header の戻る/ホームチップ。clear glass + ivory outline。
+    private func backChip(
+        label: String,
+        aid: String,
+        accessibilityLabel: String,
+        icon: String = "chevron.left",
+        trailing: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                if !trailing {
+                    Image(systemName: icon)
+                        .font(.system(size: 11, weight: .semibold))
+                }
+                Text(label)
+                    .font(.system(size: 12, weight: .medium))
+                if trailing {
+                    Image(systemName: icon)
+                        .font(.system(size: 11, weight: .semibold))
+                }
+            }
+            .foregroundStyle(Theme.Text.primarySoft)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, 7)
+            .glassEffect(.clear, in: .capsule)
+        }
+        .accessibilityLabel(accessibilityLabel)
+        .aid(aid)
     }
 
     private var modeRow: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: Theme.Spacing.md) {
             modeSegment
             resetButton
         }
@@ -145,7 +167,7 @@ struct StudioView: View {
                 aid: "studio_finetune_button"
             )
         }
-        .hairlineBorder()
+        .glassEffect(.regular, in: .capsule)
     }
 
     private var resetButton: some View {
@@ -158,11 +180,10 @@ struct StudioView: View {
                 Text("リセット")
                     .font(.system(size: 11, weight: .regular))
             }
-            .foregroundStyle(hasAnyIntensity ? Color.ivory : Color.inkTertiary)
-            .frame(width: 60)
-            .padding(.vertical, 10)
-            .hairlineBorder()
+            .foregroundStyle(hasAnyIntensity ? Color.ivory : Theme.Text.tertiary)
+            .frame(width: 56, height: 56)
         }
+        .glassEffect(.regular, in: .circle)
         .disabled(!hasAnyIntensity)
         .accessibilityLabel("メイクをリセット")
         .aid("studio_reset_button")
@@ -171,23 +192,27 @@ struct StudioView: View {
     private func modeButton(title: String, subtitle: String, mode: StudioViewModel.DisplayMode, aid: String) -> some View {
         let isActive = viewModel.displayMode == mode
         return Button {
-            withAnimation(.easeInOut(duration: 0.2)) { viewModel.displayMode = mode }
+            withAnimation(Theme.Motion.spring) { viewModel.displayMode = mode }
         } label: {
             VStack(spacing: 2) {
                 Text(title)
                     .font(.system(size: 14, weight: .semibold))
                 Text(subtitle)
-                    .font(.system(size: 11, weight: .regular))
-                    .opacity(0.65)
+                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                    .kerning(1)
+                    .opacity(0.7)
             }
             .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-            .background(isActive ? Color.ivory : Color.clear)
+            .padding(.vertical, 12)
+            .background(
+                Capsule()
+                    .fill(isActive ? Color.ivory : Color.clear)
+                    .padding(4)
+            )
         }
         .accessibilityLabel("\(title)モード。\(subtitle)")
         .aid(aid)
-        .animation(.easeInOut(duration: 0.2), value: viewModel.displayMode)
     }
 
     @ViewBuilder
@@ -201,7 +226,7 @@ struct StudioView: View {
             // できるようにする。画像プレートが潰れるのを防ぐ。
             ScrollView(.vertical, showsIndicators: false) {
                 FineTunePanelView()
-                    .padding(.bottom, 8)
+                    .padding(.bottom, Theme.Spacing.sm)
             }
         }
     }

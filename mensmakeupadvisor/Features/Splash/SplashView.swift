@@ -5,7 +5,7 @@ struct SplashView: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground(intensity: 0.45)
 
             // 四隅の十字マーク
             cornerMarks

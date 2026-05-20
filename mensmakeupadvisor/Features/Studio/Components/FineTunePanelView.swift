@@ -12,32 +12,38 @@ struct FineTunePanelView: View {
     private let advancedKinds: [MakeupKind] = [.tearbag, .eyeliner]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("細かく調整する")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color.ivory)
-                Text("0 で何もしない、50 が標準、100 で最大")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.inkSecondary)
-            }
-            .padding(.bottom, 16)
-
-            VStack(spacing: 20) {
-                ForEach(primaryKinds, id: \.self) { kind in
-                    kindSliderRow(kind)
+        GlassPanel(radius: Theme.Radius.lg, padding: Theme.Spacing.lg) {
+            VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("FINE TUNE")
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .kerning(2)
+                        .foregroundStyle(Theme.Text.secondaryFaded)
+                    Text("細かく調整する")
+                        .font(.system(size: 15, weight: .semibold, design: .serif))
+                        .foregroundStyle(Color.ivory)
+                    Text("0 で何もしない、50 が標準、100 で最大")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.Text.secondaryFaded)
                 }
-                browTypeRow
+                .padding(.bottom, Theme.Spacing.lg)
 
-                advancedDisclosure
-
-                if showAdvanced {
-                    VStack(spacing: 20) {
-                        ForEach(advancedKinds, id: \.self) { kind in
-                            kindSliderRow(kind)
-                        }
+                VStack(spacing: Theme.Spacing.xl) {
+                    ForEach(primaryKinds, id: \.self) { kind in
+                        kindSliderRow(kind)
                     }
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    browTypeRow
+
+                    advancedDisclosure
+
+                    if showAdvanced {
+                        VStack(spacing: Theme.Spacing.xl) {
+                            ForEach(advancedKinds, id: \.self) { kind in
+                                kindSliderRow(kind)
+                            }
+                        }
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
                 }
             }
         }
@@ -124,18 +130,27 @@ struct FineTunePanelView: View {
         let isActive = (entry.value == appState.composition.browType)
         let aidValue = entry.value?.rawValue ?? "off"
         return Button {
-            withAnimation(.easeInOut(duration: 0.15)) {
+            withAnimation(Theme.Motion.quick) {
                 appState.composition.setBrowType(entry.value)
             }
         } label: {
             Text(entry.label)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 8)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, Theme.Spacing.sm)
                 .frame(maxWidth: .infinity)
-                .background(isActive ? Color.ivory : Color.clear)
-                .hairlineBorder()
+                .background(
+                    Capsule()
+                        .fill(isActive ? Color.ivory : Color.clear)
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(
+                            isActive ? Color.clear : Theme.Line.outlineIvorySoft,
+                            lineWidth: 0.5
+                        )
+                )
         }
         .accessibilityLabel("眉のかたち\(entry.label)" + (isActive ? "。選択中" : ""))
         .aid("studio_brow_type_\(aidValue)")

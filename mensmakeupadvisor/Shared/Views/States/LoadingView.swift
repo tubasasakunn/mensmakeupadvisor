@@ -4,21 +4,24 @@ struct LoadingView: View {
     var message: String = "Loading..."
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Theme.Spacing.lg) {
             ProgressView()
                 .tint(Color.ivory)
-                .scaleEffect(1.5)
+                .scaleEffect(1.4)
             Text(message)
-                .font(.system(.caption, design: .monospaced))
-                .foregroundStyle(Color.inkSecondary)
+                .font(.system(size: 11, weight: .regular, design: .monospaced))
+                .kerning(2)
+                .foregroundStyle(Theme.Text.primaryFaded)
         }
+        .padding(Theme.Spacing.xxl)
+        .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.lg))
         .aid("loading_view")
     }
 }
 
 #Preview {
     ZStack {
-        Color.appBackground.ignoresSafeArea()
-        LoadingView(message: "分析中...")
+        LuxeBackground()
+        LoadingView(message: "ANALYZING")
     }
 }

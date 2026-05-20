@@ -7,46 +7,51 @@ struct HomeReportTab: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground()
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    headerSection
-                        .padding(.top, 32)
+                    kickerLabel
+                        .padding(.top, Theme.Spacing.xxxl)
                     titleSection
-                        .padding(.top, 12)
+                        .padding(.top, Theme.Spacing.md)
                     HairlineDivider()
-                        .padding(.top, 24)
+                        .padding(.top, Theme.Spacing.xxl)
                     contentSection
-                        .padding(.top, 28)
+                        .padding(.top, Theme.Spacing.xxl)
                 }
-                .padding(.horizontal, 28)
-                .padding(.bottom, 80)
+                .padding(.horizontal, Theme.Spacing.xxl)
+                .padding(.bottom, Theme.Spacing.huge)
             }
         }
         .aid("home_report_tab")
     }
 
-    private var headerSection: some View {
-        Text("あなたの顔の診断結果")
-            .font(.system(size: 12))
-            .foregroundStyle(Color.inkSecondary)
+    private var kickerLabel: some View {
+        Text("REPORT")
+            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .kerning(3)
+            .foregroundStyle(Theme.Text.secondaryFaded)
     }
 
     private var titleSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text("診断レポート")
-                .font(.system(size: 32, weight: .bold))
+                .font(.system(size: 36, weight: .bold, design: .serif))
+                .italic()
                 .foregroundStyle(Color.ivory)
+            Text("あなたの顔の診断結果")
+                .font(.system(size: 12))
+                .foregroundStyle(Color.inkSecondary)
         }
     }
 
     @ViewBuilder
     private var contentSection: some View {
         if let result = appState.analysisResult {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
                 summaryCard(result: result)
-                scorePreviewList(result: result)
+                scorePreviewCard(result: result)
                 actionButtons
             }
         } else {
@@ -54,57 +59,80 @@ struct HomeReportTab: View {
         }
     }
 
+    // 一番上の hero — 顔型・グレード・パーセンタイル
     private func summaryCard(result: AnalysisResult) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(result.faceShape.label)
-                    .font(.system(size: 28, weight: .bold, design: .serif))
-                    .italic()
-                    .foregroundStyle(Color.ivory)
-                Spacer()
-                Text(result.grade)
-                    .font(.system(size: 42, weight: .light, design: .serif))
-                    .italic()
-                    .foregroundStyle(result.gradeColor)
-                Text("\(result.totalScore)pt")
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundStyle(Color.inkSecondary)
+        GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xl) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text(result.faceShape.label)
+                        .font(.system(size: 30, weight: .bold, design: .serif))
+                        .italic()
+                        .foregroundStyle(Color.ivory)
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 0) {
+                        Text(result.grade)
+                            .font(.system(size: 46, weight: .light, design: .serif))
+                            .italic()
+                            .foregroundStyle(result.gradeColor)
+                        Text("\(result.totalScore) pt")
+                            .font(.system(size: 11, design: .monospaced))
+                            .kerning(1)
+                            .foregroundStyle(Theme.Text.secondary)
+                    }
+                }
+                Text(result.faceShape.note)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.Text.primaryFaded)
+                    .lineSpacing(5)
+                GlassDivider()
+                HStack(spacing: 6) {
+                    Image(systemName: "chart.bar.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Color.brandPrimary.opacity(0.85))
+                    Text(result.rankPercentile)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Theme.Text.primarySoft)
+                }
             }
-            Text(result.faceShape.note)
-                .font(.system(size: 12))
-                .foregroundStyle(Color.inkSecondary)
-                .lineSpacing(5)
-            Text(result.rankPercentile)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.inkTertiary)
         }
-        .padding(20)
-        .hairlineBorder()
     }
 
-    private func scorePreviewList(result: AnalysisResult) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("7 つの評価指標")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.inkSecondary)
-
-            VStack(spacing: 8) {
-                ForEach(Array(result.scores.enumerated()), id: \.element.id) { _, score in
-                    HStack {
-                        Text(score.name)
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(Color.ivory)
-                        Spacer()
-                        Text(score.grade)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(score.gradeColor)
-                        Text("\(score.score)点")
-                            .font(.system(size: 11))
-                            .foregroundStyle(Color.inkSecondary)
-                            .frame(width: 44, alignment: .trailing)
-                    }
-                    .overlay(alignment: .bottom) {
-                        HairlineDivider().offset(y: 6)
+    // 7 評価指標の表
+    private func scorePreviewCard(result: AnalysisResult) -> some View {
+        GlassCard(radius: Theme.Radius.lg, padding: Theme.Spacing.xl) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
+                HStack {
+                    Text("7 つの評価指標")
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .kerning(1.5)
+                        .foregroundStyle(Theme.Text.primaryFaded)
+                    Spacer()
+                    Text("SEVEN")
+                        .font(.system(size: 10, design: .monospaced))
+                        .kerning(2)
+                        .foregroundStyle(Theme.Text.tertiary)
+                }
+                VStack(spacing: Theme.Spacing.sm) {
+                    ForEach(Array(result.scores.enumerated()), id: \.element.id) { idx, score in
+                        HStack {
+                            Text(String(format: "%02d", idx + 1))
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundStyle(Theme.Text.tertiary)
+                            Text(score.name)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(Color.ivory)
+                            Spacer()
+                            Text(score.grade)
+                                .font(.system(size: 14, weight: .heavy))
+                                .foregroundStyle(score.gradeColor)
+                            Text("\(score.score)pt")
+                                .font(.system(size: 11, design: .monospaced))
+                                .foregroundStyle(Theme.Text.secondary)
+                                .frame(width: 44, alignment: .trailing)
+                        }
+                        .overlay(alignment: .bottom) {
+                            GlassDivider().offset(y: 7)
+                        }
                     }
                 }
             }
@@ -112,75 +140,51 @@ struct HomeReportTab: View {
     }
 
     private var actionButtons: some View {
-        VStack(spacing: 12) {
-            Button {
+        VStack(spacing: Theme.Spacing.md) {
+            GlassPrimaryButton(
+                title: "詳しいレポートを見る",
+                accessibilityID: "home_report_open_button"
+            ) {
                 appState.skipTutorialOnNextFlow = false
                 appState.navigate(to: .diagnosis)
-            } label: {
-                HStack(spacing: 6) {
-                    Text("詳しいレポートを見る")
-                        .font(.system(size: 14, weight: .semibold))
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
-                }
-                .foregroundStyle(Color.ivory)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .hairlineBorder(Theme.Line.outlineIvory)
             }
-            .aid("home_report_open_button")
 
-            Button {
+            GlassSecondaryButton(
+                title: "もう一度撮影して評価する",
+                icon: "arrow.clockwise",
+                accessibilityID: "home_report_reeval_button"
+            ) {
                 appState.navigate(to: .capture)
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 13, weight: .semibold))
-                    Text("もう一度撮影して評価する")
-                        .font(.system(size: 14, weight: .semibold))
-                }
-                .foregroundStyle(Color.appBackground)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(Color.ivory)
             }
-            .aid("home_report_reeval_button")
         }
     }
 
     private var emptyState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "face.dashed")
-                .font(.system(size: 36, weight: .light))
-                .foregroundStyle(Color.inkSecondary)
-            Text("まだ診断結果はありません")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(Color.ivory)
-            Text("顔写真を撮ると、ここに 7 つの指標で\nスコアが表示されます。")
-                .font(.system(size: 12))
-                .foregroundStyle(Color.inkSecondary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
+        GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xxl) {
+            VStack(spacing: Theme.Spacing.lg) {
+                Image(systemName: "face.dashed")
+                    .font(.system(size: 40, weight: .ultraLight))
+                    .foregroundStyle(Theme.Text.secondary)
+                Text("まだ診断結果はありません")
+                    .font(.system(size: 17, weight: .semibold, design: .serif))
+                    .foregroundStyle(Color.ivory)
+                Text("顔写真を撮ると、ここに 7 つの指標で\nスコアが表示されます。")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.Text.primaryFaded)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
 
-            Button {
-                appState.navigate(to: .capture)
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "camera.fill")
-                        .font(.system(size: 14, weight: .semibold))
-                    Text("撮影をはじめる")
-                        .font(.system(size: 14, weight: .semibold))
+                GlassPrimaryButton(
+                    title: "撮影をはじめる",
+                    icon: "camera.fill",
+                    accessibilityID: "home_report_start_button"
+                ) {
+                    appState.navigate(to: .capture)
                 }
-                .foregroundStyle(Color.appBackground)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 14)
-                .background(Color.ivory)
+                .padding(.top, Theme.Spacing.sm)
             }
-            .padding(.top, 12)
-            .aid("home_report_start_button")
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 60)
     }
 }
 

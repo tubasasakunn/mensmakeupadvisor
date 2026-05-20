@@ -3,10 +3,6 @@ import SwiftUI
 struct AdviceViewfinderArea: View {
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Theme.Surface.glassWeak)
-                .frame(height: 280)
-
             Ellipse()
                 .stroke(
                     style: StrokeStyle(lineWidth: 1, dash: [6, 4])
@@ -18,25 +14,32 @@ struct AdviceViewfinderArea: View {
 
             VStack {
                 Spacer()
-                HStack {
+                HStack(spacing: 6) {
                     Circle()
                         .fill(Color.brandPrimary)
                         .frame(width: 6, height: 6)
                     Text("LIVE")
                         .font(.system(size: 9, weight: .medium, design: .monospaced))
                         .foregroundStyle(Color.brandPrimary)
-                        .kerning(2)
+                        .kerning(2.5)
                 }
-                .padding(.bottom, 16)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, 6)
+                .glassEffect(.regular, in: .capsule)
+                .padding(.bottom, Theme.Spacing.lg)
             }
 
             Text("顔を枠内に合わせてください")
                 .font(.system(size: 11, weight: .regular, design: .monospaced))
-                .foregroundStyle(Color.inkSecondary)
+                .kerning(1)
+                .foregroundStyle(Theme.Text.primaryFaded)
         }
         .frame(height: 280)
-        .clipShape(RoundedRectangle(cornerRadius: 4))
-        .hairlineBorder(cornerRadius: 4)
+        .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.md))
+        .overlay(
+            RoundedRectangle(cornerRadius: Theme.Radius.md)
+                .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+        )
     }
 
     private var viewfinderCorners: some View {

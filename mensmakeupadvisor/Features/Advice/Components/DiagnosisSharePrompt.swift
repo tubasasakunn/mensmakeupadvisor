@@ -10,35 +10,43 @@ struct DiagnosisSharePrompt: View {
         Button {
             Task { await shareResult() }
         } label: {
-            HStack(spacing: 14) {
+            HStack(spacing: Theme.Spacing.lg) {
                 miniCardPreview
                     .frame(width: 68, height: 88)
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                     Text("結果をシェアする")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 15, weight: .semibold, design: .serif))
+                        .italic()
                         .foregroundStyle(Color.ivory)
                     Text("素顔のスコア — あなたは何点？")
                         .font(.system(size: 12))
-                        .foregroundStyle(Color.inkSecondary)
+                        .foregroundStyle(Theme.Text.primaryFaded)
                 }
 
                 Spacer()
 
                 if isRendering {
                     ProgressView().tint(result.gradeColor).scaleEffect(0.7)
-                        .frame(width: 36, height: 36)
+                        .frame(width: 40, height: 40)
                 } else {
                     Image(systemName: "arrow.up.forward")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Color.appBackground)
-                        .frame(width: 36, height: 36)
-                        .background(result.gradeColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Color.ivory)
+                        .frame(width: 40, height: 40)
+                        .background(
+                            Circle()
+                                .fill(result.gradeColor.opacity(0.85))
+                        )
+                        .glassEffect(.regular, in: .circle)
                 }
             }
-            .padding(14)
-            .hairlineBorder(result.gradeColor.opacity(0.5), cornerRadius: 2)
+            .padding(Theme.Spacing.md)
+            .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.lg))
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.Radius.lg)
+                    .stroke(result.gradeColor.opacity(0.5), lineWidth: 0.8)
+            )
         }
         .aid("diagnosis_share_button")
         .disabled(isRendering)

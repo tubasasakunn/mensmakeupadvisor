@@ -9,7 +9,7 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground(intensity: 0.5)
 
             VStack(spacing: 0) {
                 headerBar
@@ -61,16 +61,16 @@ struct OnboardingView: View {
         Button {
             showChapterSheet = true
         } label: {
-            HStack(spacing: 4) {
+            HStack(spacing: 5) {
                 Image(systemName: "list.bullet")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
                 Text("目次")
                     .font(.system(size: 12, weight: .medium))
             }
-            .foregroundStyle(Color.inkSecondary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .hairlineBorder(Theme.Line.outlineSoft, cornerRadius: 2)
+            .foregroundStyle(Theme.Text.primarySoft)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, 7)
+            .glassEffect(.clear, in: .capsule)
         }
         .accessibilityLabel("目次を開く")
         .aid("onboarding_chapter_button")
@@ -88,10 +88,10 @@ struct OnboardingView: View {
         } label: {
             Text(isRereadFromHome ? "ホームに戻る" : "読み飛ばす")
                 .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.inkSecondary)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .hairlineBorder(Theme.Line.outlineMedium, cornerRadius: 2)
+                .foregroundStyle(Theme.Text.primarySoft)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, 7)
+                .glassEffect(.clear, in: .capsule)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "読み飛ばして撮影画面へ")
@@ -134,30 +134,19 @@ struct OnboardingView: View {
 
     private var navigationBar: some View {
         HStack {
-            Spacer()
             if currentPage == pages.count - 1 {
-                Button {
+                GlassPrimaryButton(
+                    title: isRereadFromHome ? "ホームに戻る" : "撮影をはじめる",
+                    icon: isRereadFromHome ? "house.fill" : "camera.fill",
+                    accessibilityID: "onboarding_continue_button"
+                ) {
                     appState.navigate(to: isRereadFromHome ? .home : .capture)
-                } label: {
-                    HStack(spacing: 8) {
-                        Text(isRereadFromHome ? "ホームに戻る" : "撮影をはじめる")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(Color.ivory)
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(Color.ivory)
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 14)
                 }
-                .glassEffect(.regular, in: .capsule)
-                .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "撮影をはじめる")
-                .aid("onboarding_continue_button")
             }
         }
         .frame(height: 60)
-        .padding(.horizontal, 28)
-        .padding(.bottom, 32)
+        .padding(.horizontal, Theme.Spacing.xxl)
+        .padding(.bottom, Theme.Spacing.xxxl)
     }
 }
 

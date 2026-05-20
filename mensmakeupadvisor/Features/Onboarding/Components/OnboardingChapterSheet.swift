@@ -8,19 +8,19 @@ struct OnboardingChapterSheet: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground(intensity: 0.4)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     header
                     chapterList
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 20)
+                .padding(.horizontal, Theme.Spacing.xl)
+                .padding(.vertical, Theme.Spacing.xl)
             }
         }
         .presentationDetents([.medium, .large])
-        .presentationBackground(Color.appBackground)
+        .presentationBackground(.thinMaterial)
         .presentationDragIndicator(.visible)
         .aid("onboarding_chapter_sheet")
     }

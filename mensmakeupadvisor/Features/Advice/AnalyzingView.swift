@@ -16,7 +16,7 @@ struct AnalyzingView: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground()
 
             VStack(spacing: 0) {
                 topMeta
@@ -48,13 +48,18 @@ struct AnalyzingView: View {
 
     private var topMeta: some View {
         HStack {
-            Text(errorMessage == nil ? "分析中" : "分析できませんでした")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Color.appBackground)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(errorMessage == nil ? Theme.Plate.renderingTint : Color.brandPrimary)
-                .clipShape(RoundedRectangle(cornerRadius: 2))
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(errorMessage == nil ? Theme.Plate.renderingTint : Color.brandPrimary)
+                    .frame(width: 6, height: 6)
+                Text(errorMessage == nil ? "ANALYZING" : "FAILED")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .kerning(2)
+                    .foregroundStyle(Theme.Text.primaryFaded)
+            }
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, Theme.Spacing.sm)
+            .glassEffect(.regular, in: .capsule)
 
             Spacer()
         }
@@ -111,36 +116,21 @@ struct AnalyzingView: View {
                 }
             }
 
-            VStack(spacing: 10) {
-                Button {
+            VStack(spacing: Theme.Spacing.md) {
+                GlassPrimaryButton(
+                    title: "もう一度撮影する",
+                    icon: "camera.fill",
+                    accessibilityID: "analyzing_retry_button"
+                ) {
                     appState.navigate(to: .capture)
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "camera.fill")
-                            .font(.system(size: 14, weight: .semibold))
-                        Text("もう一度撮影する")
-                            .font(.system(size: 15, weight: .semibold))
-                    }
-                    .foregroundStyle(Color.appBackground)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color.ivory)
-                    .clipShape(RoundedRectangle(cornerRadius: 2))
                 }
-                .accessibilityLabel("もう一度撮影する")
-                .aid("analyzing_retry_button")
 
-                Button {
+                GlassSecondaryButton(
+                    title: "撮影画面に戻る",
+                    accessibilityID: "analyzing_back_button"
+                ) {
                     appState.navigate(to: .capture)
-                } label: {
-                    Text("撮影画面に戻る")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Color.inkSecondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .hairlineBorder(Theme.Line.outlineSoft, cornerRadius: 2)
                 }
-                .aid("analyzing_back_button")
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

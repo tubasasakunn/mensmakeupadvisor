@@ -6,60 +6,63 @@ struct DiagnosisView: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground()
 
             VStack(spacing: 0) {
                 navigationBar
-                    .padding(.top, 12)
-                    .padding(.horizontal, 24)
+                    .padding(.top, Theme.Spacing.md)
+                    .padding(.horizontal, Theme.Spacing.xl)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         reportHeader
-                            .padding(.top, 20)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.xl)
+                            .padding(.horizontal, Theme.Spacing.xl)
 
                         titleBlock
-                            .padding(.top, 12)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.md)
+                            .padding(.horizontal, Theme.Spacing.xl)
 
                         captionLine
-                            .padding(.top, 8)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.sm)
+                            .padding(.horizontal, Theme.Spacing.xl)
 
                         HairlineDivider()
-                            .padding(.top, 20)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.xl)
+                            .padding(.horizontal, Theme.Spacing.xl)
 
-                        DiagnosisHeroSection(result: result)
-                            .padding(.top, 24)
-                            .padding(.horizontal, 24)
+                        // hero は glass card 化して、上で背景が抜けるようにする
+                        GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xl) {
+                            DiagnosisHeroSection(result: result)
+                        }
+                        .padding(.top, Theme.Spacing.xl)
+                        .padding(.horizontal, Theme.Spacing.xl)
 
                         // スコアを見た直後の「シェアしたい」瞬間に配置
                         DiagnosisSharePrompt(result: result, capturedImage: appState.capturedImage)
-                            .padding(.top, 20)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.xl)
+                            .padding(.horizontal, Theme.Spacing.xl)
 
                         DiagnosisFaceMeshPlate(capturedImage: appState.capturedImage, result: result)
-                            .padding(.top, 20)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.xl)
+                            .padding(.horizontal, Theme.Spacing.xl)
 
                         DiagnosisProportionPlate(capturedImage: appState.capturedImage, result: result)
-                            .padding(.top, 16)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.lg)
+                            .padding(.horizontal, Theme.Spacing.xl)
 
                         HairlineDivider()
-                            .padding(.top, 24)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.xl)
+                            .padding(.horizontal, Theme.Spacing.xl)
 
                         DiagnosisScoreListSection(result: result, capturedImage: appState.capturedImage)
-                            .padding(.top, 4)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.xs)
+                            .padding(.horizontal, Theme.Spacing.xl)
 
                         bottomButtons
-                            .padding(.top, 32)
-                            .padding(.horizontal, 24)
-                            .padding(.bottom, 56)
+                            .padding(.top, Theme.Spacing.xxxl)
+                            .padding(.horizontal, Theme.Spacing.xl)
+                            .padding(.bottom, Theme.Spacing.huge)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -81,23 +84,26 @@ struct DiagnosisView: View {
             Button {
                 appState.navigate(to: .capture)
             } label: {
-                HStack(spacing: 6) {
+                HStack(spacing: 5) {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 11, weight: .semibold))
                     Text("撮影に戻る")
-                        .font(.system(size: 13, weight: .regular))
+                        .font(.system(size: 12, weight: .medium))
                 }
-                .foregroundStyle(Color.inkSecondary)
+                .foregroundStyle(Theme.Text.primarySoft)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, 7)
+                .glassEffect(.clear, in: .capsule)
             }
             .accessibilityLabel("撮影画面に戻る")
             .aid("diagnosis_back_button")
 
             Spacer()
 
-            Text("診断結果")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.inkSecondary)
-                .kerning(1)
+            Text("RESULT")
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .kerning(2.5)
+                .foregroundStyle(Theme.Text.primaryFaded)
         }
     }
 
@@ -106,19 +112,19 @@ struct DiagnosisView: View {
     private var reportHeader: some View {
         Text("CHAPTER 07 · RESULT")
             .font(.system(size: 10, weight: .regular, design: .monospaced))
-            .foregroundStyle(Color.inkSecondary)
-            .kerning(2.5)
+            .foregroundStyle(Theme.Text.secondaryFaded)
+            .kerning(2.8)
     }
 
     private var titleBlock: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text("step two.")
-                .font(.system(size: 38, weight: .light, design: .serif))
+                .font(.system(size: 40, weight: .light, design: .serif))
                 .italic()
                 .foregroundStyle(Color.brandPrimary)
 
             Text("診断結果.")
-                .font(.system(size: 44, weight: .bold, design: .serif))
+                .font(.system(size: 46, weight: .bold, design: .serif))
                 .italic()
                 .foregroundStyle(Color.ivory)
         }
@@ -127,62 +133,44 @@ struct DiagnosisView: View {
     private var captionLine: some View {
         Text("— a study of seven proportions —")
             .font(.system(size: 10, weight: .regular, design: .monospaced))
-            .foregroundStyle(Color.inkSecondary)
-            .kerning(1.5)
+            .foregroundStyle(Theme.Text.secondaryFaded)
+            .kerning(1.8)
     }
 
     // MARK: - Bottom Buttons
 
     private var bottomButtons: some View {
         let isSkipFlow = appState.skipTutorialOnNextFlow
-        return VStack(spacing: 12) {
-            Button {
+        return VStack(spacing: Theme.Spacing.md) {
+            GlassPrimaryButton(
+                title: isSkipFlow ? "スタジオを開く" : "メイクを試してみる",
+                icon: isSkipFlow ? "paintbrush.pointed.fill" : "wand.and.stars",
+                accessibilityID: "diagnosis_begin_button"
+            ) {
                 if isSkipFlow {
                     appState.skipTutorialOnNextFlow = false
                     appState.navigate(to: .studio)
                 } else {
                     appState.navigate(to: .tutorial)
                 }
-            } label: {
-                VStack(spacing: 4) {
-                    HStack(spacing: 8) {
-                        Text(isSkipFlow ? "スタジオを開く" : "メイクを試してみる")
-                            .font(.system(size: 16, weight: .semibold))
-                        Text("→")
-                            .font(.system(size: 15, weight: .regular))
-                    }
-                    Text(isSkipFlow ? "すぐにプリセットや細かい調整ができます" : "5ステップのガイドに沿って進めます")
-                        .font(.system(size: 11, weight: .regular))
-                        .foregroundStyle(Theme.Text.onAccentSoft)
-                }
-                .foregroundStyle(Color.appBackground)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(Color.ivory)
-                .clipShape(RoundedRectangle(cornerRadius: 2))
             }
-            .accessibilityLabel(isSkipFlow ? "スタジオを開く。すぐにプリセットや細かい調整ができます" : "メイクを試してみる。5ステップのガイドに沿って進めます")
-            .aid("diagnosis_begin_button")
+
+            Text(isSkipFlow ? "すぐにプリセットや細かい調整ができます" : "5ステップのガイドに沿って進めます")
+                .font(.system(size: 11, weight: .regular))
+                .foregroundStyle(Theme.Text.secondaryFaded)
+                .frame(maxWidth: .infinity, alignment: .center)
 
             if !isSkipFlow {
-                Button {
+                GlassSecondaryButton(
+                    title: "ガイドを飛ばしてスタジオへ",
+                    accessibilityID: "diagnosis_skip_button"
+                ) {
                     appState.navigate(to: .studio)
-                } label: {
-                    VStack(spacing: 2) {
-                        Text("ガイドを飛ばしてスタジオへ")
-                            .font(.system(size: 14, weight: .medium))
-                        Text("メイクの経験がある方向け")
-                            .font(.system(size: 11, weight: .regular))
-                            .foregroundStyle(Theme.Text.secondaryFaded)
-                    }
-                    .foregroundStyle(Color.inkSecondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.clear)
-                    .hairlineBorder(Theme.Line.outlineSoft, cornerRadius: 2)
                 }
-                .accessibilityLabel("ガイドを飛ばしてスタジオへ。メイクの経験がある方向け")
-                .aid("diagnosis_skip_button")
+                Text("メイクの経験がある方向け")
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(Theme.Text.tertiary)
+                    .frame(maxWidth: .infinity, alignment: .center)
             }
         }
     }

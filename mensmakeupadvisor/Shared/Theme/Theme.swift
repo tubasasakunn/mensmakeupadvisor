@@ -211,6 +211,55 @@ enum Theme {
         nonisolated static let cornerMark = Palette.ivoryAlpha25
     }
 
+    // MARK: - Spacing (アプリ全体の余白スケール)
+
+    // 文学的・余白多めのレイアウトを基調にするための 8pt ベースのスケール。
+    // マジックナンバー (`.padding(28)` など) は段階的にこちらへ寄せる。
+    enum Spacing {
+        nonisolated static let xs:   CGFloat = 4
+        nonisolated static let sm:   CGFloat = 8
+        nonisolated static let md:   CGFloat = 12
+        nonisolated static let lg:   CGFloat = 16
+        nonisolated static let xl:   CGFloat = 20
+        nonisolated static let xxl:  CGFloat = 28
+        nonisolated static let xxxl: CGFloat = 40
+        nonisolated static let huge: CGFloat = 56
+    }
+
+    // MARK: - Radius (角丸スケール — Liquid Glass シェイプ前提)
+
+    enum Radius {
+        nonisolated static let pill: CGFloat = 999   // capsule 相当
+        nonisolated static let xs:   CGFloat = 4
+        nonisolated static let sm:   CGFloat = 8
+        nonisolated static let md:   CGFloat = 14
+        nonisolated static let lg:   CGFloat = 20
+        nonisolated static let xl:   CGFloat = 28
+        nonisolated static let xxl:  CGFloat = 36
+    }
+
+    // MARK: - Motion (アニメーション・タイミング)
+
+    enum Motion {
+        nonisolated static let quick:  Animation = .easeOut(duration: 0.2)
+        nonisolated static let smooth: Animation = .easeInOut(duration: 0.35)
+        nonisolated static let spring: Animation = .spring(duration: 0.45, bounce: 0.18)
+        nonisolated static let lazy:   Animation = .easeInOut(duration: 0.6)
+    }
+
+    // MARK: - Ambient (Liquid Glass の屈折を見せるための暖色背景パレット)
+
+    // 背景は単色ではなく、暖色のオーブを 2 つ配置した radial gradient にする。
+    // これでガラスの「向こうに何かある」感が生まれる。
+    enum Ambient {
+        nonisolated static let backdrop      = Palette.canvas
+        nonisolated static let backdropDeep  = Palette.canvasDeep
+        nonisolated static let orbWarm       = Palette.bordeauxAlpha22
+        nonisolated static let orbCool       = Palette.sulphurAlpha22
+        nonisolated static let grain         = Palette.ivoryAlpha04
+        nonisolated static let vignette      = Palette.blackAlpha50
+    }
+
     // MARK: - UIKitColor (画像生成用の UIColor 版)
 
     // UIGraphicsImageRenderer で塗りつぶす際に SwiftUI Color では受け取れないため、
@@ -240,6 +289,8 @@ enum Palette {
 
     // MARK: ベース色 (solid)
     nonisolated static let canvas        = Color(hex: 0x0E0E0C)
+    // canvas の深いバリエーション。ambient gradient の外周用。
+    nonisolated static let canvasDeep    = Color(hex: 0x070705)
     nonisolated static let ivory         = Color(hex: 0xF4EFE6)
     nonisolated static let bordeaux      = Color(hex: 0xB8332A)
     nonisolated static let sulphur       = Color(red: 0.90, green: 0.85, blue: 0.40)
@@ -307,6 +358,7 @@ enum Palette {
     nonisolated static let bordeauxAlpha90 = Color(hex: 0xB8332A, opacity: 0.90)
 
     // MARK: sulphur (黄系) の半透明
+    nonisolated static let sulphurAlpha22 = Color(red: 0.90, green: 0.85, blue: 0.40, opacity: 0.22)
     nonisolated static let sulphurAlpha85 = Color(red: 0.90, green: 0.85, blue: 0.40, opacity: 0.85)
     nonisolated static let sulphurAlpha90 = Color(red: 0.90, green: 0.85, blue: 0.40, opacity: 0.90)
 
