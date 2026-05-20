@@ -690,3 +690,44 @@ VoiceOver で装飾英語が読み上げられる事故を回避。
 | P2 | Onboarding 53 ページの章ジャンプ＋後からアクセス | Profile 画面が無いので作るところから |
 | P3 | Dynamic Type / Reduce Motion 対応 | アプリ全体に波及するので別 PR |
 | P3 | NavigationStack 採用（エッジスワイプ戻り対応） | 既存の AppState 駆動ナビからのリアーキ |
+
+### Phase D — 残課題対応（コミット 70c4e42 / 7a87744 / 1974e39 / 0b68670）
+
+#### P1: 最低フォントサイズ引き上げ
+- 8〜10pt の monospaced を 11pt 以上に一括引き上げ（sed バッチ + 個別調整）
+- Studio / Advice / Home / Tutorial / Onboarding のユーザー対面 UI を網羅
+- 装飾英語（Splash フォリオ、AdviceView/DiagnosisView の `CHAPTER 07 · SCAN/RESULT`、シェアカード、Canvas 内の Diagram ラベル、`AdviceViewfinderArea` の LIVE インジケータ）は世界観として残す
+- 否定的・競争的表現を Growth Mindset 寄りに：
+  - `gradeDescription`: `exceptional/excellent/good balance/standard/needs care` → 「理想的なバランス／とても整っている／バランス良好／標準的／伸びしろあり」
+  - `rankPercentile`: `上位 約22%` 等の競争表現 → 「整いやすいタイプ／伸びしろが大きい」等
+  - Diagnosis `STRONGEST / NEEDS CARE` → 「いちばんの強み／伸びしろ」
+- `FIG. 01 / FIG. 02` → 「図 1 / 図 2」、`PROPORTIONS · 3RDS / 5THS` → 「比率 · 三分割/五分割」、`FACE MESH · 478 PTS` → 「顔メッシュ · 478 点」、`OF 100` → 「100 点満点」
+
+#### P2: Onboarding 章ジャンプ + Home からの再アクセス
+- 新規 `Models/OnboardingChapter.swift`: 8 章 + firstPageIndex を持つ Index、`OnboardingChapter.current(forPage:)` で現在ページから所属章を逆引き
+- 新規 `Components/OnboardingChapterSheet.swift`: `.presentationDetents(.medium/.large)` の目次シート。タップで `currentPage` を書き換え + dismiss
+- `OnboardingView` ヘッダー左に「目次」ボタン（`list.bullet` アイコン）追加
+- `HomeCreateTab` フッターに「メイクの基本ガイドを読む」リンクを常設（Profile/Settings 画面が無いため）
+- 再読モード自動判定（`analysisResult != nil`）で「読み飛ばす」「撮影をはじめる」が両方「ホームに戻る」に切り替わる
+
+新規 accessibilityIdentifier:
+- `onboarding_chapter_button` / `onboarding_chapter_sheet` / `onboarding_chapter_01`〜`08`
+- `home_create_guide_link`
+
+#### P3a: Reduce Motion + Dynamic Type レンジ制限
+- `@Environment(\.accessibilityReduceMotion)` を主要アニメ箇所に注入：
+  - `AnalyzingView`: スキャンライン 2 秒ループ → 静的表示
+  - `StudioImagePlate`: Compare Before/After のオート振り → ヒントだけ 3 秒表示
+  - `ScoreRingView`: `interpolatingSpring(1.4)` → 即時表示
+  - `DiagnosisHeroSection`: グレードバッジの 1.5 秒遅延 spring → 即時表示
+  - `RootView`: 画面遷移 opacity + 0.35s easeInOut → identity
+- `RootView` 全体に `.dynamicTypeSize(.xSmall ... .xxLarge)` を適用（accessibility1〜5 の極端拡大でレイアウト崩壊を防ぐ。完全な semantic font 化は依然別 PR）
+- 合わせて `ScoreRingView` / グレードバッジに日本語 `accessibilityLabel` を追加
+
+#### P3b: 左端エッジスワイプ戻り（NavigationStack 代替）
+- フル NavigationStack 採用は AppState 駆動ナビからのリアーキで影響範囲大、見送り
+- 代替として `RootView` に `simultaneousGesture` で軽量実装：
+  - 起点 `startLocation.x < 24`、横移動 80pt 以上、縦のブレが横の半分以下、で発火
+  - `edgeSwipeBackTarget` マップ: capture → onboarding, diagnosis → capture, studio → diagnosis
+  - splash/home/analyzing/tutorial/onboarding は無効化（トップ階層・処理中・内側スワイプ衝突回避）
+- `simultaneousGesture` でタップ / 縦スクロールを邪魔しない
