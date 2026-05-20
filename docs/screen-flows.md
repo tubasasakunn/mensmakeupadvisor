@@ -2,6 +2,11 @@
 
 MensMakeupAdvisor の全画面について、遷移・レイアウト（文言・配置・挙動）を洗い出したドキュメント。
 
+> **2026-05 更新**: UI/UX 改修（Phase A〜C）で多くの英語ラベルが和文化、
+> 復帰経路・確認ダイアログが追加された。最新の文言・挙動は本ドキュメント
+> 末尾の「UI/UX 改修ログ」を参照。本文中の表は改修前の状態を残している
+> 部分があるので、実装は ソース or 改修ログ を正とすること。
+
 ソースは `mensmakeupadvisor/App/RootView.swift` および各 `Features/*` 配下。
 画面遷移はすべて `AppState.currentScreen: AppScreen` の切り替えで行われる（`.transition(.opacity)` + `easeInOut 0.35s`）。
 
@@ -603,3 +608,85 @@ ScrollView 内。6 種の `StudioSlider`（横線、ハンドル ivory 6×14、0
 - `requestMakeupRender()`: 80ms debounce で `MakeupEngineService.render(composition:)` を実行、結果を `renderedImage` に反映。
 - `runScreenshotFlow()`: `--screenshot-mode` 時に 8 画面を 3 秒間隔で巡回（モック画像＋mock 結果）。
 - `reset()` で全状態クリア＋ `makeupEngine.reset()`。
+
+---
+
+## 13. UI/UX 改修ログ（Phase A〜C）
+
+Nielsen の 10 原則 / WCAG / iOS HIG / 認知負荷理論 をベースに洗い出した
+P0〜P2 課題を、3 フェーズに分けて適用した。
+
+### Phase A — 文言・ラベルの和文化（コミット d83ca36 / a06911a）
+
+「マガジン世界観のための装飾英語」と「機能ラベル」を切り分け、後者を
+日本語＋SF Symbols に統一。装飾英語（`CHAPTER 07 · RESULT`、`step one.`、
+`FIG. 01` 等）はブランドのために残す。
+
+| Before | After |
+|---|---|
+| Home タブ `REPORT / CREATE / ARCHIVE` | `診断 / 撮影 / 保存`（SF Symbols 併用） |
+| Diagnosis `BEGIN COMPOSITION` / `Skip to fine tuning` | 「メイクを試してみる（5ステップのガイドに沿って進めます）」/「ガイドを飛ばしてスタジオへ（メイクの経験がある方向け）」※副題を追加 |
+| Diagnosis `OPEN STUDIO` (skipTutorial時) | 「スタジオを開く（すぐにプリセットや細かい調整ができます）」 |
+| 各画面 `← BACK` | `← 撮影に戻る` / `← ガイドに戻る` / `← 診断結果` 等、戻り先を明示 |
+| Tutorial `NEXT ACT → / COMPOSE → / SKIP →` | `次のステップへ / スタジオで仕上げる / あとで` |
+| Tutorial header `ACT III OF 5` | `ステップ 3 / 5` |
+| Tutorial `INTENSITY` / `OFF · 50 · MAX` | `強さ` / `なし · ふつう · 最大` |
+| Studio header `← REPORT / ATELIER · STUDIO / HOME →` | `← 診断結果 / スタジオ / ホーム` |
+| Studio mode `COMPARE / FINE TUNE` | `比べる (Before/After) / 細かく調整 (色味と強さ)` |
+| Studio Bottom `♥ ARCHIVE THIS LOOK` / `↑` | `♥ このルックを保存` / `square.and.arrow.up` |
+| Studio Toast `✓ LOOK ARCHIVED` | `✓ 保存しました` + ホームへ案内 |
+| Studio Image `FIG. A — BEFORE / FIG. B — AFTER` | `Before · 素のまま / After · メイク後` |
+| Studio Image `RENDERING…` | `反映中…` + ProgressView |
+| Studio Image `SCORE 70` | `スコア 70` |
+| FineTune `BASE / HIGHLIGHT / SHADOW / EYESHADOW / TEAR BAG / EYELINER` | `ベース / ハイライト / シェーディング / アイシャドウ / 涙袋 / アイライン` |
+| FineTune `BROW TYPE` / `OFF · NATURAL · ARCH …` | `眉のかたち / なし · ナチュラル · 角度あり …` |
+| Onboarding `SKIP →` | `読み飛ばす` |
+| Onboarding `BEGIN →` | `撮影をはじめる` |
+| Onboarding folio `p. 003 of 053` | `3 / 53 ページ` |
+| Analyzing phases `PREPARING / DETECTING FACE / …` | `準備中 / 顔を検出中 / 比率を測定中 / 完了`、進捗番号 `(2/5)` 付き |
+| Analyzing 「analysing…」「your facial geometry」 | 「解析しています」「顔の比率と骨格を測っています。10〜20 秒ほどかかります。」 |
+| Home Create `compose. / 新しいルック.` | 「メイクを試す」+ `1 撮影 → 2 診断 → 3 メイク` の流れ表示 |
+| Home Report `your face. / 評価レポート.` | 「診断レポート」、空状態に face.dashed アイコン |
+| Home Archive `your archive.` `N looks saved` | 「マイ・コレクション」「保存 N 件」 |
+| SavedLook 詳細 `HIGHLIGHT / SHADOW / EYE / BROW / INTENSITY` | `ハイライト / シェーディング / 目元 / 眉のかたち / 強さ` |
+| SavedLook `40pt` | `40 点` |
+
+合わせて全インタラクティブ要素に **日本語の `accessibilityLabel`** を付与し、
+VoiceOver で装飾英語が読み上げられる事故を回避。
+
+### Phase B — 不可逆操作の安全網（コミット a06911a / 837d7bf）
+
+| 課題 | 対策 |
+|---|---|
+| **B1**: SavedLook の削除が確認ダイアログなしで即実行されデータ損失リスク | `SavedLookDetailSheet` に `.confirmationDialog` を追加。「このルックを削除しますか？削除すると元に戻せません。」+「削除する（destructive）/ キャンセル」 |
+| **B2**: Analyzing でエラー (撮影失敗/顔検出失敗) になると戻る手段なし＝詰み | `AnalyzingView` にエラー状態専用画面を追加：原因＋対処を明文化、「もう一度撮影する」(プライマリ) / 「撮影画面に戻る」(セカンダリ) の 2 ボタン |
+| **B3**: Studio で composition をいじった後「全部リセット」「直前に戻す」ができない | `StudioViewModel.resetAll()` を実装、モード行の右端に「リセット」ボタン（`arrow.counterclockwise`）を配置。`hasAnyIntensity` のときのみ有効化、`.confirmationDialog` で 1 段ガード |
+| **B4**: ARCHIVE 後 1.4 秒で勝手に Home に飛び、もう一度直したいユーザーに不親切 | 自動遷移を廃止、Toast に「編集を続ける」「ホームへ」の 2 ボタンを置きユーザーが行き先を選ぶ。`StudioViewModel.dismissSavedNotification()` 追加 |
+
+合わせて Maestro flows (`archive_flow.yaml` / `share_flow.yaml`) を新しい
+動線に追従（`studio_saved_go_home` をタップして Home へ）。
+
+新規 accessibilityIdentifier:
+- `analyzing_retry_button` / `analyzing_back_button`
+- `studio_reset_button`
+- `studio_saved_keep_editing` / `studio_saved_go_home`
+
+### Phase C — Studio の構造改修（コミット 63e7de1）
+
+| 課題 | 対策 |
+|---|---|
+| **C1**: Fine Tune に 6 スライダー + 6 眉タイプ ＝ 12 個の制御が並びオーバーホエルム | Progressive Disclosure 化：既定で `肌 / 光 / 影 / 目元 + 眉のかたち` の 5 制御。「涙袋やアイラインも調整する」アコーディオンで残り 2 つを開示 |
+| **C2**: プリセット名 (ナチュラル / Kスタイル等) だけでは仕上がりが想像できない | 各プリセットカードに **4 軸 (肌/光/影/目) のミニ縦バー** を追加。適用前に視覚で比較可能。`accessibilityLabel` には「肌 22、光 18、影 14、目 12」を生成して VoiceOver でも比較可 |
+| **C3**: Compare の Before/After スライダーが中央 (0.5) で止まっていて、どっちが After か瞬時に分からない | 初回表示時に `comparePosition` を 0.5→0.25→0.75→0.5 と自動アニメ。戻った位置で「中央をドラッグして比べる」ヒントを 2.5 秒表示。`@State didPlayCompareIntro` で 1 回限り |
+
+新規 accessibilityIdentifier:
+- `studio_finetune_disclosure`
+
+### 未着手 / 次のステップ
+
+| 優先 | 課題 | メモ |
+|---|---|---|
+| P1 | フォントサイズ最小 9pt → 11pt 引き上げ | WCAG 観点。装飾フォリオ等は除く |
+| P2 | Onboarding 53 ページの章ジャンプ＋後からアクセス | Profile 画面が無いので作るところから |
+| P3 | Dynamic Type / Reduce Motion 対応 | アプリ全体に波及するので別 PR |
+| P3 | NavigationStack 採用（エッジスワイプ戻り対応） | 既存の AppState 駆動ナビからのリアーキ |
