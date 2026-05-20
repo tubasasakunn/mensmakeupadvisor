@@ -85,7 +85,7 @@ struct HomeCreateTab: View {
 
     private var heroArrow: some View {
         Image(systemName: "chevron.right")
-            .font(.system(size: 9, weight: .medium))
+            .font(.system(size: 11, weight: .medium))
             .foregroundStyle(Color.inkTertiary)
     }
 

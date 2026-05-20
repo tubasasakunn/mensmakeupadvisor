@@ -8,7 +8,7 @@ struct StatPageView: View {
             Spacer(minLength: 32)
 
             Text(page.tag)
-                .font(.system(size: 9, weight: .regular, design: .monospaced))
+                .font(.system(size: 11, weight: .regular, design: .monospaced))
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(2.5)
                 .padding(.bottom, 31)
@@ -45,7 +45,7 @@ struct StatPageView: View {
 
             if let source = page.source {
                 Text(source)
-                    .font(.system(size: 9, design: .monospaced))
+                    .font(.system(size: 11, design: .monospaced))
                     .foregroundStyle(Color.inkSecondary.opacity(0.6))
                     .kerning(0.5)
             }

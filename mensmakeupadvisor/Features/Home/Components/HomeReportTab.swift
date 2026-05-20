@@ -79,9 +79,8 @@ struct HomeReportTab: View {
                 .foregroundStyle(Color.inkSecondary)
                 .lineSpacing(5)
             Text(result.rankPercentile)
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.inkTertiary)
-                .kerning(1.2)
         }
         .padding(20)
         .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))

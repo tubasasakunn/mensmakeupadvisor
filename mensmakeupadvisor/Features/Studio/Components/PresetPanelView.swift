@@ -90,8 +90,8 @@ struct PresetPanelView: View {
                             .frame(width: 8, height: max(2, CGFloat(strength) * 56))
                     }
                     Text(axis.label)
-                        .font(.system(size: 9))
-                        .opacity(0.7)
+                        .font(.system(size: 11))
+                        .opacity(0.75)
                 }
             }
         }

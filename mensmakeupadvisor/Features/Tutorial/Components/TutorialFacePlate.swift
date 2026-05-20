@@ -70,10 +70,9 @@ struct TutorialFacePlate: View {
 
             VStack(spacing: 4) {
                 Spacer()
-                Text("ACT \(currentStep.tag) · \(currentStep.titleJP)")
-                    .font(.system(size: 8, weight: .light, design: .monospaced))
+                Text("ステップ \(currentStep.tagNumeric) · \(currentStep.titleJP)")
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(Color.inkSecondary)
-                    .kerning(2)
                     .padding(.bottom, 12)
             }
         }

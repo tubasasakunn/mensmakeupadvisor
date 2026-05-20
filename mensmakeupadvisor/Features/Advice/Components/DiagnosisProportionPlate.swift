@@ -172,14 +172,12 @@ struct DiagnosisProportionPlate: View {
 
     private var captionLabel: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("FIG. 02")
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
+            Text("図 2")
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
-            Text("PROPORTIONS · 3RDS / 5THS")
-                .font(.system(size: 8, weight: .regular, design: .monospaced))
+            Text("比率 · 三分割 / 五分割")
+                .font(.system(size: 11, weight: .regular))
                 .foregroundStyle(Color.inkTertiary)
-                .kerning(1.5)
         }
     }
 }

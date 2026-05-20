@@ -156,10 +156,10 @@ struct StudioView: View {
                 Image(systemName: "arrow.counterclockwise")
                     .font(.system(size: 14, weight: .regular))
                 Text("リセット")
-                    .font(.system(size: 9, weight: .regular))
+                    .font(.system(size: 11, weight: .regular))
             }
             .foregroundStyle(hasAnyIntensity ? Color.ivory : Color.inkTertiary)
-            .frame(width: 56)
+            .frame(width: 60)
             .padding(.vertical, 10)
             .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
         }
@@ -177,7 +177,7 @@ struct StudioView: View {
                 Text(title)
                     .font(.system(size: 14, weight: .semibold))
                 Text(subtitle)
-                    .font(.system(size: 9, weight: .regular))
+                    .font(.system(size: 11, weight: .regular))
                     .opacity(0.65)
             }
             .foregroundStyle(isActive ? Color.appBackground : Color.ivory)

@@ -29,34 +29,30 @@ struct DiagnosisHeroSection: View {
             }
 
             VStack(alignment: .leading, spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("FACE SHAPE")
-                        .font(.system(size: 9, weight: .regular, design: .monospaced))
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("顔型")
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.inkSecondary)
-                        .kerning(2)
 
                     Text(result.faceShape.label)
-                        .font(.system(size: 24, weight: .bold, design: .serif))
-                        .italic()
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundStyle(Color.ivory)
 
                     HStack(spacing: 5) {
                         Text(result.grade)
-                            .font(.system(size: 11, weight: .black, design: .monospaced))
+                            .font(.system(size: 13, weight: .heavy))
                             .foregroundStyle(result.gradeColor)
                         Text("·")
-                            .font(.system(size: 11, design: .monospaced))
+                            .font(.system(size: 12))
                             .foregroundStyle(Color.inkTertiary)
                         Text(result.gradeDescription)
-                            .font(.system(size: 11, weight: .regular, design: .monospaced))
+                            .font(.system(size: 12, weight: .regular))
                             .foregroundStyle(result.gradeColor.opacity(0.9))
-                            .kerning(0.5)
                     }
 
                     Text(result.rankPercentile)
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.inkSecondary)
-                        .kerning(1)
                 }
 
                 Rectangle()

@@ -61,7 +61,7 @@ struct PrinciplePageView: View {
                     .padding(.bottom, 10)
 
                 Text(footer)
-                    .font(.system(size: 10))
+                    .font(.system(size: 11))
                     .foregroundStyle(Color.inkSecondary.opacity(0.7))
                     .lineSpacing(4)
             }

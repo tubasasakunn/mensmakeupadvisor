@@ -28,8 +28,8 @@ struct AdviceMockImagePicker: View {
             }
 
             Text("[MOCK] 画像ピッカー")
-                .font(.system(size: 10, design: .monospaced))
-                .foregroundStyle(Color.orange.opacity(0.8))
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(Color.orange.opacity(0.85))
         }
         .padding(12)
         .overlay(

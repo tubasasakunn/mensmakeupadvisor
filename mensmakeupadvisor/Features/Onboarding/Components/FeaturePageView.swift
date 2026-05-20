@@ -47,7 +47,7 @@ struct FeaturePageView: View {
                     }
                     if let jp = page.featureLabelJP {
                         Text(jp)
-                            .font(.system(size: 10, design: .monospaced))
+                            .font(.system(size: 11, design: .monospaced))
                             .foregroundStyle(Color.inkSecondary)
                             .kerning(1.5)
                     }
@@ -137,7 +137,7 @@ struct StepBeforeAfterSlider: View {
                         .frame(width: 26, height: 26)
                         .overlay(
                             Image(systemName: "arrow.left.arrow.right")
-                                .font(.system(size: 9, weight: .bold))
+                                .font(.system(size: 11, weight: .bold))
                                 .foregroundStyle(Color.appBackground)
                         )
                 }
@@ -170,7 +170,7 @@ struct StepBeforeAfterSlider: View {
 
     private func stepBadge(_ text: String, color: Color) -> some View {
         Text(text)
-            .font(.system(size: 9, design: .monospaced))
+            .font(.system(size: 11, design: .monospaced))
             .foregroundStyle(color)
             .kerning(2)
             .padding(6)

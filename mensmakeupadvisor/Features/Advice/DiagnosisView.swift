@@ -178,7 +178,7 @@ struct DiagnosisView: View {
                         Text("ガイドを飛ばしてスタジオへ")
                             .font(.system(size: 14, weight: .medium))
                         Text("メイクの経験がある方向け")
-                            .font(.system(size: 10, weight: .regular))
+                            .font(.system(size: 11, weight: .regular))
                             .foregroundStyle(Color.inkSecondary.opacity(0.7))
                     }
                     .foregroundStyle(Color.inkSecondary)

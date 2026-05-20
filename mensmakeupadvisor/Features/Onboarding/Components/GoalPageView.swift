@@ -77,7 +77,7 @@ struct GoalPageView: View {
                 .clipShape(Circle())
 
             Text(label)
-                .font(.system(size: 9, design: .monospaced))
+                .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(0.5)
         }

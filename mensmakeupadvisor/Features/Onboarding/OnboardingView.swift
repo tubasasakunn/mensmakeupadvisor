@@ -37,9 +37,9 @@ struct OnboardingView: View {
     private var headerBar: some View {
         HStack {
             Text(pages[currentPage].tag)
-                .font(.system(size: 9, design: .monospaced))
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2.5)
+                .kerning(1.5)
                 .animation(.none, value: currentPage)
                 .accessibilityIdentifier("onboarding_page_tag")
             Spacer()

@@ -85,7 +85,7 @@ struct BeforeAfterSlider: View {
 
     private func sliderBadge(_ text: String, color: Color) -> some View {
         Text(text)
-            .font(.system(size: 9, design: .monospaced))
+            .font(.system(size: 11, design: .monospaced))
             .foregroundStyle(color)
             .kerning(2)
             .padding(6)
@@ -103,7 +103,7 @@ struct BeforeAfterSlider: View {
                 .frame(width: 28, height: 28)
                 .overlay(
                     Image(systemName: "arrow.left.arrow.right")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(Color.appBackground)
                 )
         }

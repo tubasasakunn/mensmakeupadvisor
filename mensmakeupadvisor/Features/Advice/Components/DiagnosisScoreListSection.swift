@@ -8,19 +8,16 @@ struct DiagnosisScoreListSection: View {
         VStack(spacing: 0) {
             if let best = result.strongestScore, let worst = result.weakestScore {
                 HStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("STRONGEST")
-                            .font(.system(size: 8, weight: .regular, design: .monospaced))
-                            .foregroundStyle(Color.inkTertiary)
-                            .kerning(1.5)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("いちばんの強み")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(Color.inkSecondary)
                         HStack(spacing: 4) {
                             Text(best.name)
-                                .font(.system(size: 12, weight: .medium, design: .serif))
-                                .italic()
+                                .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(Color.ivory)
                             Text(best.grade)
-                                .font(.system(size: 12, weight: .black, design: .serif))
-                                .italic()
+                                .font(.system(size: 14, weight: .heavy))
                                 .foregroundStyle(best.gradeColor)
                         }
                     }
@@ -33,19 +30,16 @@ struct DiagnosisScoreListSection: View {
 
                     Spacer()
 
-                    VStack(alignment: .trailing, spacing: 3) {
-                        Text("NEEDS CARE")
-                            .font(.system(size: 8, weight: .regular, design: .monospaced))
-                            .foregroundStyle(Color.inkTertiary)
-                            .kerning(1.5)
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("伸びしろ")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(Color.inkSecondary)
                         HStack(spacing: 4) {
                             Text(worst.grade)
-                                .font(.system(size: 12, weight: .black, design: .serif))
-                                .italic()
+                                .font(.system(size: 14, weight: .heavy))
                                 .foregroundStyle(worst.gradeColor)
                             Text(worst.name)
-                                .font(.system(size: 12, weight: .medium, design: .serif))
-                                .italic()
+                                .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(Color.ivory)
                         }
                     }
@@ -57,10 +51,9 @@ struct DiagnosisScoreListSection: View {
             }
 
             HStack {
-                Text("7 CRITERIA — DETAILED REPORT")
-                    .font(.system(size: 9, weight: .regular, design: .monospaced))
+                Text("7 つの評価指標 — 詳細レポート")
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(Color.inkSecondary)
-                    .kerning(2.5)
                 Spacer()
             }
             .padding(.top, 16)

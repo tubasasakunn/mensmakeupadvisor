@@ -39,7 +39,7 @@ struct ExampleItemView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 8) {
                 Text("Q")
-                    .font(.system(size: 9, design: .monospaced))
+                    .font(.system(size: 11, design: .monospaced))
                     .foregroundStyle(Color.inkSecondary)
                     .padding(.top, 2)
                 Text(concern)

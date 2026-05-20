@@ -46,7 +46,7 @@ struct TutorialEyebrowPicker: View {
                     .font(.system(size: 12, weight: .medium))
                 if isRecommended {
                     Text("★ おすすめ")
-                        .font(.system(size: 9, weight: .medium))
+                        .font(.system(size: 11, weight: .medium))
                 }
             }
             .foregroundStyle(isActive ? Color.appBackground : Color.ivory)

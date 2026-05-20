@@ -124,11 +124,11 @@ struct StudioImagePlate: View {
                 Spacer()
                 HStack {
                     Text("Before · 素のまま")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(Color.ivory.opacity(0.85))
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Color.ivory.opacity(0.9))
                         .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.appBackground.opacity(0.55))
+                        .padding(.vertical, 4)
+                        .background(Color.appBackground.opacity(0.6))
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)
                     Spacer()
@@ -140,11 +140,11 @@ struct StudioImagePlate: View {
                 HStack {
                     Spacer()
                     Text("After · メイク後")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(Color.ivory.opacity(0.85))
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Color.ivory.opacity(0.9))
                         .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.appBackground.opacity(0.55))
+                        .padding(.vertical, 4)
+                        .background(Color.appBackground.opacity(0.6))
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)
                 }
@@ -234,10 +234,10 @@ struct StudioImagePlate: View {
     private func scoreChip(result: AnalysisResult) -> some View {
         HStack(spacing: 4) {
             Text("スコア")
-                .font(.system(size: 10))
+                .font(.system(size: 11))
                 .opacity(0.75)
             Text("\(result.totalScore)")
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: 14, weight: .semibold))
         }
         .foregroundStyle(Color.ivory)
         .padding(.horizontal, 10)
