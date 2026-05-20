@@ -3,6 +3,7 @@ import SwiftUI
 
 struct RootView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -20,9 +21,15 @@ struct RootView: View {
                 case .studio:     StudioView()
                 }
             }
-            .transition(.opacity)
-            .animation(.easeInOut(duration: 0.35), value: appState.currentScreen)
+            .transition(reduceMotion ? .identity : .opacity)
+            .animation(
+                reduceMotion ? nil : .easeInOut(duration: 0.35),
+                value: appState.currentScreen
+            )
         }
+        // 巨大な Dynamic Type サイズではマガジン的なタイポ階層が崩壊するので、
+        // 過度な拡大を防止しつつ、視覚調整 (medium 既定の 1.4x まで) は受け付ける。
+        .dynamicTypeSize(.xSmall ... .xxLarge)
     }
 }
 

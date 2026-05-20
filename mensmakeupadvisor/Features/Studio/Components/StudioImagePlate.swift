@@ -5,6 +5,7 @@ import UIKit
 struct StudioImagePlate: View {
     let viewModel: StudioViewModel
     @Environment(AppState.self) private var appState
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     // Compare 入場時のオート・デモを 1 回だけ走らせる。スライダーが
     // 動くことを言葉で説明する代わりに、目で覚えてもらう。
@@ -63,8 +64,16 @@ struct StudioImagePlate: View {
 
     // 左右どちらが Before / After かを身体で覚えてもらう短いデモ。
     // 0.5 → 0.25 → 0.75 → 0.5 とゆっくり振ってから、ヒントテキストを出す。
+    // Reduce Motion 設定時はアニメーションせず、ヒントだけ表示する。
     @MainActor
     private func playCompareIntro() async {
+        if reduceMotion {
+            try? await Task.sleep(for: .milliseconds(400))
+            showCompareHint = true
+            try? await Task.sleep(for: .seconds(3.0))
+            showCompareHint = false
+            return
+        }
         try? await Task.sleep(for: .milliseconds(400))
         withAnimation(.easeInOut(duration: 0.8)) { viewModel.comparePosition = 0.25 }
         try? await Task.sleep(for: .milliseconds(800))

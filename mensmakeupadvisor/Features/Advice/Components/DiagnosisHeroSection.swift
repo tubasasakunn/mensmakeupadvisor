@@ -4,6 +4,7 @@ import UIKit
 struct DiagnosisHeroSection: View {
     let result: AnalysisResult
     @State private var gradeBadgeVisible = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(alignment: .center, spacing: 24) {
@@ -12,7 +13,7 @@ struct DiagnosisHeroSection: View {
                     .aid("diagnosis_score_ring")
 
                 Text(result.grade)
-                    .font(.system(size: 17, weight: .black, design: .monospaced))
+                    .font(.system(size: 18, weight: .heavy))
                     .foregroundStyle(Color.appBackground)
                     .frame(width: 44, height: 44)
                     .background(result.gradeColor)
@@ -21,9 +22,14 @@ struct DiagnosisHeroSection: View {
                     .offset(x: 8, y: 8)
                     .opacity(gradeBadgeVisible ? 1 : 0)
                     .scaleEffect(gradeBadgeVisible ? 1 : 0.4)
+                    .accessibilityLabel("総合評価 \(result.grade)")
                     .onAppear {
-                        withAnimation(.spring(duration: 0.5, bounce: 0.4).delay(1.5)) {
+                        if reduceMotion {
                             gradeBadgeVisible = true
+                        } else {
+                            withAnimation(.spring(duration: 0.5, bounce: 0.4).delay(1.5)) {
+                                gradeBadgeVisible = true
+                            }
                         }
                     }
             }

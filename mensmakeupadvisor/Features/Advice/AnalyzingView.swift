@@ -4,6 +4,7 @@ import UIKit
 struct AnalyzingView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.analysisService) private var analysisService
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var progress: Double = 0
     @State private var phaseIndex: Int = 0
@@ -76,6 +77,8 @@ struct AnalyzingView: View {
             AnalyzingScanArea(capturedImage: appState.capturedImage, scanY: scanY)
                 .padding(.horizontal, 24)
                 .onAppear {
+                    // Reduce Motion 設定時はスキャンラインを動かさず静的表示。
+                    guard !reduceMotion else { return }
                     withAnimation(
                         .linear(duration: 2.0)
                         .repeatForever(autoreverses: false)
