@@ -9,11 +9,30 @@ final class StudioViewModel {
     var comparePosition: CGFloat = 0.5
     var showSavedNotification: Bool = false
 
+    // 何か触られているか。リセットボタンの表示判定に使う。
+    func hasAnyIntensity(_ comp: MakeupComposition) -> Bool {
+        for kind in MakeupKind.allCases where comp.intensity(of: kind) > 0.001 {
+            return true
+        }
+        return comp.browType != nil
+    }
+
     func applyPreset(_ preset: MakeupPreset, appState: AppState) {
         withAnimation(.easeInOut(duration: 0.3)) {
             preset.apply(to: &appState.composition)
         }
         appState.activePresetID = preset.id
+    }
+
+    // 全化粧単位の強度を 0 に戻し、眉も解除する。プリセットの選択状態も解除。
+    func resetAll(appState: AppState) {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            for kind in MakeupKind.allCases {
+                appState.composition.setIntensity(0, for: kind)
+            }
+            appState.composition.setBrowType(nil)
+            appState.activePresetID = nil
+        }
     }
 
     func saveLook(appState: AppState, modelContext: ModelContext) {
@@ -39,13 +58,13 @@ final class StudioViewModel {
         )
         modelContext.insert(look)
         try? modelContext.save()
+        // トーストは長めに表示（保存できたことを確認できる時間を確保）し、
+        // 自動遷移はしない。ユーザーが「ホームへ」「編集を続ける」を自分で選ぶ。
         withAnimation(.easeInOut(duration: 0.25)) { showSavedNotification = true }
-        Task {
-            try? await Task.sleep(for: .seconds(1.4))
-            withAnimation(.easeInOut(duration: 0.25)) { showSavedNotification = false }
-            // 保存完了で home へ。CREATE フローも同じ動線になる。
-            appState.navigate(to: .home)
-        }
+    }
+
+    func dismissSavedNotification() {
+        withAnimation(.easeInOut(duration: 0.25)) { showSavedNotification = false }
     }
 
     private func eyeAreaNames(_ comp: MakeupComposition) -> Set<String> {

@@ -5,6 +5,7 @@ struct StudioView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = StudioViewModel()
+    @State private var showResetConfirmation = false
 
     var body: some View {
         ZStack {
@@ -18,7 +19,7 @@ struct StudioView: View {
                     .padding(.horizontal, 28)
                     .padding(.top, 12)
 
-                modeSegment
+                modeRow
                     .padding(.top, 16)
                     .padding(.horizontal, 28)
 
@@ -36,16 +37,38 @@ struct StudioView: View {
             }
 
             if viewModel.showSavedNotification {
-                StudioSavedToast()
+                StudioSavedToast(
+                    onGoHome: {
+                        viewModel.dismissSavedNotification()
+                        appState.navigate(to: .home)
+                    },
+                    onKeepEditing: {
+                        viewModel.dismissSavedNotification()
+                    }
+                )
             }
         }
-        // 親 identifier が子の Button/Toggle 等に継承されないようにする
+        .confirmationDialog(
+            "メイクを全部リセットしますか？",
+            isPresented: $showResetConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("リセットする", role: .destructive) {
+                viewModel.resetAll(appState: appState)
+            }
+            Button("やめる", role: .cancel) {}
+        } message: {
+            Text("すべての強さを 0 に、眉の選択を解除します。")
+        }
         .accessibilityElement(children: .contain)
         .aid("studio_view")
-        // composition の変化で task が再起動 → AppState 側で debounce している。
         .task(id: compositionKey) {
             await MainActor.run { appState.requestMakeupRender() }
         }
+    }
+
+    private var hasAnyIntensity: Bool {
+        viewModel.hasAnyIntensity(appState.composition)
     }
 
     // 全化粧単位の強度 + 眉 type を 1 つのキーに集約して task(id:) で監視する。
@@ -100,6 +123,13 @@ struct StudioView: View {
         .padding(.horizontal, 28)
     }
 
+    private var modeRow: some View {
+        HStack(spacing: 10) {
+            modeSegment
+            resetButton
+        }
+    }
+
     private var modeSegment: some View {
         HStack(spacing: 0) {
             modeButton(
@@ -116,6 +146,26 @@ struct StudioView: View {
             )
         }
         .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+    }
+
+    private var resetButton: some View {
+        Button {
+            showResetConfirmation = true
+        } label: {
+            VStack(spacing: 2) {
+                Image(systemName: "arrow.counterclockwise")
+                    .font(.system(size: 14, weight: .regular))
+                Text("リセット")
+                    .font(.system(size: 9, weight: .regular))
+            }
+            .foregroundStyle(hasAnyIntensity ? Color.ivory : Color.inkTertiary)
+            .frame(width: 56)
+            .padding(.vertical, 10)
+            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+        }
+        .disabled(!hasAnyIntensity)
+        .accessibilityLabel("メイクをリセット")
+        .aid("studio_reset_button")
     }
 
     private func modeButton(title: String, subtitle: String, mode: StudioViewModel.DisplayMode, aid: String) -> some View {

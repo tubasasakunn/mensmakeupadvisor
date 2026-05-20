@@ -28,17 +28,19 @@ appId: com.tubasasakun.mensmakeupadvisor
 - tapOn:
     id: "studio_save_button"
 
-- waitForAnimationToEnd:
-    timeout: 2000
+- assertVisible:
+    id: "studio_saved_notification"
 
-# SAVED → ボタンでアーカイブ画面へ
+# トーストの「ホームへ」ボタンでホームに戻る
 - tapOn:
-    id: "studio_header_saved_button"
+    id: "studio_saved_go_home"
 
 - assertVisible:
-    id: "archive_view"
+    id: "home_view"
 
-# 空状態の場合はそのまま確認（看守したルックがあれば looksGrid を確認）
+# 「保存」タブを開いて保存したルックを確認
+- tapOn:
+    id: "home_tab_archive"
+
 - assertVisible:
-    id: "archive_empty_state"
-    optional: true
+    id: "home_archive_tab"
