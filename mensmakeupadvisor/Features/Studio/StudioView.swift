@@ -54,6 +54,7 @@ struct StudioView: View {
             titleVisibility: .visible
         ) {
             Button("リセットする", role: .destructive) {
+                Haptics.medium()
                 viewModel.resetAll(appState: appState)
             }
             Button("やめる", role: .cancel) {}
@@ -82,14 +83,25 @@ struct StudioView: View {
 
     // MARK: - Subviews
 
+    // 戻る先は AppState.studioOrigin に従う。
+    // - Diagnosis 経由（新規撮影フロー or Tutorial 終了）: .diagnosis
+    // - Archive 経由（保存ルックの編集）: .home
+    private var backLabel: String {
+        appState.studioOrigin == .home ? "保存" : "診断結果"
+    }
+    private var backAccessibilityLabel: String {
+        appState.studioOrigin == .home ? "保存タブに戻る" : "診断結果に戻る"
+    }
+
     private var headerBar: some View {
         HStack {
             backChip(
-                label: "診断結果",
+                label: backLabel,
                 aid: "studio_back_button",
-                accessibilityLabel: "診断結果に戻る"
+                accessibilityLabel: backAccessibilityLabel
             ) {
-                appState.navigate(to: .diagnosis)
+                Haptics.soft()
+                appState.navigate(to: appState.studioOrigin)
             }
 
             Spacer()
@@ -108,6 +120,7 @@ struct StudioView: View {
                 icon: "house.fill",
                 trailing: true
             ) {
+                Haptics.soft()
                 appState.navigate(to: .home)
             }
         }
@@ -172,6 +185,7 @@ struct StudioView: View {
 
     private var resetButton: some View {
         Button {
+            Haptics.warning()
             showResetConfirmation = true
         } label: {
             VStack(spacing: 2) {
@@ -192,6 +206,8 @@ struct StudioView: View {
     private func modeButton(title: String, subtitle: String, mode: StudioViewModel.DisplayMode, aid: String) -> some View {
         let isActive = viewModel.displayMode == mode
         return Button {
+            guard !isActive else { return }
+            Haptics.selection()
             withAnimation(Theme.Motion.spring) { viewModel.displayMode = mode }
         } label: {
             VStack(spacing: 2) {
@@ -217,18 +233,23 @@ struct StudioView: View {
 
     @ViewBuilder
     private var controlPanel: some View {
-        switch viewModel.displayMode {
-        case .compare:
-            PresetPanelView(viewModel: viewModel)
-        case .fineTune:
-            // FINE TUNE は要素が多い (4 slider + 2 preset 群 + brow picker) ので
-            // 高さに収まらないことがある。ScrollView でラップして上下にスワイプ
-            // できるようにする。画像プレートが潰れるのを防ぐ。
-            ScrollView(.vertical, showsIndicators: false) {
-                FineTunePanelView()
-                    .padding(.bottom, Theme.Spacing.sm)
+        Group {
+            switch viewModel.displayMode {
+            case .compare:
+                PresetPanelView(viewModel: viewModel)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            case .fineTune:
+                // FINE TUNE は要素が多い (4 slider + 2 preset 群 + brow picker) ので
+                // 高さに収まらないことがある。ScrollView でラップして上下にスワイプ
+                // できるようにする。画像プレートが潰れるのを防ぐ。
+                ScrollView(.vertical, showsIndicators: false) {
+                    FineTunePanelView()
+                        .padding(.bottom, Theme.Spacing.sm)
+                }
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
+        .animation(Theme.Motion.smooth, value: viewModel.displayMode)
     }
 
 }

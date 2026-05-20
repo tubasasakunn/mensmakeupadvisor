@@ -37,6 +37,13 @@ final class AppState {
     // AnalyzingView 完了時の navigate 分岐で参照する。
     var skipTutorialOnNextFlow: Bool = false
 
+    // 「戻る」の文脈を保持するブレッドクラム。
+    // capture / studio はオンボーディング初回フロー以外にも、Home の各タブから
+    // 入ってこられるため、画面遷移元を覚えておき「戻る」をその場所へ返す。
+    // 例: Archive → applyLook → studio。このとき studio の戻るは Home へ。
+    var captureOrigin: AppScreen = .onboarding
+    var studioOrigin: AppScreen = .diagnosis
+
     private var presetsInitializedFromAnalysis = false
 
     // makeup_claude のアルゴリズムを移植したエンジン。
@@ -55,6 +62,8 @@ final class AppState {
         tutorialStep = 0; tutorialDone = false
         composition = MakeupComposition(); activePresetID = nil
         skipTutorialOnNextFlow = false
+        captureOrigin = .onboarding
+        studioOrigin = .diagnosis
         presetsInitializedFromAnalysis = false
         renderTask?.cancel(); renderTask = nil
         Task { await makeupEngine.reset() }

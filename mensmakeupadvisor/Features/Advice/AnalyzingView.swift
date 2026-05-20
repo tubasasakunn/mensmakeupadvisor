@@ -62,6 +62,24 @@ struct AnalyzingView: View {
             .glassEffect(.regular, in: .capsule)
 
             Spacer()
+
+            // 解析中はキャンセル、エラー時は戻るで撮影画面へ。
+            // 10〜20 秒待たされる処理を「ここから出られない」状態にはしない。
+            if errorMessage == nil {
+                Button {
+                    Haptics.soft()
+                    appState.navigate(to: .capture)
+                } label: {
+                    Text("キャンセル")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Theme.Text.primarySoft)
+                        .padding(.horizontal, Theme.Spacing.md)
+                        .padding(.vertical, Theme.Spacing.sm)
+                        .glassEffect(.clear, in: .capsule)
+                }
+                .accessibilityLabel("分析をキャンセルして撮影画面に戻る")
+                .aid("analyzing_cancel_button")
+            }
         }
     }
 
@@ -116,21 +134,16 @@ struct AnalyzingView: View {
                 }
             }
 
-            VStack(spacing: Theme.Spacing.md) {
-                GlassPrimaryButton(
-                    title: "もう一度撮影する",
-                    icon: "camera.fill",
-                    accessibilityID: "analyzing_retry_button"
-                ) {
-                    appState.navigate(to: .capture)
-                }
-
-                GlassSecondaryButton(
-                    title: "撮影画面に戻る",
-                    accessibilityID: "analyzing_back_button"
-                ) {
-                    appState.navigate(to: .capture)
-                }
+            // エラー時の動線はひとつだけ: 撮影画面に戻る。
+            // 旧 UI では「もう一度撮影する」と「撮影画面に戻る」が両方 .capture へ
+            // 飛ぶ重複ボタンだったので 1 本化した。
+            GlassPrimaryButton(
+                title: "撮影画面に戻る",
+                icon: "camera.fill",
+                accessibilityID: "analyzing_retry_button"
+            ) {
+                Haptics.soft()
+                appState.navigate(to: .capture)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -205,6 +218,10 @@ struct AnalyzingView: View {
                 appState.capturedImage = cropped
             }
             appState.analysisResult = result
+            // 新規撮影フローを経た Studio の戻る先は診断結果。
+            // Archive 経由のときは applyLook 側で .home を入れているので上書きしない。
+            appState.studioOrigin = .diagnosis
+            Haptics.success()
             appState.navigate(to: .diagnosis)
         } catch {
             showError(

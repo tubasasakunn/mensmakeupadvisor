@@ -82,12 +82,13 @@ struct DiagnosisView: View {
     private var navigationBar: some View {
         HStack {
             Button {
+                Haptics.soft()
                 appState.navigate(to: .capture)
             } label: {
                 HStack(spacing: 5) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 11, weight: .semibold))
-                    Text("撮影に戻る")
+                    Text("戻る")
                         .font(.system(size: 12, weight: .medium))
                 }
                 .foregroundStyle(Theme.Text.primarySoft)
@@ -139,38 +140,95 @@ struct DiagnosisView: View {
 
     // MARK: - Bottom Buttons
 
+    // タイトル＋サブタイトルを 1 つのボタン内に収める専用 CTA。
+    // 旧 UI ではサブタイトルがボタンの外に置かれ、視覚的に分離していて
+    // 「これ何の説明？」になっていた。1 つの tap area で読ませる。
+    private func ctaWithSubtitle(
+        title: String,
+        subtitle: String,
+        icon: String?,
+        isProminent: Bool,
+        accessibilityID: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: Theme.Spacing.md) {
+                if let icon {
+                    Image(systemName: icon)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(Color.ivory)
+                        .frame(width: 24)
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 15, weight: isProminent ? .semibold : .medium))
+                        .foregroundStyle(isProminent ? Color.ivory : Theme.Text.primarySoft)
+                    Text(subtitle)
+                        .font(.system(size: 11, weight: .regular))
+                        .foregroundStyle(isProminent ? Theme.Text.primaryFaded : Theme.Text.secondaryFaded)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(isProminent ? Color.ivory.opacity(0.85) : Theme.Text.primaryFaded)
+            }
+            .padding(.horizontal, Theme.Spacing.xl)
+            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity)
+            .background(
+                Group {
+                    if isProminent {
+                        LinearGradient(
+                            colors: [Theme.Accent.primaryFaded, Theme.Accent.primarySoft],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    }
+                }
+            )
+            .glassEffect(isProminent ? .regular : .clear, in: .capsule)
+            .overlay(
+                Capsule()
+                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
+            )
+        }
+        .buttonStyle(GlassPressedButtonStyle())
+        .accessibilityLabel("\(title)。\(subtitle)")
+        .aid(accessibilityID)
+    }
+
     private var bottomButtons: some View {
         let isSkipFlow = appState.skipTutorialOnNextFlow
         return VStack(spacing: Theme.Spacing.md) {
-            GlassPrimaryButton(
+            ctaWithSubtitle(
                 title: isSkipFlow ? "スタジオを開く" : "メイクを試してみる",
+                subtitle: isSkipFlow ? "プリセットや細かい調整ができます" : "5ステップのガイドに沿って進めます",
                 icon: isSkipFlow ? "paintbrush.pointed.fill" : "wand.and.stars",
+                isProminent: true,
                 accessibilityID: "diagnosis_begin_button"
             ) {
+                Haptics.medium()
                 if isSkipFlow {
                     appState.skipTutorialOnNextFlow = false
+                    appState.studioOrigin = .diagnosis
                     appState.navigate(to: .studio)
                 } else {
                     appState.navigate(to: .tutorial)
                 }
             }
 
-            Text(isSkipFlow ? "すぐにプリセットや細かい調整ができます" : "5ステップのガイドに沿って進めます")
-                .font(.system(size: 11, weight: .regular))
-                .foregroundStyle(Theme.Text.secondaryFaded)
-                .frame(maxWidth: .infinity, alignment: .center)
-
             if !isSkipFlow {
-                GlassSecondaryButton(
+                ctaWithSubtitle(
                     title: "ガイドを飛ばしてスタジオへ",
+                    subtitle: "メイクの経験がある方向け",
+                    icon: nil,
+                    isProminent: false,
                     accessibilityID: "diagnosis_skip_button"
                 ) {
+                    Haptics.soft()
+                    appState.studioOrigin = .diagnosis
                     appState.navigate(to: .studio)
                 }
-                Text("メイクの経験がある方向け")
-                    .font(.system(size: 11, weight: .regular))
-                    .foregroundStyle(Theme.Text.tertiary)
-                    .frame(maxWidth: .infinity, alignment: .center)
             }
         }
     }

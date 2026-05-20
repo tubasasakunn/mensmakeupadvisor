@@ -59,6 +59,7 @@ struct OnboardingView: View {
 
     private var chapterIndexButton: some View {
         Button {
+            Haptics.soft()
             showChapterSheet = true
         } label: {
             HStack(spacing: 5) {
@@ -84,6 +85,10 @@ struct OnboardingView: View {
 
     private var skipButton: some View {
         Button {
+            Haptics.soft()
+            if !isRereadFromHome {
+                appState.captureOrigin = .onboarding
+            }
             appState.navigate(to: isRereadFromHome ? .home : .capture)
         } label: {
             Text(isRereadFromHome ? "ホームに戻る" : "読み飛ばす")
@@ -130,17 +135,51 @@ struct OnboardingView: View {
         .padding(.bottom, 4)
     }
 
-    // MARK: - Navigation: BEGIN on last page only
+    // MARK: - Navigation: 最終ページは CTA、それ以外はスワイプヒント
 
     private var navigationBar: some View {
-        HStack {
+        Group {
             if currentPage == pages.count - 1 {
                 GlassPrimaryButton(
                     title: isRereadFromHome ? "ホームに戻る" : "撮影をはじめる",
                     icon: isRereadFromHome ? "house.fill" : "camera.fill",
                     accessibilityID: "onboarding_continue_button"
                 ) {
+                    Haptics.medium()
+                    if !isRereadFromHome {
+                        appState.captureOrigin = .onboarding
+                    }
                     appState.navigate(to: isRereadFromHome ? .home : .capture)
+                }
+            } else {
+                // 中間ページは「スワイプで進む」を明示。タップでも次ページに送る。
+                // 旧 UI ではスワイプ可能性が伝わらず、止まるユーザーがいた。
+                HStack {
+                    Spacer()
+                    Button {
+                        Haptics.selection()
+                        withAnimation(Theme.Motion.smooth) {
+                            currentPage = min(currentPage + 1, pages.count - 1)
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Text("SWIPE")
+                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .kerning(2.5)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 11, weight: .semibold))
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 11, weight: .semibold))
+                                .opacity(0.5)
+                        }
+                        .foregroundStyle(Theme.Text.primaryFaded)
+                        .padding(.horizontal, Theme.Spacing.lg)
+                        .padding(.vertical, Theme.Spacing.sm)
+                        .glassEffect(.clear, in: .capsule)
+                    }
+                    .accessibilityLabel("次のページへ")
+                    .aid("onboarding_next_hint")
+                    Spacer()
                 }
             }
         }

@@ -108,7 +108,10 @@ struct HomeArchiveTab: View {
     }
 
     private func gridCell(for look: SavedLook) -> some View {
-        Button { selected = look } label: {
+        Button {
+            Haptics.soft()
+            selected = look
+        } label: {
             SavedLookMeshThumbnail(look: look, geometry: geometry)
                 .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
                 .overlay(

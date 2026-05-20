@@ -33,6 +33,7 @@ struct SavedLookDetailSheet: View {
             titleVisibility: .visible
         ) {
             Button("削除する", role: .destructive) {
+                Haptics.warning()
                 onDelete()
             }
             Button("キャンセル", role: .cancel) {}
@@ -120,14 +121,17 @@ struct SavedLookDetailSheet: View {
                 icon: "trash",
                 accessibilityID: "home_archive_detail_delete"
             ) {
+                Haptics.warning()
                 showDeleteConfirmation = true
             }
 
             GlassPrimaryButton(
                 title: "このルックを編集",
-                accessibilityID: "home_archive_detail_apply",
-                action: onApply
-            )
+                accessibilityID: "home_archive_detail_apply"
+            ) {
+                Haptics.medium()
+                onApply()
+            }
         }
     }
 }

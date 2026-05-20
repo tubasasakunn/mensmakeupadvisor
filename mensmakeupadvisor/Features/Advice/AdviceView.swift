@@ -66,15 +66,30 @@ struct AdviceView: View {
 
     // MARK: - Navigation
 
+    // 戻り先は AppState.captureOrigin に従う。
+    // - 初回 (onboarding 完了直後): .onboarding に戻る
+    // - Home 経由: .home に戻る
+    // ラベルはどちらの場合でも「戻る」で統一し、行き先を読み上げる
+    // accessibilityLabel だけ文脈に応じて切り替える。
+    private var backDestination: AppScreen { appState.captureOrigin }
+    private var backAccessibilityLabel: String {
+        switch backDestination {
+        case .home: "ホームに戻る"
+        case .onboarding: "オンボーディングガイドに戻る"
+        default: "戻る"
+        }
+    }
+
     private var navigationBar: some View {
         HStack {
             Button {
-                appState.navigate(to: .onboarding)
+                Haptics.soft()
+                appState.navigate(to: backDestination)
             } label: {
                 HStack(spacing: 5) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 11, weight: .semibold))
-                    Text("ガイドに戻る")
+                    Text("戻る")
                         .font(.system(size: 12, weight: .medium))
                 }
                 .foregroundStyle(Theme.Text.primarySoft)
@@ -82,7 +97,7 @@ struct AdviceView: View {
                 .padding(.vertical, 7)
                 .glassEffect(.clear, in: .capsule)
             }
-            .accessibilityLabel("オンボーディングガイドに戻る")
+            .accessibilityLabel(backAccessibilityLabel)
             .aid("advice_back_button")
 
             Spacer()
@@ -135,6 +150,7 @@ struct AdviceView: View {
                     icon: "camera.fill",
                     accessibilityID: "advice_camera_button"
                 ) {
+                    Haptics.medium()
                     viewModel.showCamera = true
                 }
             }
@@ -143,6 +159,7 @@ struct AdviceView: View {
                 icon: "photo",
                 accessibilityID: "advice_sample_button"
             ) {
+                Haptics.soft()
                 viewModel.useSample(appState: appState)
             }
         }

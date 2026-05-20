@@ -20,13 +20,16 @@ struct StudioBottomBar: View {
             icon: "heart.fill",
             showsTrailingChevron: false,
             accessibilityID: "studio_save_button",
-            isProminent: true,
-            action: onArchive
-        )
+            isProminent: true
+        ) {
+            Haptics.success()
+            onArchive()
+        }
     }
 
     private var shareButton: some View {
         Button {
+            Haptics.soft()
             Task { await shareCurrentLook() }
         } label: {
             Group {

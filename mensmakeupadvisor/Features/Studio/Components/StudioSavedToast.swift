@@ -29,16 +29,20 @@ struct StudioSavedToast: View {
                     HStack(spacing: Theme.Spacing.md) {
                         GlassSecondaryButton(
                             title: "編集を続ける",
-                            accessibilityID: "studio_saved_keep_editing",
-                            action: onKeepEditing
-                        )
+                            accessibilityID: "studio_saved_keep_editing"
+                        ) {
+                            Haptics.soft()
+                            onKeepEditing()
+                        }
                         GlassPrimaryButton(
                             title: "ホームへ",
                             icon: "house.fill",
                             showsTrailingChevron: false,
-                            accessibilityID: "studio_saved_go_home",
-                            action: onGoHome
-                        )
+                            accessibilityID: "studio_saved_go_home"
+                        ) {
+                            Haptics.soft()
+                            onGoHome()
+                        }
                     }
                 }
             }

@@ -43,6 +43,7 @@ struct OnboardingChapterSheet: View {
             ForEach(OnboardingChapter.all) { ch in
                 let isCurrent = ch.id == currentChapter.id
                 Button {
+                    Haptics.selection()
                     currentPage = ch.firstPageIndex
                     dismiss()
                 } label: {

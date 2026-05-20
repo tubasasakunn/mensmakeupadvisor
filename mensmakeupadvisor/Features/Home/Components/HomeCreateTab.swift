@@ -28,7 +28,9 @@ struct HomeCreateTab: View {
                     icon: "camera.fill",
                     accessibilityID: "home_create_camera_button"
                 ) {
+                    Haptics.medium()
                     appState.skipTutorialOnNextFlow = true
+                    appState.captureOrigin = .home
                     appState.navigate(to: .capture)
                 }
 
@@ -48,6 +50,7 @@ struct HomeCreateTab: View {
     // 控えめに置く。Profile/Settings 画面が無いためここに常設している。
     private var guideLink: some View {
         Button {
+            Haptics.soft()
             appState.navigate(to: .onboarding)
         } label: {
             HStack(spacing: Theme.Spacing.sm) {

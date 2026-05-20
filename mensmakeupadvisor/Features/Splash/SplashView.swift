@@ -3,6 +3,14 @@ import SwiftUI
 struct SplashView: View {
     @Environment(AppState.self) private var appState
 
+    @State private var didAdvance = false
+
+    private func advance() {
+        guard !didAdvance else { return }
+        didAdvance = true
+        appState.navigate(to: .onboarding)
+    }
+
     var body: some View {
         ZStack {
             LuxeBackground(intensity: 0.45)
@@ -28,10 +36,15 @@ struct SplashView: View {
             }
             .padding(.horizontal, 28)
         }
+        // タップでスキップ可能 (HIG: 自動再生やスプラッシュは触れたら止めるべき)
+        .contentShape(Rectangle())
+        .onTapGesture { advance() }
         .task {
             try? await Task.sleep(for: .seconds(2.2))
-            appState.navigate(to: .onboarding)
+            advance()
         }
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel("タップしてスタート")
         .aid("splash_view")
     }
 
@@ -107,6 +120,13 @@ struct SplashView: View {
                     .kerning(1.5)
             }
             Spacer()
+            // タップ可能であることを伝える小さなサイン。HIG: スプラッシュは
+            // 「進行中だが触れる」ことを 1 秒以内に分からせるべき。
+            Text("Tap to begin")
+                .font(.system(size: 10, weight: .regular, design: .monospaced))
+                .foregroundStyle(Color.inkSecondary)
+                .kerning(2)
+                .opacity(0.6)
         }
     }
 

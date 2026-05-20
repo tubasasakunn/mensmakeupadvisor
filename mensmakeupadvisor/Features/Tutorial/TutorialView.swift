@@ -105,6 +105,7 @@ struct TutorialView: View {
         let isFirst = appState.tutorialStep == 0
         return HStack {
             Button {
+                Haptics.soft()
                 viewModel.prevStep(appState: appState)
             } label: {
                 HStack(spacing: 5) {
@@ -134,6 +135,8 @@ struct TutorialView: View {
             Spacer()
 
             Button {
+                Haptics.soft()
+                appState.studioOrigin = .diagnosis
                 viewModel.skip(appState: appState)
             } label: {
                 Text("あとで")
@@ -182,6 +185,11 @@ struct TutorialView: View {
             icon: isLast ? "paintbrush.pointed.fill" : nil,
             accessibilityID: "tutorial_next_button"
         ) {
+            Haptics.medium()
+            if isLast {
+                // Tutorial 経由で Studio に入った場合の戻り先は診断結果
+                appState.studioOrigin = .diagnosis
+            }
             viewModel.nextStep(appState: appState)
         }
     }

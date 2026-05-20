@@ -154,6 +154,8 @@ struct HomeReportTab: View {
                 icon: "arrow.clockwise",
                 accessibilityID: "home_report_reeval_button"
             ) {
+                Haptics.soft()
+                appState.captureOrigin = .home
                 appState.navigate(to: .capture)
             }
         }
@@ -179,6 +181,8 @@ struct HomeReportTab: View {
                     icon: "camera.fill",
                     accessibilityID: "home_report_start_button"
                 ) {
+                    Haptics.medium()
+                    appState.captureOrigin = .home
                     appState.navigate(to: .capture)
                 }
                 .padding(.top, Theme.Spacing.sm)

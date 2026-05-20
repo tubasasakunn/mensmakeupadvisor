@@ -44,6 +44,8 @@ struct PresetPanelView: View {
     private func presetCard(preset: MakeupPreset, index: Int) -> some View {
         let isActive = appState.activePresetID == preset.id
         return Button {
+            guard !isActive else { return }
+            Haptics.selection()
             viewModel.applyPreset(preset, appState: appState)
         } label: {
             VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
