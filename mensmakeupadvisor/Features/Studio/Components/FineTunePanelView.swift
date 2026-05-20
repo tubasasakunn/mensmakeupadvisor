@@ -2,12 +2,14 @@ import SwiftUI
 
 // FINE TUNE: 化粧単位ごとの強度スライダー + 眉タイプ選択。
 // 各スライダーはその化粧単位の全メッシュに一律の強度を適用する。
+// 初心者の認知過負荷を避けるため、主要 4 スライダー + 眉だけを既定で見せ、
+// 涙袋 / アイラインは「もっと細かく」で開示する Progressive Disclosure。
 struct FineTunePanelView: View {
     @Environment(AppState.self) private var appState
+    @State private var showAdvanced = false
 
-    private let sliderKinds: [MakeupKind] = [
-        .base, .highlight, .shadow, .eyeshadow, .tearbag, .eyeliner,
-    ]
+    private let primaryKinds: [MakeupKind] = [.base, .highlight, .shadow, .eyeshadow]
+    private let advancedKinds: [MakeupKind] = [.tearbag, .eyeliner]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -22,12 +24,44 @@ struct FineTunePanelView: View {
             .padding(.bottom, 16)
 
             VStack(spacing: 20) {
-                ForEach(sliderKinds, id: \.self) { kind in
+                ForEach(primaryKinds, id: \.self) { kind in
                     kindSliderRow(kind)
                 }
                 browTypeRow
+
+                advancedDisclosure
+
+                if showAdvanced {
+                    VStack(spacing: 20) {
+                        ForEach(advancedKinds, id: \.self) { kind in
+                            kindSliderRow(kind)
+                        }
+                    }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
             }
         }
+    }
+
+    private var advancedDisclosure: some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                showAdvanced.toggle()
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: showAdvanced ? "chevron.up" : "chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+                Text(showAdvanced ? "詳しい項目を閉じる" : "涙袋やアイラインも調整する")
+                    .font(.system(size: 12, weight: .medium))
+                Spacer()
+            }
+            .foregroundStyle(Color.inkSecondary)
+            .padding(.vertical, 8)
+            .contentShape(Rectangle())
+        }
+        .accessibilityLabel(showAdvanced ? "詳しい項目を閉じる" : "涙袋やアイラインも調整する")
+        .aid("studio_finetune_disclosure")
     }
 
     private func kindSliderRow(_ kind: MakeupKind) -> some View {
