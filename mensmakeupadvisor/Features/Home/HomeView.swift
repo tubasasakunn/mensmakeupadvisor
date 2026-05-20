@@ -37,7 +37,9 @@ struct HomeView: View {
                 .aid("home_tab_archive")
         }
         .tint(Color.ivory)
-        .background(Color.appBackground)
+        // iOS 26: Tab bar も Liquid Glass の上に乗るようにする
+        .toolbarBackground(.ultraThinMaterial, for: .tabBar)
+        .toolbarBackgroundVisibility(.visible, for: .tabBar)
         .accessibilityElement(children: .contain)
         .aid("home_view")
         // Home に戻ってきた時点で Create フラグはクリアする。

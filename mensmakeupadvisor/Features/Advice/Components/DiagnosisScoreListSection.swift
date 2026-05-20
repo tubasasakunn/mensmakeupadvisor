@@ -24,9 +24,7 @@ struct DiagnosisScoreListSection: View {
 
                     Spacer()
 
-                    Rectangle()
-                        .fill(Color.lineColor)
-                        .frame(width: 1, height: 36)
+                    HairlineVDivider(height: 36)
 
                     Spacer()
 
@@ -46,7 +44,7 @@ struct DiagnosisScoreListSection: View {
                 }
                 .padding(.vertical, 16)
                 .overlay(alignment: .bottom) {
-                    Rectangle().fill(Color.lineColor).frame(height: 1)
+                    HairlineDivider()
                 }
             }
 

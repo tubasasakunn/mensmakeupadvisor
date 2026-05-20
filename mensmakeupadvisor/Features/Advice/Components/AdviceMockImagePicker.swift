@@ -5,10 +5,10 @@ struct AdviceMockImagePicker: View {
     let onSelect: (UIImage) -> Void
 
     var body: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 8) {
+        VStack(spacing: Theme.Spacing.md) {
+            HStack(spacing: Theme.Spacing.sm) {
                 ForEach(0..<3, id: \.self) { index in
-                    Button("画像\(index + 1)") {
+                    Button("画像 \(index + 1)") {
                         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 300, height: 400))
                         let image = renderer.image { ctx in
                             let hue = CGFloat(index) / 3.0
@@ -17,23 +17,27 @@ struct AdviceMockImagePicker: View {
                         }
                         onSelect(image)
                     }
-                    .font(.system(size: 13, weight: .regular, design: .monospaced))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color.ivory)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Theme.Surface.glassMedium)
-                    .clipShape(RoundedRectangle(cornerRadius: 2))
+                    .glassEffect(.regular, in: .capsule)
                     .aid("advice_mock_image_\(index)")
                 }
             }
 
-            Text("[MOCK] 画像ピッカー")
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(Theme.Status.warning)
+            HStack(spacing: 6) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 10))
+                Text("MOCK MODE")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .kerning(2)
+            }
+            .foregroundStyle(Theme.Status.warning)
         }
-        .padding(12)
+        .padding(Theme.Spacing.md)
         .overlay(
-            RoundedRectangle(cornerRadius: 4)
+            RoundedRectangle(cornerRadius: Theme.Radius.md)
                 .stroke(Theme.Status.warningBorder, lineWidth: 1)
         )
         .aid("advice_mock_image_picker")
@@ -41,7 +45,9 @@ struct AdviceMockImagePicker: View {
 }
 
 #Preview {
-    AdviceMockImagePicker { _ in }
-        .padding(24)
-        .background(Color.appBackground)
+    ZStack {
+        LuxeBackground()
+        AdviceMockImagePicker { _ in }
+            .padding(24)
+    }
 }

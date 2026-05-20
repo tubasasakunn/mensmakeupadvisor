@@ -8,24 +8,28 @@ struct TutorialStepInfoArea: View {
     @Binding var eyebrowType: EyebrowApplier.BrowType?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            headerBlock
-            divider
-            oneLinerText
-            explanationText
-            controlBlock
-                .padding(.top, 22)
+        GlassPanel(radius: Theme.Radius.lg, padding: Theme.Spacing.lg) {
+            VStack(alignment: .leading, spacing: 0) {
+                headerBlock
+                divider
+                oneLinerText
+                explanationText
+                controlBlock
+                    .padding(.top, Theme.Spacing.xl)
+            }
         }
     }
 
     private var headerBlock: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("ステップ \(currentStep.tagNumeric) · \(currentStep.layer.labelJP)")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.inkSecondary)
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+            Text("STEP \(String(format: "%02d", currentStep.tagNumeric)) · \(currentStep.layer.labelJP)")
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .kerning(2)
+                .foregroundStyle(Theme.Text.secondaryFaded)
 
             Text(currentStep.titleJP)
-                .font(.system(size: 24, weight: .bold))
+                .font(.system(size: 24, weight: .bold, design: .serif))
+                .italic()
                 .foregroundStyle(Color.ivory)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -33,10 +37,8 @@ struct TutorialStepInfoArea: View {
     }
 
     private var divider: some View {
-        Rectangle()
-            .fill(Color.lineColor)
-            .frame(height: 1)
-            .padding(.vertical, 14)
+        GlassDivider()
+            .padding(.vertical, Theme.Spacing.md)
     }
 
     private var oneLinerText: some View {
@@ -46,13 +48,13 @@ struct TutorialStepInfoArea: View {
             .foregroundStyle(Theme.Text.primarySoft)
             .lineSpacing(4)
             .fixedSize(horizontal: false, vertical: true)
-            .padding(.bottom, 12)
+            .padding(.bottom, Theme.Spacing.md)
     }
 
     private var explanationText: some View {
         Text(currentStep.explanation)
             .font(.system(size: 12, weight: .regular))
-            .foregroundStyle(Color.inkSecondary)
+            .foregroundStyle(Theme.Text.primaryFaded)
             .lineSpacing(6)
             .lineLimit(6)
             .minimumScaleFactor(0.85)
@@ -73,11 +75,13 @@ struct TutorialStepInfoArea: View {
 #Preview {
     @Previewable @State var intensity: Double = 50
     @Previewable @State var brow: EyebrowApplier.BrowType? = .natural
-    return TutorialStepInfoArea(
-        currentStep: TutorialStep.sequence(for: .marugao)[1],
-        intensity: $intensity,
-        eyebrowType: $brow
-    )
-    .padding(28)
-    .background(Color.appBackground)
+    return ZStack {
+        LuxeBackground()
+        TutorialStepInfoArea(
+            currentStep: TutorialStep.sequence(for: .marugao)[1],
+            intensity: $intensity,
+            eyebrowType: $brow
+        )
+        .padding(28)
+    }
 }

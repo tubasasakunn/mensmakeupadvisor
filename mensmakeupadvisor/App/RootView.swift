@@ -7,7 +7,7 @@ struct RootView: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground()
 
             Group {
                 switch appState.currentScreen {
@@ -39,11 +39,13 @@ struct RootView: View {
     }
 
     // 画面ごとの「戻る先」マップ。nil なら戻る無効。
+    // capture / studio は AppState.captureOrigin / studioOrigin を参照することで、
+    // Home 経由 / Onboarding 経由 / Archive 経由などの文脈で正しい場所に戻れる。
     private var edgeSwipeBackTarget: AppScreen? {
         switch appState.currentScreen {
-        case .capture:   return .onboarding
+        case .capture:   return appState.captureOrigin
         case .diagnosis: return .capture
-        case .studio:    return .diagnosis
+        case .studio:    return appState.studioOrigin
         // Splash/Home はトップ階層、Analyzing は処理中、
         // Tutorial/Onboarding は内側スワイプと衝突するため除外
         case .splash, .home, .analyzing, .tutorial, .onboarding: return nil

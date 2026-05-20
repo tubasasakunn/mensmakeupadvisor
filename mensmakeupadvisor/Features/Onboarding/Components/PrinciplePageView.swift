@@ -55,9 +55,7 @@ struct PrinciplePageView: View {
             }
 
             if let footer = page.footer {
-                Rectangle()
-                    .fill(Color.lineColor)
-                    .frame(height: 1)
+                HairlineDivider()
                     .padding(.bottom, 10)
 
                 Text(footer)

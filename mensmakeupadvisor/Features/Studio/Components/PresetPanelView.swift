@@ -14,60 +14,79 @@ struct PresetPanelView: View {
     ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("プリセットから選ぶ")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color.ivory)
-                Text("4 つの傾向 — グラフでざっくり比べられます")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.inkSecondary)
-            }
+        GlassPanel(radius: Theme.Radius.lg, padding: Theme.Spacing.lg) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("PRESET")
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .kerning(2)
+                        .foregroundStyle(Theme.Text.secondaryFaded)
+                    Text("4 つの傾向から選ぶ")
+                        .font(.system(size: 15, weight: .semibold, design: .serif))
+                        .foregroundStyle(Color.ivory)
+                }
 
-            LazyVGrid(
-                columns: [GridItem(.flexible(), spacing: 0), GridItem(.flexible(), spacing: 0)],
-                spacing: 0
-            ) {
-                ForEach(Array(MakeupPreset.all.enumerated()), id: \.element.id) { index, preset in
-                    presetCard(preset: preset, index: index)
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: Theme.Spacing.sm),
+                        GridItem(.flexible(), spacing: Theme.Spacing.sm)
+                    ],
+                    spacing: Theme.Spacing.sm
+                ) {
+                    ForEach(Array(MakeupPreset.all.enumerated()), id: \.element.id) { index, preset in
+                        presetCard(preset: preset, index: index)
+                    }
                 }
             }
-            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
         }
     }
 
     private func presetCard(preset: MakeupPreset, index: Int) -> some View {
         let isActive = appState.activePresetID == preset.id
         return Button {
+            guard !isActive else { return }
+            Haptics.selection()
             viewModel.applyPreset(preset, appState: appState)
         } label: {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
                 HStack(spacing: 6) {
-                    Text("\(index + 1)")
-                        .font(.system(size: 11, weight: .light, design: .serif))
-                        .italic()
+                    Text(String(format: "%02d", index + 1))
+                        .font(.system(size: 10, weight: .regular, design: .monospaced))
+                        .opacity(0.7)
+                    Spacer()
                     if isActive {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 11))
+                            .font(.system(size: 12))
                     }
                 }
 
                 Text(preset.label)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 17, weight: .semibold, design: .serif))
+                    .italic()
 
                 Text(preset.tag)
                     .font(.system(size: 11))
-                    .opacity(0.8)
+                    .opacity(0.75)
 
                 presetPreviewBars(preset: preset, isActive: isActive)
-                    .padding(.top, 2)
+                    .padding(.top, 4)
             }
-            .padding(14)
+            .padding(Theme.Spacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(isActive ? Color.ivory : Color.clear)
             .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
+            .background(
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
+                    .fill(isActive ? Color.ivory : Color.clear)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
+                    .stroke(
+                        isActive ? Color.clear : Theme.Line.outlineIvorySoft,
+                        lineWidth: 0.5
+                    )
+            )
         }
-        .animation(.easeInOut(duration: 0.2), value: appState.activePresetID)
+        .animation(Theme.Motion.smooth, value: appState.activePresetID)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilitySummary(for: preset, isActive: isActive))
         .aid("studio_preset_\(preset.id)")

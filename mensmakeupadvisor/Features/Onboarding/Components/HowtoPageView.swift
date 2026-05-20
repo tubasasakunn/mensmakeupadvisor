@@ -30,9 +30,7 @@ struct HowtoPageView: View {
                     .padding(.bottom, 14)
             }
 
-            Rectangle()
-                .fill(Color.lineColor)
-                .frame(height: 1)
+            HairlineDivider()
                 .padding(.bottom, 16)
 
             if let step = animatedStep {

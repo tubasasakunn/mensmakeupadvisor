@@ -3,6 +3,7 @@ import UIKit
 
 struct FeaturePageView: View {
     let page: OnboardingPage
+    @State private var sliderX: CGFloat = 0.5
 
     private var regionKey: String {
         switch page.featureLabel {
@@ -65,19 +66,18 @@ struct FeaturePageView: View {
 
             // before/after スライダー（画像がある場合のみ）
             if beforeImage != nil || afterImage != nil {
-                StepBeforeAfterSlider(
+                BeforeAfterSlider(
+                    sliderX: $sliderX,
                     beforeImage: beforeImage,
                     afterImage: afterImage,
-                    label: page.featureLabel ?? ""
+                    style: .step
                 )
                 .frame(height: 200)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .padding(.bottom, 14)
             }
 
-            Rectangle()
-                .fill(Color.lineColor)
-                .frame(height: 1)
+            HairlineDivider()
                 .padding(.bottom, 14)
 
             if let title = page.title {
@@ -97,95 +97,5 @@ struct FeaturePageView: View {
             }
         }
         .padding(.top, 16)
-    }
-}
-
-// MARK: - StepBeforeAfterSlider
-
-struct StepBeforeAfterSlider: View {
-    let beforeImage: UIImage?
-    let afterImage: UIImage?
-    let label: String
-    @State private var sliderX: CGFloat = 0.5
-
-    var body: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let h = geo.size.height
-
-            ZStack(alignment: .leading) {
-                // After — 底レイヤー: 常に full size で固定
-                stepImageLayer(img: afterImage, w: w, h: h, placeholder: Theme.Placeholder.stepAfterSoft)
-                    .overlay(alignment: .bottomTrailing) {
-                        stepBadge("AFTER", color: Theme.Plate.labelText)
-                    }
-
-                // Before — 上レイヤー: full size だが左端からクリップ
-                stepImageLayer(img: beforeImage, w: w, h: h, placeholder: Theme.Placeholder.stepBeforeSoft)
-                    .overlay(alignment: .bottomLeading) {
-                        stepBadge("BEFORE", color: Color.inkSecondary)
-                    }
-                    .clipShape(StepRevealShape(fraction: sliderX))
-
-                // ハンドル
-                ZStack {
-                    Rectangle()
-                        .fill(Theme.Plate.labelText)
-                        .frame(width: 2)
-                    Circle()
-                        .fill(Color.ivory)
-                        .frame(width: 26, height: 26)
-                        .overlay(
-                            Image(systemName: "arrow.left.arrow.right")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundStyle(Color.appBackground)
-                        )
-                }
-                .frame(height: h)
-                .offset(x: w * sliderX - 13)
-            }
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        sliderX = max(0, min(1, value.location.x / w))
-                    }
-            )
-        }
-    }
-
-    private func stepImageLayer(img: UIImage?, w: CGFloat, h: CGFloat, placeholder: Color) -> some View {
-        Group {
-            if let img {
-                Image(uiImage: img)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: w, height: h)
-                    .clipped()
-            } else {
-                placeholder.frame(width: w, height: h)
-            }
-        }
-    }
-
-    private func stepBadge(_ text: String, color: Color) -> some View {
-        Text(text)
-            .font(.system(size: 11, design: .monospaced))
-            .foregroundStyle(color)
-            .kerning(2)
-            .padding(6)
-            .background(Theme.Surface.scrim)
-            .padding(8)
-    }
-}
-
-private struct StepRevealShape: Shape {
-    var fraction: CGFloat
-    var animatableData: CGFloat {
-        get { fraction }
-        set { fraction = newValue }
-    }
-    func path(in rect: CGRect) -> Path {
-        Path(CGRect(x: 0, y: 0, width: rect.width * fraction, height: rect.height))
     }
 }

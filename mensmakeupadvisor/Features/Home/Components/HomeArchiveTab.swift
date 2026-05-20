@@ -13,14 +13,14 @@ struct HomeArchiveTab: View {
     @State private var geometry: SavedLookMeshGeometry? = SavedLookMeshGeometry.makeLatest()
 
     private let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 2),
-        GridItem(.flexible(), spacing: 2),
-        GridItem(.flexible(), spacing: 2),
+        GridItem(.flexible(), spacing: 6),
+        GridItem(.flexible(), spacing: 6),
+        GridItem(.flexible(), spacing: 6),
     ]
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground()
             ScrollView { contentStack }
         }
         .sheet(item: $selected) { look in
@@ -29,42 +29,48 @@ struct HomeArchiveTab: View {
                 onApply: { handleApply(look) },
                 onDelete: { handleDelete(look) }
             )
-            .presentationBackground(Color.appBackground)
+            .presentationBackground(Theme.Ambient.backdrop)
         }
         .aid("home_archive_tab")
     }
 
     private var contentStack: some View {
         VStack(alignment: .leading, spacing: 0) {
-            headerSection
-                .padding(.top, 32)
-                .padding(.horizontal, 28)
+            kickerLabel
+                .padding(.top, Theme.Spacing.xxxl)
+                .padding(.horizontal, Theme.Spacing.xxl)
             titleSection
-                .padding(.top, 12)
-                .padding(.horizontal, 28)
-            Rectangle().fill(Color.lineColor).frame(height: 1)
-                .padding(.top, 20)
-                .padding(.horizontal, 28)
+                .padding(.top, Theme.Spacing.md)
+                .padding(.horizontal, Theme.Spacing.xxl)
+            HairlineDivider()
+                .padding(.top, Theme.Spacing.xxl)
+                .padding(.horizontal, Theme.Spacing.xxl)
 
             if savedLooks.isEmpty {
                 emptyState
+                    .padding(.horizontal, Theme.Spacing.xxl)
+                    .padding(.top, Theme.Spacing.xl)
             } else {
-                grid.padding(.top, 16)
+                grid
+                    .padding(.top, Theme.Spacing.xl)
+                    .padding(.horizontal, Theme.Spacing.lg)
             }
         }
-        .padding(.bottom, 80)
+        .padding(.bottom, Theme.Spacing.huge)
     }
 
-    private var headerSection: some View {
-        Text("保存したルック")
-            .font(.system(size: 12))
-            .foregroundStyle(Color.inkSecondary)
+    private var kickerLabel: some View {
+        Text("ARCHIVE")
+            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .kerning(3)
+            .foregroundStyle(Theme.Text.secondaryFaded)
     }
 
     private var titleSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text("マイ・コレクション")
-                .font(.system(size: 28, weight: .bold))
+                .font(.system(size: 32, weight: .bold, design: .serif))
+                .italic()
                 .foregroundStyle(Color.ivory)
 
             Text(savedLooks.isEmpty ? "保存ゼロ件" : "保存 \(savedLooks.count) 件")
@@ -74,42 +80,53 @@ struct HomeArchiveTab: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "heart")
-                .font(.system(size: 36, weight: .light))
-                .foregroundStyle(Color.inkSecondary)
-            Text("まだ保存したルックがありません")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(Color.ivory)
-            Text("「撮影」タブから自分の顔を撮って、\nスタジオで気に入った仕上がりを保存できます。")
-                .font(.system(size: 12))
-                .foregroundStyle(Color.inkSecondary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(5)
+        GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xxl) {
+            VStack(spacing: Theme.Spacing.lg) {
+                Image(systemName: "heart")
+                    .font(.system(size: 40, weight: .ultraLight))
+                    .foregroundStyle(Theme.Text.secondary)
+                Text("まだ保存したルックがありません")
+                    .font(.system(size: 17, weight: .semibold, design: .serif))
+                    .foregroundStyle(Color.ivory)
+                Text("「撮影」タブから自分の顔を撮って、\nスタジオで気に入った仕上がりを保存できます。")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.Text.primaryFaded)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(5)
+            }
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 60)
         .aid("home_archive_empty")
     }
 
     private var grid: some View {
-        LazyVGrid(columns: columns, spacing: 2) {
+        LazyVGrid(columns: columns, spacing: 6) {
             ForEach(savedLooks) { look in
                 gridCell(for: look)
             }
         }
-        .padding(.horizontal, 2)
     }
 
     private func gridCell(for look: SavedLook) -> some View {
-        Button { selected = look } label: {
+        Button {
+            Haptics.soft()
+            selected = look
+        } label: {
             SavedLookMeshThumbnail(look: look, geometry: geometry)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Theme.Radius.sm)
+                        .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                )
                 .overlay(alignment: .bottomTrailing) {
                     if look.totalScore > 0 {
                         Text(grade(for: look.totalScore))
-                            .font(.system(size: 11, weight: .light, design: .serif))
+                            .font(.system(size: 12, weight: .light, design: .serif))
                             .italic()
-                            .foregroundStyle(Theme.Step.labelTag)
+                            .foregroundStyle(Color.ivory)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .glassEffect(.regular, in: .capsule)
                             .padding(6)
                     }
                 }

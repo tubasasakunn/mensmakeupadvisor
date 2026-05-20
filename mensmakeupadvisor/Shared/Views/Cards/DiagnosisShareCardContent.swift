@@ -97,9 +97,4 @@ extension DiagnosisShareCardView {
         }
     }
 
-    var thinLine: some View {
-        Rectangle()
-            .fill(Color.lineColor)
-            .frame(height: 1)
-    }
 }

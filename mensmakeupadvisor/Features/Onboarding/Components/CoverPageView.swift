@@ -29,9 +29,7 @@ struct CoverPageView: View {
                     .padding(.bottom, 24)
             }
 
-            Rectangle()
-                .fill(Color.lineColor)
-                .frame(height: 1)
+            HairlineDivider()
                 .padding(.bottom, 24)
 
             if let body = page.body {

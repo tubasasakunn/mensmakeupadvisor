@@ -34,9 +34,7 @@ struct GoalPageView: View {
                 .padding(.bottom, 16)
             }
 
-            Rectangle()
-                .fill(Color.lineColor)
-                .frame(height: 1)
+            HairlineDivider()
                 .padding(.bottom, 14)
 
             if let body = page.body {

@@ -16,7 +16,7 @@ struct AnalyzingView: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground()
 
             VStack(spacing: 0) {
                 topMeta
@@ -48,15 +48,38 @@ struct AnalyzingView: View {
 
     private var topMeta: some View {
         HStack {
-            Text(errorMessage == nil ? "分析中" : "分析できませんでした")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Color.appBackground)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(errorMessage == nil ? Theme.Plate.renderingTint : Color.brandPrimary)
-                .clipShape(RoundedRectangle(cornerRadius: 2))
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(errorMessage == nil ? Theme.Plate.renderingTint : Color.brandPrimary)
+                    .frame(width: 6, height: 6)
+                Text(errorMessage == nil ? "ANALYZING" : "FAILED")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .kerning(2)
+                    .foregroundStyle(Theme.Text.primaryFaded)
+            }
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, Theme.Spacing.sm)
+            .glassEffect(.regular, in: .capsule)
 
             Spacer()
+
+            // 解析中はキャンセル、エラー時は戻るで撮影画面へ。
+            // 10〜20 秒待たされる処理を「ここから出られない」状態にはしない。
+            if errorMessage == nil {
+                Button {
+                    Haptics.soft()
+                    appState.navigate(to: .capture)
+                } label: {
+                    Text("キャンセル")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Theme.Text.primarySoft)
+                        .padding(.horizontal, Theme.Spacing.md)
+                        .padding(.vertical, Theme.Spacing.sm)
+                        .glassEffect(.clear, in: .capsule)
+                }
+                .accessibilityLabel("分析をキャンセルして撮影画面に戻る")
+                .aid("analyzing_cancel_button")
+            }
         }
     }
 
@@ -111,39 +134,16 @@ struct AnalyzingView: View {
                 }
             }
 
-            VStack(spacing: 10) {
-                Button {
-                    appState.navigate(to: .capture)
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "camera.fill")
-                            .font(.system(size: 14, weight: .semibold))
-                        Text("もう一度撮影する")
-                            .font(.system(size: 15, weight: .semibold))
-                    }
-                    .foregroundStyle(Color.appBackground)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color.ivory)
-                    .clipShape(RoundedRectangle(cornerRadius: 2))
-                }
-                .accessibilityLabel("もう一度撮影する")
-                .aid("analyzing_retry_button")
-
-                Button {
-                    appState.navigate(to: .capture)
-                } label: {
-                    Text("撮影画面に戻る")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Color.inkSecondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 2)
-                                .stroke(Theme.Line.outlineSoft, lineWidth: 1)
-                        )
-                }
-                .aid("analyzing_back_button")
+            // エラー時の動線はひとつだけ: 撮影画面に戻る。
+            // 旧 UI では「もう一度撮影する」と「撮影画面に戻る」が両方 .capture へ
+            // 飛ぶ重複ボタンだったので 1 本化した。
+            GlassPrimaryButton(
+                title: "撮影画面に戻る",
+                icon: "camera.fill",
+                accessibilityID: "analyzing_retry_button"
+            ) {
+                Haptics.soft()
+                appState.navigate(to: .capture)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -167,9 +167,7 @@ struct AnalyzingView: View {
 
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    Rectangle()
-                        .fill(Color.lineColor)
-                        .frame(height: 2)
+                    HairlineDivider(height: 2)
 
                     Rectangle()
                         .fill(Color.brandPrimary)
@@ -220,6 +218,10 @@ struct AnalyzingView: View {
                 appState.capturedImage = cropped
             }
             appState.analysisResult = result
+            // 新規撮影フローを経た Studio の戻る先は診断結果。
+            // Archive 経由のときは applyLook 側で .home を入れているので上書きしない。
+            appState.studioOrigin = .diagnosis
+            Haptics.success()
             appState.navigate(to: .diagnosis)
         } catch {
             showError(

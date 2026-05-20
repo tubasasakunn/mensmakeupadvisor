@@ -6,32 +6,42 @@ struct HomeCreateTab: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground()
 
             VStack(alignment: .leading, spacing: 0) {
-                headerSection
-                    .padding(.top, 32)
+                kickerLabel
+                    .padding(.top, Theme.Spacing.xxxl)
                 titleSection
-                    .padding(.top, 12)
-                dividerLine
-                    .padding(.top, 24)
+                    .padding(.top, Theme.Spacing.md)
+                HairlineDivider()
+                    .padding(.top, Theme.Spacing.xxl)
 
                 Spacer()
 
-                heroBlock
-                    .padding(.vertical, 32)
+                heroCard
+                    .padding(.vertical, Theme.Spacing.xxxl)
 
                 Spacer()
 
-                primaryButton
+                GlassPrimaryButton(
+                    title: "カメラで撮影する",
+                    icon: "camera.fill",
+                    accessibilityID: "home_create_camera_button"
+                ) {
+                    Haptics.medium()
+                    appState.skipTutorialOnNextFlow = true
+                    appState.captureOrigin = .home
+                    appState.navigate(to: .capture)
+                }
+
                 lastPresetHint
-                    .padding(.top, 16)
+                    .padding(.top, Theme.Spacing.lg)
 
                 guideLink
-                    .padding(.top, 20)
+                    .padding(.top, Theme.Spacing.xl)
             }
-            .padding(.horizontal, 28)
-            .padding(.bottom, 60)
+            .padding(.horizontal, Theme.Spacing.xxl)
+            .padding(.bottom, Theme.Spacing.huge)
         }
         .aid("home_create_tab")
     }
@@ -40,9 +50,10 @@ struct HomeCreateTab: View {
     // 控えめに置く。Profile/Settings 画面が無いためここに常設している。
     private var guideLink: some View {
         Button {
+            Haptics.soft()
             appState.navigate(to: .onboarding)
         } label: {
-            HStack(spacing: 6) {
+            HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "book")
                     .font(.system(size: 12, weight: .regular))
                 Text("メイクの基本ガイドを読む")
@@ -50,100 +61,98 @@ struct HomeCreateTab: View {
                 Image(systemName: "chevron.right")
                     .font(.system(size: 10, weight: .semibold))
             }
-            .foregroundStyle(Color.inkSecondary)
+            .foregroundStyle(Theme.Text.primaryFaded)
+            .frame(maxWidth: .infinity)
         }
         .accessibilityLabel("メイクの基本ガイドを最初から読み直す")
         .aid("home_create_guide_link")
     }
 
-    private var headerSection: some View {
-        Text("新しく撮影する")
-            .font(.system(size: 12))
-            .foregroundStyle(Color.inkSecondary)
+    private var kickerLabel: some View {
+        Text("CREATE")
+            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .kerning(3)
+            .foregroundStyle(Theme.Text.secondaryFaded)
     }
 
     private var titleSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("メイクを試す")
-                .font(.system(size: 32, weight: .bold))
+                .font(.system(size: 36, weight: .bold, design: .serif))
+                .italic()
                 .foregroundStyle(Color.ivory)
+            Text("撮って、診て、塗ってみる。")
+                .font(.system(size: 13))
+                .foregroundStyle(Color.inkSecondary)
+                .kerning(0.5)
         }
     }
 
-    private var dividerLine: some View {
-        Rectangle().fill(Color.lineColor).frame(height: 1)
-    }
+    // Liquid Glass の主役カード。3 ステップを上品な hero として見せる。
+    private var heroCard: some View {
+        GlassPanel(radius: Theme.Radius.xl, padding: Theme.Spacing.xl) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("3 STEPS")
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .kerning(2.5)
+                        .foregroundStyle(Theme.Text.secondaryFaded)
+                    Spacer()
+                    Text("≈ 90s")
+                        .font(.system(size: 10, weight: .regular, design: .monospaced))
+                        .kerning(1.5)
+                        .foregroundStyle(Theme.Text.secondaryFaded)
+                }
 
-    private var heroBlock: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Text("3 ステップで完了")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.inkSecondary)
-            Text("自分の顔を撮って、\nメイクを試してみる。")
-                .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(Color.ivory)
-                .lineSpacing(4)
-            HStack(spacing: 6) {
-                heroStep(number: "1", label: "撮影")
-                heroArrow
-                heroStep(number: "2", label: "診断")
-                heroArrow
-                heroStep(number: "3", label: "メイク")
+                Text("自分の顔を撮って、\nメイクを試してみる。")
+                    .font(.system(size: 22, weight: .bold, design: .serif))
+                    .foregroundStyle(Color.ivory)
+                    .lineSpacing(6)
+
+                GlassDivider()
+
+                HStack(spacing: Theme.Spacing.sm) {
+                    heroStep(number: "01", label: "撮影")
+                    heroArrow
+                    heroStep(number: "02", label: "診断")
+                    heroArrow
+                    heroStep(number: "03", label: "メイク")
+                }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func heroStep(number: String, label: String) -> some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 6) {
             Text(number)
-                .font(.system(size: 11, weight: .semibold, design: .serif))
+                .font(.system(size: 16, weight: .light, design: .serif))
                 .italic()
                 .foregroundStyle(Color.brandPrimary)
             Text(label)
                 .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.inkSecondary)
+                .foregroundStyle(Color.ivory)
         }
     }
 
     private var heroArrow: some View {
         Image(systemName: "chevron.right")
-            .font(.system(size: 11, weight: .medium))
-            .foregroundStyle(Color.inkTertiary)
-    }
-
-    private var primaryButton: some View {
-        Button {
-            appState.skipTutorialOnNextFlow = true
-            appState.navigate(to: .capture)
-        } label: {
-            HStack(spacing: 10) {
-                Image(systemName: "camera.fill")
-                    .font(.system(size: 16, weight: .semibold))
-                Text("カメラで撮影する")
-                    .font(.system(size: 16, weight: .semibold))
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
-            }
-            .foregroundStyle(Color.appBackground)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
-            .background(Color.ivory)
-        }
-        .accessibilityLabel("カメラで撮影する")
-        .aid("home_create_camera_button")
+            .font(.system(size: 10, weight: .medium))
+            .foregroundStyle(Theme.Text.secondaryDim)
     }
 
     private var lastPresetHint: some View {
         HStack {
+            Image(systemName: "clock")
+                .font(.system(size: 10))
+                .foregroundStyle(Theme.Text.tertiary)
             if let result = appState.analysisResult {
                 Text("前回の診断: \(result.faceShape.label) · \(result.grade)")
                     .font(.system(size: 11))
-                    .foregroundStyle(Color.inkTertiary)
+                    .foregroundStyle(Theme.Text.tertiary)
             } else {
                 Text("初回の撮影です")
                     .font(.system(size: 11))
-                    .foregroundStyle(Color.inkTertiary)
+                    .foregroundStyle(Theme.Text.tertiary)
             }
             Spacer()
         }

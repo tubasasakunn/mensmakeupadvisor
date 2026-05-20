@@ -7,43 +7,43 @@ struct AdviceView: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground()
 
             VStack(spacing: 0) {
                 navigationBar
-                    .padding(.top, 12)
-                    .padding(.horizontal, 24)
+                    .padding(.top, Theme.Spacing.md)
+                    .padding(.horizontal, Theme.Spacing.xxl)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         chapterLabel
-                            .padding(.top, 24)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.xl)
+                            .padding(.horizontal, Theme.Spacing.xxl)
 
                         titleBlock
-                            .padding(.top, 16)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.lg)
+                            .padding(.horizontal, Theme.Spacing.xxl)
 
-                        dividerLine
-                            .padding(.top, 20)
-                            .padding(.horizontal, 24)
+                        HairlineDivider()
+                            .padding(.top, Theme.Spacing.xl)
+                            .padding(.horizontal, Theme.Spacing.xxl)
 
                         descriptionText
-                            .padding(.top, 16)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.lg)
+                            .padding(.horizontal, Theme.Spacing.xxl)
 
                         AdviceViewfinderArea()
-                            .padding(.top, 28)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.xxl)
+                            .padding(.horizontal, Theme.Spacing.xxl)
 
                         actionButtons
-                            .padding(.top, 24)
-                            .padding(.horizontal, 24)
+                            .padding(.top, Theme.Spacing.xl)
+                            .padding(.horizontal, Theme.Spacing.xxl)
 
                         privacyCaption
-                            .padding(.top, 16)
-                            .padding(.horizontal, 24)
-                            .padding(.bottom, 48)
+                            .padding(.top, Theme.Spacing.lg)
+                            .padding(.horizontal, Theme.Spacing.xxl)
+                            .padding(.bottom, Theme.Spacing.xxxl)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -66,20 +66,38 @@ struct AdviceView: View {
 
     // MARK: - Navigation
 
+    // 戻り先は AppState.captureOrigin に従う。
+    // - 初回 (onboarding 完了直後): .onboarding に戻る
+    // - Home 経由: .home に戻る
+    // ラベルはどちらの場合でも「戻る」で統一し、行き先を読み上げる
+    // accessibilityLabel だけ文脈に応じて切り替える。
+    private var backDestination: AppScreen { appState.captureOrigin }
+    private var backAccessibilityLabel: String {
+        switch backDestination {
+        case .home: "ホームに戻る"
+        case .onboarding: "オンボーディングガイドに戻る"
+        default: "戻る"
+        }
+    }
+
     private var navigationBar: some View {
         HStack {
             Button {
-                appState.navigate(to: .onboarding)
+                Haptics.soft()
+                appState.navigate(to: backDestination)
             } label: {
-                HStack(spacing: 4) {
+                HStack(spacing: 5) {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 12, weight: .semibold))
-                    Text("ガイドに戻る")
-                        .font(.system(size: 13, weight: .regular))
+                        .font(.system(size: 11, weight: .semibold))
+                    Text("戻る")
+                        .font(.system(size: 12, weight: .medium))
                 }
-                .foregroundStyle(Color.inkSecondary)
+                .foregroundStyle(Theme.Text.primarySoft)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, 7)
+                .glassEffect(.clear, in: .capsule)
             }
-            .accessibilityLabel("オンボーディングガイドに戻る")
+            .accessibilityLabel(backAccessibilityLabel)
             .aid("advice_back_button")
 
             Spacer()
@@ -91,102 +109,74 @@ struct AdviceView: View {
     private var chapterLabel: some View {
         Text("CHAPTER 07 · SCAN")
             .font(.system(size: 10, weight: .regular, design: .monospaced))
-            .foregroundStyle(Color.inkSecondary)
-            .kerning(2.5)
+            .foregroundStyle(Theme.Text.secondaryFaded)
+            .kerning(2.8)
     }
 
     private var titleBlock: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("step one.")
-                .font(.system(size: 42, weight: .light, design: .serif))
+                .font(.system(size: 44, weight: .light, design: .serif))
                 .italic()
                 .foregroundStyle(Color.brandPrimary)
 
             Text("まず、あなたの顔を\nちゃんと、知る。")
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(.system(size: 30, weight: .bold, design: .serif))
                 .italic()
                 .foregroundStyle(Color.ivory)
-                .lineSpacing(4)
+                .lineSpacing(6)
         }
-    }
-
-    private var dividerLine: some View {
-        Rectangle()
-            .fill(Color.lineColor)
-            .frame(height: 1)
     }
 
     private var descriptionText: some View {
         Text("顔の比率・骨格・左右対称性を\n7つの指標で分析。あなただけの\nメイクアドバイスを導き出す。")
             .font(.system(size: 13, weight: .regular))
-            .foregroundStyle(Color.inkSecondary)
-            .lineSpacing(6)
+            .foregroundStyle(Theme.Text.primaryFaded)
+            .lineSpacing(7)
     }
 
     // MARK: - Action Buttons
 
     @ViewBuilder
     private var actionButtons: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Theme.Spacing.md) {
             if AppEnvironment.useMockImagePicker {
                 AdviceMockImagePicker { image in
                     viewModel.selectImage(image, appState: appState)
                 }
             } else {
-                primaryButton
+                GlassPrimaryButton(
+                    title: "カメラで撮影する",
+                    icon: "camera.fill",
+                    accessibilityID: "advice_camera_button"
+                ) {
+                    Haptics.medium()
+                    viewModel.showCamera = true
+                }
             }
-            sampleButton
-        }
-    }
-
-    private var primaryButton: some View {
-        Button {
-            viewModel.showCamera = true
-        } label: {
-            HStack(spacing: 8) {
-                Image(systemName: "camera.fill")
-                    .font(.system(size: 14, weight: .semibold))
-                Text("カメラで撮影する")
-                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                    .kerning(0.5)
-                Text("→")
-                    .font(.system(size: 14, weight: .regular, design: .monospaced))
+            GlassSecondaryButton(
+                title: "サンプル画像で試す",
+                icon: "photo",
+                accessibilityID: "advice_sample_button"
+            ) {
+                Haptics.soft()
+                viewModel.useSample(appState: appState)
             }
-            .foregroundStyle(Color.appBackground)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(Color.ivory)
-            .clipShape(RoundedRectangle(cornerRadius: 2))
         }
-        .aid("advice_camera_button")
-    }
-
-    private var sampleButton: some View {
-        Button {
-            viewModel.useSample(appState: appState)
-        } label: {
-            Text("サンプル画像で試す")
-                .font(.system(size: 13, weight: .regular, design: .monospaced))
-                .foregroundStyle(Color.ivory)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(Color.clear)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 2)
-                        .stroke(Theme.Line.outlineIvory, lineWidth: 1)
-                )
-        }
-        .aid("advice_sample_button")
     }
 
     // MARK: - Privacy Caption
 
     private var privacyCaption: some View {
-        Text("— 端末内処理 · アップロードなし · 痕跡なし —")
-            .font(.system(size: 10, weight: .regular, design: .monospaced))
-            .foregroundStyle(Color.inkTertiary)
-            .kerning(1.0)
-            .frame(maxWidth: .infinity, alignment: .center)
+        HStack(spacing: 8) {
+            Image(systemName: "lock.shield")
+                .font(.system(size: 10))
+            Text("端末内処理 · アップロードなし · 痕跡なし")
+                .font(.system(size: 10, weight: .regular, design: .monospaced))
+                .kerning(1.2)
+        }
+        .foregroundStyle(Theme.Text.tertiary)
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 

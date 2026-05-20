@@ -21,7 +21,7 @@ struct TutorialIntensitySlider: View {
                     .foregroundStyle(Color.ivory)
             }
 
-            CustomIntensitySlider(value: $value, range: 0...100)
+            HairlineSlider(value: $value, range: 0...100, style: .tutorial)
                 .accessibilityLabel("\(layer.labelJP)の強さ")
                 .accessibilityValue("\(Int(value))")
                 .aid("tutorial_intensity_slider_\(layer.rawValue)")

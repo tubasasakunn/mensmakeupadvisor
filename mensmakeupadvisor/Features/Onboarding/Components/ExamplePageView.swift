@@ -63,9 +63,6 @@ struct ExampleItemView: View {
         }
         .padding(14)
         .background(Theme.Surface.glassWeakIvory)
-        .overlay(
-            RoundedRectangle(cornerRadius: 6)
-                .stroke(Color.lineColor, lineWidth: 1)
-        )
+        .hairlineBorder(cornerRadius: 6)
     }
 }

@@ -8,50 +8,44 @@ struct StudioBottomBar: View {
     @State private var isRenderingShare = false
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: Theme.Spacing.md) {
             archiveButton
-            shareButton.frame(width: 52)
+            shareButton.frame(width: 56)
         }
     }
 
     private var archiveButton: some View {
-        Button(action: onArchive) {
-            HStack(spacing: 8) {
-                Image(systemName: "heart.fill")
-                    .font(.system(size: 14))
-                Text("このルックを保存")
-                    .font(.system(size: 15, weight: .semibold))
-            }
-            .foregroundStyle(Color.ivory)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .overlay(
-                Rectangle().stroke(Color.lineStrong, lineWidth: 1)
-            )
+        GlassPrimaryButton(
+            title: "このルックを保存",
+            icon: "heart.fill",
+            showsTrailingChevron: false,
+            accessibilityID: "studio_save_button",
+            isProminent: true
+        ) {
+            Haptics.success()
+            onArchive()
         }
-        .accessibilityLabel("このルックを保存")
-        .aid("studio_save_button")
     }
 
     private var shareButton: some View {
         Button {
+            Haptics.soft()
             Task { await shareCurrentLook() }
         } label: {
             Group {
                 if isRenderingShare {
                     ProgressView()
-                        .tint(Color.inkSecondary)
-                        .scaleEffect(0.7)
+                        .tint(Color.ivory)
+                        .scaleEffect(0.8)
                 } else {
                     Image(systemName: "square.and.arrow.up")
                         .font(.system(size: 17, weight: .regular))
                         .foregroundStyle(Color.ivory)
                 }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .overlay(Rectangle().stroke(Color.lineStrong, lineWidth: 1))
+            .frame(width: 56, height: 56)
         }
+        .glassEffect(.regular, in: .circle)
         .accessibilityLabel(isRenderingShare ? "シェア画像を準備中" : "シェアする")
         .aid("studio_share_button")
         .disabled(isRenderingShare)

@@ -9,7 +9,7 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground(intensity: 0.5)
 
             VStack(spacing: 0) {
                 headerBar
@@ -33,7 +33,7 @@ struct OnboardingView: View {
         // 親に付けた identifier を子に継承させない。SwiftUI のデフォルト挙動だと
         // 子の Button の identifier が "onboarding_view" で上書きされる。
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("onboarding_view")
+        .aid("onboarding_view")
     }
 
     // MARK: - Header
@@ -47,7 +47,7 @@ struct OnboardingView: View {
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(1.5)
                 .animation(.none, value: currentPage)
-                .accessibilityIdentifier("onboarding_page_tag")
+                .aid("onboarding_page_tag")
 
             Spacer()
             skipButton
@@ -59,24 +59,22 @@ struct OnboardingView: View {
 
     private var chapterIndexButton: some View {
         Button {
+            Haptics.soft()
             showChapterSheet = true
         } label: {
-            HStack(spacing: 4) {
+            HStack(spacing: 5) {
                 Image(systemName: "list.bullet")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
                 Text("目次")
                     .font(.system(size: 12, weight: .medium))
             }
-            .foregroundStyle(Color.inkSecondary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .overlay(
-                RoundedRectangle(cornerRadius: 2)
-                    .stroke(Theme.Line.outlineSoft, lineWidth: 1)
-            )
+            .foregroundStyle(Theme.Text.primarySoft)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, 7)
+            .glassEffect(.clear, in: .capsule)
         }
         .accessibilityLabel("目次を開く")
-        .accessibilityIdentifier("onboarding_chapter_button")
+        .aid("onboarding_chapter_button")
     }
 
     // Home から再読しているか (analysisResult があれば一度はアプリを使った人)。
@@ -87,21 +85,22 @@ struct OnboardingView: View {
 
     private var skipButton: some View {
         Button {
+            Haptics.soft()
+            if !isRereadFromHome {
+                appState.captureOrigin = .onboarding
+            }
             appState.navigate(to: isRereadFromHome ? .home : .capture)
         } label: {
             Text(isRereadFromHome ? "ホームに戻る" : "読み飛ばす")
                 .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.inkSecondary)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 2)
-                        .stroke(Theme.Line.outlineMedium, lineWidth: 1)
-                )
+                .foregroundStyle(Theme.Text.primarySoft)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, 7)
+                .glassEffect(.clear, in: .capsule)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "読み飛ばして撮影画面へ")
-        .accessibilityIdentifier("onboarding_skip_button")
+        .aid("onboarding_skip_button")
     }
 
     // MARK: - Progress hairline
@@ -109,19 +108,16 @@ struct OnboardingView: View {
     private var progressBar: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
-                Rectangle()
-                    .fill(Color.lineColor)
-                    .frame(height: 1.5)
-                Rectangle()
-                    .fill(Theme.Text.primaryFaded)
-                    .frame(width: geo.size.width * CGFloat(currentPage + 1) / CGFloat(pages.count), height: 1.5)
+                HairlineDivider(height: 1.5)
+                HairlineDivider(color: Theme.Text.primaryFaded, height: 1.5)
+                    .frame(width: geo.size.width * CGFloat(currentPage + 1) / CGFloat(pages.count))
                     .animation(.easeInOut(duration: 0.25), value: currentPage)
             }
         }
         .frame(height: 1.5)
         .padding(.horizontal, 28)
         .padding(.bottom, 6)
-        .accessibilityIdentifier("onboarding_progress_bar")
+        .aid("onboarding_progress_bar")
     }
 
     // MARK: - Folio
@@ -133,40 +129,63 @@ struct OnboardingView: View {
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.Text.secondaryFaded)
                 .accessibilityLabel("\(currentPage + 1) ページ目、全 \(pages.count) ページ中")
-                .accessibilityIdentifier("onboarding_folio_label")
+                .aid("onboarding_folio_label")
         }
         .padding(.horizontal, 28)
         .padding(.bottom, 4)
     }
 
-    // MARK: - Navigation: BEGIN on last page only
+    // MARK: - Navigation: 最終ページは CTA、それ以外はスワイプヒント
 
     private var navigationBar: some View {
-        HStack {
-            Spacer()
+        Group {
             if currentPage == pages.count - 1 {
-                Button {
-                    appState.navigate(to: isRereadFromHome ? .home : .capture)
-                } label: {
-                    HStack(spacing: 8) {
-                        Text(isRereadFromHome ? "ホームに戻る" : "撮影をはじめる")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(Color.ivory)
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(Color.ivory)
+                GlassPrimaryButton(
+                    title: isRereadFromHome ? "ホームに戻る" : "撮影をはじめる",
+                    icon: isRereadFromHome ? "house.fill" : "camera.fill",
+                    accessibilityID: "onboarding_continue_button"
+                ) {
+                    Haptics.medium()
+                    if !isRereadFromHome {
+                        appState.captureOrigin = .onboarding
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 14)
+                    appState.navigate(to: isRereadFromHome ? .home : .capture)
                 }
-                .glassEffect(.regular, in: .capsule)
-                .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "撮影をはじめる")
-                .accessibilityIdentifier("onboarding_continue_button")
+            } else {
+                // 中間ページは「スワイプで進む」を明示。タップでも次ページに送る。
+                // 旧 UI ではスワイプ可能性が伝わらず、止まるユーザーがいた。
+                HStack {
+                    Spacer()
+                    Button {
+                        Haptics.selection()
+                        withAnimation(Theme.Motion.smooth) {
+                            currentPage = min(currentPage + 1, pages.count - 1)
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Text("SWIPE")
+                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .kerning(2.5)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 11, weight: .semibold))
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 11, weight: .semibold))
+                                .opacity(0.5)
+                        }
+                        .foregroundStyle(Theme.Text.primaryFaded)
+                        .padding(.horizontal, Theme.Spacing.lg)
+                        .padding(.vertical, Theme.Spacing.sm)
+                        .glassEffect(.clear, in: .capsule)
+                    }
+                    .accessibilityLabel("次のページへ")
+                    .aid("onboarding_next_hint")
+                    Spacer()
+                }
             }
         }
         .frame(height: 60)
-        .padding(.horizontal, 28)
-        .padding(.bottom, 32)
+        .padding(.horizontal, Theme.Spacing.xxl)
+        .padding(.bottom, Theme.Spacing.xxxl)
     }
 }
 

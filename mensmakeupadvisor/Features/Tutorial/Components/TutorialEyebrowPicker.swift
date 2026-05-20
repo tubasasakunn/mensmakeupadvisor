@@ -39,22 +39,31 @@ struct TutorialEyebrowPicker: View {
         let aidValue = entry.value?.rawValue ?? "off"
 
         return Button {
-            withAnimation(.easeInOut(duration: 0.15)) { eyebrowType = entry.value }
+            withAnimation(Theme.Motion.quick) { eyebrowType = entry.value }
         } label: {
             VStack(spacing: 2) {
                 Text(entry.label)
                     .font(.system(size: 12, weight: .medium))
                 if isRecommended {
                     Text("★ おすすめ")
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: 10, weight: .medium))
                 }
             }
             .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, Theme.Spacing.sm)
             .frame(maxWidth: .infinity)
-            .background(isActive ? Color.ivory : Color.clear)
-            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+            .background(
+                Capsule()
+                    .fill(isActive ? Color.ivory : Color.clear)
+            )
+            .overlay(
+                Capsule()
+                    .stroke(
+                        isActive ? Color.clear : Theme.Line.outlineIvorySoft,
+                        lineWidth: 0.5
+                    )
+            )
         }
         .accessibilityLabel("眉のかたち\(entry.label)" + (isRecommended ? "、おすすめ" : "") + (isActive ? "、選択中" : ""))
         .aid("tutorial_brow_type_\(aidValue)")

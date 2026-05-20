@@ -61,9 +61,7 @@ struct DiagnosisHeroSection: View {
                         .foregroundStyle(Color.inkSecondary)
                 }
 
-                Rectangle()
-                    .fill(Color.lineColor)
-                    .frame(height: 1)
+                HairlineDivider()
 
                 Text(result.faceShape.note)
                     .font(.system(size: 11, weight: .regular))

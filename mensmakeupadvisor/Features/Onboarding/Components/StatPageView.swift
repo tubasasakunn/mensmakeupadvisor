@@ -30,9 +30,7 @@ struct StatPageView: View {
                     .padding(.bottom, 26)
             }
 
-            Rectangle()
-                .fill(Color.lineColor)
-                .frame(height: 1)
+            HairlineDivider()
                 .padding(.bottom, 21)
 
             if let body = page.body {

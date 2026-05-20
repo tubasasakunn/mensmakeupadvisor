@@ -30,11 +30,11 @@ struct DiagnosisShareCardView: View {
                     faceShapeBlock
                         .padding(.top, 10)
 
-                    thinLine.padding(.top, 18)
+                    HairlineDivider().padding(.top, 18)
 
                     topScoresList.padding(.top, 12)
 
-                    thinLine.padding(.top, 12)
+                    HairlineDivider().padding(.top, 12)
 
                     Spacer(minLength: 10)
 

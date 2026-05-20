@@ -5,9 +5,7 @@ struct DuoPageView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Rectangle()
-                .fill(Color.lineColor)
-                .frame(height: 1)
+            HairlineDivider()
                 .padding(.bottom, 20)
 
             HStack(alignment: .top, spacing: 16) {
@@ -18,9 +16,7 @@ struct DuoPageView: View {
                     accentColor: Color.ivory
                 )
 
-                Rectangle()
-                    .fill(Color.lineColor)
-                    .frame(width: 1)
+                HairlineVDivider()
                     .frame(maxHeight: .infinity)
 
                 DuoColumn(
@@ -54,9 +50,7 @@ struct DuoColumn: View {
                 .kerning(0.5)
                 .lineSpacing(3)
 
-            Rectangle()
-                .fill(accentColor.opacity(0.3))
-                .frame(height: 1)
+            HairlineDivider(color: accentColor.opacity(0.3))
 
             Text(desc)
                 .font(.system(size: 12))

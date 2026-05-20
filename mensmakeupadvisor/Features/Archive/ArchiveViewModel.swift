@@ -20,6 +20,9 @@ final class ArchiveViewModel {
             eye: Float(look.eye / 100)
         )
         appState.activePresetID = look.presetID
+        // Archive 経由で Studio を開いた場合、戻る先は Home (Archive タブ) にする。
+        // デフォルトの .diagnosis にすると「診断結果がない/別物」に戻ってしまい混乱する。
+        appState.studioOrigin = .home
         appState.navigate(to: .studio)
     }
 }

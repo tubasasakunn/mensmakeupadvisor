@@ -11,16 +11,20 @@ struct SavedLookDetailSheet: View {
 
     var body: some View {
         ZStack {
-            Color.appBackground.ignoresSafeArea()
+            LuxeBackground(intensity: 0.4)
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
                     headerRow
                     thumbnail
-                    appliedZoneList
-                    intensityRows
+                    GlassCard(radius: Theme.Radius.lg, padding: Theme.Spacing.lg) {
+                        appliedZoneList
+                    }
+                    GlassCard(radius: Theme.Radius.lg, padding: Theme.Spacing.lg) {
+                        intensityRows
+                    }
                     actionRow
                 }
-                .padding(24)
+                .padding(Theme.Spacing.xl)
             }
         }
         .confirmationDialog(
@@ -29,6 +33,7 @@ struct SavedLookDetailSheet: View {
             titleVisibility: .visible
         ) {
             Button("削除する", role: .destructive) {
+                Haptics.warning()
                 onDelete()
             }
             Button("キャンセル", role: .cancel) {}
@@ -56,7 +61,11 @@ struct SavedLookDetailSheet: View {
         SavedLookMeshThumbnail(look: look, geometry: SavedLookMeshGeometry.makeLatest())
             .frame(maxWidth: 320)
             .frame(maxWidth: .infinity)
-            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
+                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+            )
     }
 
     private var appliedZoneList: some View {
@@ -106,38 +115,23 @@ struct SavedLookDetailSheet: View {
     }
 
     private var actionRow: some View {
-        HStack(spacing: 12) {
-            Button(role: .destructive) {
+        HStack(spacing: Theme.Spacing.md) {
+            GlassSecondaryButton(
+                title: "削除",
+                icon: "trash",
+                accessibilityID: "home_archive_detail_delete"
+            ) {
+                Haptics.warning()
                 showDeleteConfirmation = true
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "trash")
-                        .font(.system(size: 12, weight: .medium))
-                    Text("削除")
-                        .font(.system(size: 13, weight: .medium))
-                }
-                .foregroundStyle(Color.inkSecondary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .overlay(Rectangle().stroke(Theme.Line.outlineSoft, lineWidth: 1))
             }
-            .accessibilityLabel("このルックを削除")
-            .aid("home_archive_detail_delete")
 
-            Button(action: onApply) {
-                HStack(spacing: 6) {
-                    Text("このルックを編集")
-                        .font(.system(size: 14, weight: .semibold))
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
-                }
-                .foregroundStyle(Color.appBackground)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(Color.ivory)
+            GlassPrimaryButton(
+                title: "このルックを編集",
+                accessibilityID: "home_archive_detail_apply"
+            ) {
+                Haptics.medium()
+                onApply()
             }
-            .accessibilityLabel("このルックをスタジオで編集")
-            .aid("home_archive_detail_apply")
         }
     }
 }
