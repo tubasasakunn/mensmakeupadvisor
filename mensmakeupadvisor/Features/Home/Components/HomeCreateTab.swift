@@ -34,21 +34,15 @@ struct HomeCreateTab: View {
     }
 
     private var headerSection: some View {
-        Text("CREATE · NEW LOOK")
-            .font(.system(size: 10, weight: .regular, design: .monospaced))
+        Text("新しく撮影する")
+            .font(.system(size: 12))
             .foregroundStyle(Color.inkSecondary)
-            .kerning(2.5)
     }
 
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("compose.")
-                .font(.system(size: 38, weight: .light, design: .serif))
-                .italic()
-                .foregroundStyle(Color.brandPrimary)
-            Text("新しいルック.")
-                .font(.system(size: 32, weight: .bold, design: .serif))
-                .italic()
+            Text("メイクを試す")
+                .font(.system(size: 32, weight: .bold))
                 .foregroundStyle(Color.ivory)
         }
     }
@@ -59,59 +53,74 @@ struct HomeCreateTab: View {
 
     private var heroBlock: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("01 · 撮影")
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
+            Text("3 ステップで完了")
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
-            Text("自分の顔を撮る。\n顔の比率から、\nメイクを設計する。")
-                .font(.system(size: 22, weight: .bold, design: .serif))
-                .italic()
+            Text("自分の顔を撮って、\nメイクを試してみる。")
+                .font(.system(size: 22, weight: .bold))
                 .foregroundStyle(Color.ivory)
                 .lineSpacing(4)
-            Text("· 撮影 → 7 指標で評価 → スタジオで調整 ·")
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
-                .foregroundStyle(Color.inkTertiary)
-                .kerning(1.5)
+            HStack(spacing: 6) {
+                heroStep(number: "1", label: "撮影")
+                heroArrow
+                heroStep(number: "2", label: "診断")
+                heroArrow
+                heroStep(number: "3", label: "メイク")
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    private func heroStep(number: String, label: String) -> some View {
+        HStack(spacing: 4) {
+            Text(number)
+                .font(.system(size: 11, weight: .semibold, design: .serif))
+                .italic()
+                .foregroundStyle(Color.brandPrimary)
+            Text(label)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(Color.inkSecondary)
+        }
+    }
+
+    private var heroArrow: some View {
+        Image(systemName: "chevron.right")
+            .font(.system(size: 9, weight: .medium))
+            .foregroundStyle(Color.inkTertiary)
+    }
+
     private var primaryButton: some View {
         Button {
-            // ホーム→Create では Tutorial をスキップして直接スタジオまで進む。
-            // (Tutorial フラグは AnalyzingView 後のナビ分岐に使う)
             appState.skipTutorialOnNextFlow = true
             appState.navigate(to: .capture)
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "camera.fill")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
                 Text("カメラで撮影する")
-                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                    .kerning(0.5)
-                Text("→")
-                    .font(.system(size: 14, design: .monospaced))
+                    .font(.system(size: 16, weight: .semibold))
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
             }
             .foregroundStyle(Color.appBackground)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
             .background(Color.ivory)
         }
+        .accessibilityLabel("カメラで撮影する")
         .aid("home_create_camera_button")
     }
 
     private var lastPresetHint: some View {
         HStack {
             if let result = appState.analysisResult {
-                Text("前回: \(result.faceShape.label) · \(result.grade)")
-                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                Text("前回の診断: \(result.faceShape.label) · \(result.grade)")
+                    .font(.system(size: 11))
                     .foregroundStyle(Color.inkTertiary)
-                    .kerning(1)
             } else {
-                Text("はじめての撮影")
-                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                Text("初回の撮影です")
+                    .font(.system(size: 11))
                     .foregroundStyle(Color.inkTertiary)
-                    .kerning(1)
             }
             Spacer()
         }

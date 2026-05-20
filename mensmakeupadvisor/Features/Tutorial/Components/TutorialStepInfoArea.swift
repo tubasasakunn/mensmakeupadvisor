@@ -20,14 +20,12 @@ struct TutorialStepInfoArea: View {
 
     private var headerBlock: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("ACT \(currentStep.tag) · \(currentStep.layer.labelJP.uppercased())")
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
+            Text("ステップ \(currentStep.tagNumeric) · \(currentStep.layer.labelJP)")
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
 
-            Text("\(currentStep.titleJP).")
-                .font(.system(size: 24, weight: .bold, design: .serif))
-                .italic()
+            Text(currentStep.titleJP)
+                .font(.system(size: 24, weight: .bold))
                 .foregroundStyle(Color.ivory)
                 .fixedSize(horizontal: false, vertical: true)
         }

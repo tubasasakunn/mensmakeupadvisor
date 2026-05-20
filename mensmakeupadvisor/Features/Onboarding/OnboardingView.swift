@@ -54,25 +54,18 @@ struct OnboardingView: View {
         Button {
             appState.navigate(to: .capture)
         } label: {
-            HStack(spacing: 4) {
-                Text("SKIP")
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
-                    .kerning(1.5)
-                Text("→")
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
-            }
-            .foregroundStyle(Color.inkSecondary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .overlay(
-                RoundedRectangle(cornerRadius: 2)
-                    .stroke(Color.inkSecondary.opacity(0.4), lineWidth: 1)
-            )
+            Text("読み飛ばす")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(Color.inkSecondary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 2)
+                        .stroke(Color.inkSecondary.opacity(0.4), lineWidth: 1)
+                )
         }
-        // 子要素の Text を1つのアクセシビリティ要素に束ね、Maestro 等から identifier で
-        // 確実にヒットさせる。
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Skip onboarding")
+        .accessibilityLabel("読み飛ばして撮影画面へ")
         .accessibilityIdentifier("onboarding_skip_button")
     }
 
@@ -101,10 +94,10 @@ struct OnboardingView: View {
     private var folioBar: some View {
         HStack {
             Spacer()
-            Text("p. \(String(format: "%03d", currentPage + 1)) of \(String(format: "%03d", pages.count))")
-                .font(.system(size: 9, design: .monospaced))
-                .foregroundStyle(Color.inkSecondary.opacity(0.6))
-                .kerning(1)
+            Text("\(currentPage + 1) / \(pages.count) ページ")
+                .font(.system(size: 11))
+                .foregroundStyle(Color.inkSecondary.opacity(0.7))
+                .accessibilityLabel("\(currentPage + 1) ページ目、全 \(pages.count) ページ中")
                 .accessibilityIdentifier("onboarding_folio_label")
         }
         .padding(.horizontal, 28)
@@ -120,19 +113,19 @@ struct OnboardingView: View {
                 Button {
                     appState.navigate(to: .capture)
                 } label: {
-                    HStack(spacing: 6) {
-                        Text("BEGIN")
-                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                            .kerning(1.5)
+                    HStack(spacing: 8) {
+                        Text("撮影をはじめる")
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(Color.ivory)
-                        Text("→")
-                            .font(.system(size: 12, weight: .semibold))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(Color.ivory)
                     }
                     .padding(.horizontal, 24)
-                    .padding(.vertical, 13)
+                    .padding(.vertical, 14)
                 }
                 .glassEffect(.regular, in: .capsule)
+                .accessibilityLabel("撮影をはじめる")
                 .accessibilityIdentifier("onboarding_continue_button")
             }
         }

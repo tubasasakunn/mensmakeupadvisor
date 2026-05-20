@@ -7,20 +7,19 @@ struct TutorialEyebrowPicker: View {
     let recommended: String?
 
     private let options: [(label: String, value: EyebrowApplier.BrowType?)] = [
-        ("OFF", nil),
-        ("NATURAL", .natural),
-        ("STRAIGHT", .straight),
-        ("ARCH", .arch),
-        ("PARALLEL", .parallel),
-        ("CORNER", .corner),
+        ("なし", nil),
+        ("ナチュラル", .natural),
+        ("ストレート", .straight),
+        ("アーチ", .arch),
+        ("平行", .parallel),
+        ("角度あり", .corner),
     ]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("BROW TYPE")
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
-                .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
+            Text("眉のかたち")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color.ivory)
 
             VStack(spacing: 6) {
                 HStack(spacing: 6) {
@@ -44,21 +43,20 @@ struct TutorialEyebrowPicker: View {
         } label: {
             VStack(spacing: 2) {
                 Text(entry.label)
-                    .font(.system(size: 9, weight: .medium, design: .monospaced))
-                    .kerning(1.2)
+                    .font(.system(size: 12, weight: .medium))
                 if isRecommended {
                     Text("★ おすすめ")
-                        .font(.system(size: 7, weight: .medium, design: .monospaced))
-                        .kerning(0.5)
+                        .font(.system(size: 9, weight: .medium))
                 }
             }
             .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
             .padding(.horizontal, 10)
-            .padding(.vertical, 6)
+            .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
             .background(isActive ? Color.ivory : Color.clear)
             .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
         }
+        .accessibilityLabel("眉のかたち\(entry.label)" + (isRecommended ? "、おすすめ" : "") + (isActive ? "、選択中" : ""))
         .aid("tutorial_brow_type_\(aidValue)")
     }
 }

@@ -71,15 +71,15 @@ struct AdviceView: View {
             Button {
                 appState.navigate(to: .onboarding)
             } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "arrow.left")
-                        .font(.system(size: 11, weight: .regular, design: .monospaced))
-                    Text("BACK")
-                        .font(.system(size: 11, weight: .regular, design: .monospaced))
-                        .kerning(1.5)
+                HStack(spacing: 4) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text("ガイドに戻る")
+                        .font(.system(size: 13, weight: .regular))
                 }
                 .foregroundStyle(Color.inkSecondary)
             }
+            .accessibilityLabel("オンボーディングガイドに戻る")
             .aid("advice_back_button")
 
             Spacer()

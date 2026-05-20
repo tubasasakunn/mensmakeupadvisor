@@ -28,22 +28,15 @@ struct HomeReportTab: View {
     }
 
     private var headerSection: some View {
-        Text("YOUR FACE · REPORT")
-            .font(.system(size: 10, weight: .regular, design: .monospaced))
+        Text("あなたの顔の診断結果")
+            .font(.system(size: 12))
             .foregroundStyle(Color.inkSecondary)
-            .kerning(2.5)
     }
 
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("your face.")
-                .font(.system(size: 38, weight: .light, design: .serif))
-                .italic()
-                .foregroundStyle(Color.brandPrimary)
-
-            Text("評価レポート.")
-                .font(.system(size: 32, weight: .bold, design: .serif))
-                .italic()
+            Text("診断レポート")
+                .font(.system(size: 32, weight: .bold))
                 .foregroundStyle(Color.ivory)
         }
     }
@@ -96,25 +89,22 @@ struct HomeReportTab: View {
 
     private func scorePreviewList(result: AnalysisResult) -> some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("7 CRITERIA")
-                .font(.system(size: 9, weight: .regular, design: .monospaced))
+            Text("7 つの評価指標")
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2.5)
 
             VStack(spacing: 8) {
                 ForEach(Array(result.scores.enumerated()), id: \.element.id) { _, score in
                     HStack {
                         Text(score.name)
-                            .font(.system(size: 12, weight: .medium, design: .serif))
-                            .italic()
+                            .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(Color.ivory)
                         Spacer()
                         Text(score.grade)
-                            .font(.system(size: 14, weight: .light, design: .serif))
-                            .italic()
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(score.gradeColor)
-                        Text("\(score.score)pt")
-                            .font(.system(size: 10, design: .monospaced))
+                        Text("\(score.score)点")
+                            .font(.system(size: 11))
                             .foregroundStyle(Color.inkSecondary)
                             .frame(width: 44, alignment: .trailing)
                     }
@@ -129,16 +119,19 @@ struct HomeReportTab: View {
     private var actionButtons: some View {
         VStack(spacing: 12) {
             Button {
-                // 通常の閲覧導線。Create フラグが残ってる場合は明示的に外す。
                 appState.skipTutorialOnNextFlow = false
                 appState.navigate(to: .diagnosis)
             } label: {
-                Text("詳細レポートを開く →")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.ivory)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .overlay(Rectangle().stroke(Color.ivory.opacity(0.35), lineWidth: 1))
+                HStack(spacing: 6) {
+                    Text("詳しいレポートを見る")
+                        .font(.system(size: 14, weight: .semibold))
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                }
+                .foregroundStyle(Color.ivory)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .overlay(Rectangle().stroke(Color.ivory.opacity(0.35), lineWidth: 1))
             }
             .aid("home_report_open_button")
 
@@ -148,8 +141,8 @@ struct HomeReportTab: View {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: 13, weight: .semibold))
-                    Text("再評価する")
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                    Text("もう一度撮影して評価する")
+                        .font(.system(size: 14, weight: .semibold))
                 }
                 .foregroundStyle(Color.appBackground)
                 .frame(maxWidth: .infinity)
@@ -162,26 +155,31 @@ struct HomeReportTab: View {
 
     private var emptyState: some View {
         VStack(spacing: 16) {
-            Text("⊕")
-                .font(.system(size: 32))
+            Image(systemName: "face.dashed")
+                .font(.system(size: 36, weight: .light))
                 .foregroundStyle(Color.inkSecondary)
-            Text("まだ、評価結果はありません")
-                .font(.system(size: 14, weight: .light, design: .serif))
-                .italic()
+            Text("まだ診断結果はありません")
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Color.ivory)
-            Text("最初の顔評価から始めましょう。")
-                .font(.system(size: 11))
+            Text("顔写真を撮ると、ここに 7 つの指標で\nスコアが表示されます。")
+                .font(.system(size: 12))
                 .foregroundStyle(Color.inkSecondary)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
 
             Button {
                 appState.navigate(to: .capture)
             } label: {
-                Text("評価を始める →")
-                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(Color.appBackground)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 14)
-                    .background(Color.ivory)
+                HStack(spacing: 8) {
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                    Text("撮影をはじめる")
+                        .font(.system(size: 14, weight: .semibold))
+                }
+                .foregroundStyle(Color.appBackground)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 14)
+                .background(Color.ivory)
             }
             .padding(.top, 12)
             .aid("home_report_start_button")
