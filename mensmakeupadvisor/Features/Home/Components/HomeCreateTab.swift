@@ -26,11 +26,34 @@ struct HomeCreateTab: View {
                 primaryButton
                 lastPresetHint
                     .padding(.top, 16)
+
+                guideLink
+                    .padding(.top, 20)
             }
             .padding(.horizontal, 28)
             .padding(.bottom, 60)
         }
         .aid("home_create_tab")
+    }
+
+    // Onboarding は通常 1 回しか通らないので、いつでもガイドに戻れる入口を
+    // 控えめに置く。Profile/Settings 画面が無いためここに常設している。
+    private var guideLink: some View {
+        Button {
+            appState.navigate(to: .onboarding)
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "book")
+                    .font(.system(size: 12, weight: .regular))
+                Text("メイクの基本ガイドを読む")
+                    .font(.system(size: 12, weight: .medium))
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .semibold))
+            }
+            .foregroundStyle(Color.inkSecondary)
+        }
+        .accessibilityLabel("メイクの基本ガイドを最初から読み直す")
+        .aid("home_create_guide_link")
     }
 
     private var headerSection: some View {

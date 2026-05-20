@@ -3,6 +3,7 @@ import SwiftUI
 struct OnboardingView: View {
     @Environment(AppState.self) private var appState
     @State private var currentPage = 0
+    @State private var showChapterSheet = false
 
     private let pages = OnboardingPage.all
 
@@ -26,6 +27,9 @@ struct OnboardingView: View {
                 navigationBar
             }
         }
+        .sheet(isPresented: $showChapterSheet) {
+            OnboardingChapterSheet(currentPage: $currentPage)
+        }
         // 親に付けた identifier を子に継承させない。SwiftUI のデフォルト挙動だと
         // 子の Button の identifier が "onboarding_view" で上書きされる。
         .accessibilityElement(children: .contain)
@@ -35,13 +39,16 @@ struct OnboardingView: View {
     // MARK: - Header
 
     private var headerBar: some View {
-        HStack {
+        HStack(spacing: 10) {
+            chapterIndexButton
+
             Text(pages[currentPage].tag)
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(1.5)
                 .animation(.none, value: currentPage)
                 .accessibilityIdentifier("onboarding_page_tag")
+
             Spacer()
             skipButton
         }
@@ -50,11 +57,39 @@ struct OnboardingView: View {
         .padding(.bottom, 10)
     }
 
+    private var chapterIndexButton: some View {
+        Button {
+            showChapterSheet = true
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "list.bullet")
+                    .font(.system(size: 12, weight: .medium))
+                Text("目次")
+                    .font(.system(size: 12, weight: .medium))
+            }
+            .foregroundStyle(Color.inkSecondary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .overlay(
+                RoundedRectangle(cornerRadius: 2)
+                    .stroke(Color.inkSecondary.opacity(0.35), lineWidth: 1)
+            )
+        }
+        .accessibilityLabel("目次を開く")
+        .accessibilityIdentifier("onboarding_chapter_button")
+    }
+
+    // Home から再読しているか (analysisResult があれば一度はアプリを使った人)。
+    // 初回フローでは「読み飛ばす → 撮影画面」、再読では「ホームに戻る」にする。
+    private var isRereadFromHome: Bool {
+        appState.analysisResult != nil
+    }
+
     private var skipButton: some View {
         Button {
-            appState.navigate(to: .capture)
+            appState.navigate(to: isRereadFromHome ? .home : .capture)
         } label: {
-            Text("読み飛ばす")
+            Text(isRereadFromHome ? "ホームに戻る" : "読み飛ばす")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.inkSecondary)
                 .padding(.horizontal, 12)
@@ -65,7 +100,7 @@ struct OnboardingView: View {
                 )
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("読み飛ばして撮影画面へ")
+        .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "読み飛ばして撮影画面へ")
         .accessibilityIdentifier("onboarding_skip_button")
     }
 
@@ -111,10 +146,10 @@ struct OnboardingView: View {
             Spacer()
             if currentPage == pages.count - 1 {
                 Button {
-                    appState.navigate(to: .capture)
+                    appState.navigate(to: isRereadFromHome ? .home : .capture)
                 } label: {
                     HStack(spacing: 8) {
-                        Text("撮影をはじめる")
+                        Text(isRereadFromHome ? "ホームに戻る" : "撮影をはじめる")
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(Color.ivory)
                         Image(systemName: "chevron.right")
@@ -125,7 +160,7 @@ struct OnboardingView: View {
                     .padding(.vertical, 14)
                 }
                 .glassEffect(.regular, in: .capsule)
-                .accessibilityLabel("撮影をはじめる")
+                .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "撮影をはじめる")
                 .accessibilityIdentifier("onboarding_continue_button")
             }
         }
