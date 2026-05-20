@@ -63,7 +63,7 @@ struct GoalPageView: View {
             Spacer()
         }
         .padding(.vertical, 16)
-        .background(Color.white.opacity(0.04))
+        .background(Theme.Surface.glassWeak)
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 
@@ -73,7 +73,7 @@ struct GoalPageView: View {
                 .font(.system(size: 26))
                 .foregroundStyle(Color.brandPrimary.opacity(0.85))
                 .frame(width: 56, height: 56)
-                .background(Color.white.opacity(0.06))
+                .background(Theme.Surface.glassWeak)
                 .clipShape(Circle())
 
             Text(label)

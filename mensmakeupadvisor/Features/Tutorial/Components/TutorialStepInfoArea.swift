@@ -43,7 +43,7 @@ struct TutorialStepInfoArea: View {
         Text(currentStep.oneLiner)
             .font(.system(size: 13, weight: .semibold, design: .serif))
             .italic()
-            .foregroundStyle(Color.ivory.opacity(0.92))
+            .foregroundStyle(Theme.Text.primarySoft)
             .lineSpacing(4)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.bottom, 12)

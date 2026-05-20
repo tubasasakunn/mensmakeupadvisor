@@ -160,7 +160,7 @@ struct TutorialView: View {
         case .highlight: return Color.ivory
         case .shadow:    return Color.brandPrimary
         case .eye:       return Color.sulphur
-        case .eyebrow:   return Color(red: 0.55, green: 0.35, blue: 0.20)
+        case .eyebrow:   return Theme.Accent.eyebrow
         }
     }
 

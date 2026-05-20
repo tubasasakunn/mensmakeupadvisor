@@ -96,7 +96,7 @@ struct StudioImagePlate: View {
             .foregroundStyle(Color.appBackground)
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(Color.ivory.opacity(0.92))
+            .background(Theme.Surface.toastBackground)
             .clipShape(Capsule())
             .padding(.top, 12)
             Spacer()
@@ -137,7 +137,7 @@ struct StudioImagePlate: View {
                         .foregroundStyle(Color.ivory.opacity(0.9))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color.appBackground.opacity(0.6))
+                        .background(Theme.Surface.labelBackdrop)
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)
                     Spacer()
@@ -153,7 +153,7 @@ struct StudioImagePlate: View {
                         .foregroundStyle(Color.ivory.opacity(0.9))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color.appBackground.opacity(0.6))
+                        .background(Theme.Surface.labelBackdrop)
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)
                 }
@@ -196,7 +196,7 @@ struct StudioImagePlate: View {
                     .clipped()
             } else {
                 ZStack {
-                    Color(white: 0.10)
+                    Theme.Surface.raised
                     VStack(spacing: 8) {
                         Ellipse()
                             .stroke(Color.ivory.opacity(0.25), lineWidth: 1)
@@ -228,7 +228,7 @@ struct StudioImagePlate: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
-                .background(Color.appBackground.opacity(0.6))
+                .background(Theme.Surface.labelBackdrop)
                 Spacer()
             }
             Spacer()
@@ -237,7 +237,7 @@ struct StudioImagePlate: View {
     }
 
     private func placeholderHalf(width: CGFloat, height: CGFloat) -> some View {
-        Color(white: 0.06).frame(width: width, height: height)
+        Theme.Surface.sunken.frame(width: width, height: height)
     }
 
     private func scoreChip(result: AnalysisResult) -> some View {
@@ -251,7 +251,7 @@ struct StudioImagePlate: View {
         .foregroundStyle(Color.ivory)
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
-        .background(Color.appBackground.opacity(0.7))
+        .background(Theme.Surface.labelBackdrop)
         .overlay(
             Rectangle().stroke(Color.lineColor, lineWidth: 1)
         )

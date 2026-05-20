@@ -20,7 +20,7 @@ struct StudioSavedToast: View {
                 }
                 Text("ホームの「保存」タブからいつでも開けます。")
                     .font(.system(size: 12))
-                    .foregroundStyle(Color.appBackground.opacity(0.7))
+                    .foregroundStyle(Theme.Text.onAccentSoft)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 HStack(spacing: 10) {
                     Button(action: onKeepEditing) {
@@ -30,7 +30,7 @@ struct StudioSavedToast: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
                             .overlay(
-                                Rectangle().stroke(Color.appBackground.opacity(0.35), lineWidth: 1)
+                                Rectangle().stroke(Theme.Line.onAccentSubtle, lineWidth: 1)
                             )
                     }
                     .accessibilityLabel("編集を続ける")

@@ -174,7 +174,7 @@ struct StepBeforeAfterSlider: View {
             .foregroundStyle(color)
             .kerning(2)
             .padding(6)
-            .background(Color.black.opacity(0.5))
+            .background(Theme.Surface.scrim)
             .padding(8)
     }
 }

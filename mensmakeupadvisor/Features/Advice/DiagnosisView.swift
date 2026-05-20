@@ -159,7 +159,7 @@ struct DiagnosisView: View {
                     }
                     Text(isSkipFlow ? "すぐにプリセットや細かい調整ができます" : "5ステップのガイドに沿って進めます")
                         .font(.system(size: 11, weight: .regular))
-                        .foregroundStyle(Color.appBackground.opacity(0.65))
+                        .foregroundStyle(Theme.Text.onAccentSoft)
                 }
                 .foregroundStyle(Color.appBackground)
                 .frame(maxWidth: .infinity)

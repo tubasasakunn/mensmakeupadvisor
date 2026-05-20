@@ -62,7 +62,7 @@ struct TutorialFacePlate: View {
     @ViewBuilder
     private func placeholderFace(width: CGFloat, height: CGFloat) -> some View {
         ZStack {
-            Color(white: 0.10)
+            Theme.Surface.raised
 
             Ellipse()
                 .stroke(Color.ivory.opacity(0.25), lineWidth: 1)

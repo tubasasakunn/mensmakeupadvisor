@@ -12,7 +12,7 @@ struct AnalyzingScanArea: View {
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .overlay(
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.appBackground.opacity(0.5))
+                        .fill(Theme.Surface.imageDim)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 4)
@@ -50,7 +50,7 @@ struct AnalyzingScanArea: View {
                 .contrast(0.9)
         } else {
             Rectangle()
-                .fill(Color.white.opacity(0.04))
+                .fill(Theme.Surface.glassWeak)
         }
     }
 

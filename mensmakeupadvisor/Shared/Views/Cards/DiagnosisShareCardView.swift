@@ -78,7 +78,7 @@ struct DiagnosisShareCardView: View {
                         .scaledToFill()
                 } else {
                     Rectangle()
-                        .fill(Color.white.opacity(0.04))
+                        .fill(Theme.Surface.glassWeak)
                 }
             }
             .frame(width: 320, height: 200)

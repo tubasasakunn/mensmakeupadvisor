@@ -42,9 +42,9 @@ struct DiagnosisProportionPlate: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: size.width, height: size.height)
-                    .overlay(Color.appBackground.opacity(0.65))
+                    .overlay(Theme.Surface.imageDimStrong)
             } else {
-                Rectangle().fill(Color.white.opacity(0.08))
+                Rectangle().fill(Theme.Surface.glassMedium)
             }
 
             if let landmarks = result?.landmarksNormalized, landmarks.count >= 478 {

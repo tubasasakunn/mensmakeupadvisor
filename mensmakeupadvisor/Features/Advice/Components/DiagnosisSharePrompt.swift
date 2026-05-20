@@ -46,7 +46,7 @@ struct DiagnosisSharePrompt: View {
 
     private var miniCardPreview: some View {
         ZStack {
-            Color(white: 0.11)
+            Theme.Surface.raised
 
             VStack(spacing: 0) {
                 Text("M·M·A")

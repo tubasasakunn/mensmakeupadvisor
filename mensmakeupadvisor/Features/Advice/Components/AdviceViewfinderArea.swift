@@ -4,7 +4,7 @@ struct AdviceViewfinderArea: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color.white.opacity(0.03))
+                .fill(Theme.Surface.glassWeak)
                 .frame(height: 280)
 
             Ellipse()
