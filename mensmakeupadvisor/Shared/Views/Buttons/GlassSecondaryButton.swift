@@ -13,7 +13,7 @@ struct GlassSecondaryButton: View {
                 .overlay(Capsule().stroke(Theme.Diagram.jawLine, lineWidth: 1))
                 .foregroundStyle(Color.ivory)
         }
-        .accessibilityIdentifier(accessibilityID)
+        .aid(accessibilityID)
     }
 }
 

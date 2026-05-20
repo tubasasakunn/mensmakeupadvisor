@@ -24,7 +24,7 @@ struct AdviceView: View {
                             .padding(.top, 16)
                             .padding(.horizontal, 24)
 
-                        dividerLine
+                        HairlineDivider()
                             .padding(.top, 20)
                             .padding(.horizontal, 24)
 
@@ -110,12 +110,6 @@ struct AdviceView: View {
         }
     }
 
-    private var dividerLine: some View {
-        Rectangle()
-            .fill(Color.lineColor)
-            .frame(height: 1)
-    }
-
     private var descriptionText: some View {
         Text("顔の比率・骨格・左右対称性を\n7つの指標で分析。あなただけの\nメイクアドバイスを導き出す。")
             .font(.system(size: 13, weight: .regular))
@@ -171,10 +165,7 @@ struct AdviceView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(Color.clear)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 2)
-                        .stroke(Theme.Line.outlineIvory, lineWidth: 1)
-                )
+                .hairlineBorder(Theme.Line.outlineIvory, cornerRadius: 2)
         }
         .aid("advice_sample_button")
     }

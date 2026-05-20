@@ -33,7 +33,7 @@ struct OnboardingView: View {
         // 親に付けた identifier を子に継承させない。SwiftUI のデフォルト挙動だと
         // 子の Button の identifier が "onboarding_view" で上書きされる。
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("onboarding_view")
+        .aid("onboarding_view")
     }
 
     // MARK: - Header
@@ -47,7 +47,7 @@ struct OnboardingView: View {
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(1.5)
                 .animation(.none, value: currentPage)
-                .accessibilityIdentifier("onboarding_page_tag")
+                .aid("onboarding_page_tag")
 
             Spacer()
             skipButton
@@ -70,13 +70,10 @@ struct OnboardingView: View {
             .foregroundStyle(Color.inkSecondary)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .overlay(
-                RoundedRectangle(cornerRadius: 2)
-                    .stroke(Theme.Line.outlineSoft, lineWidth: 1)
-            )
+            .hairlineBorder(Theme.Line.outlineSoft, cornerRadius: 2)
         }
         .accessibilityLabel("目次を開く")
-        .accessibilityIdentifier("onboarding_chapter_button")
+        .aid("onboarding_chapter_button")
     }
 
     // Home から再読しているか (analysisResult があれば一度はアプリを使った人)。
@@ -94,14 +91,11 @@ struct OnboardingView: View {
                 .foregroundStyle(Color.inkSecondary)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 2)
-                        .stroke(Theme.Line.outlineMedium, lineWidth: 1)
-                )
+                .hairlineBorder(Theme.Line.outlineMedium, cornerRadius: 2)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "読み飛ばして撮影画面へ")
-        .accessibilityIdentifier("onboarding_skip_button")
+        .aid("onboarding_skip_button")
     }
 
     // MARK: - Progress hairline
@@ -109,19 +103,16 @@ struct OnboardingView: View {
     private var progressBar: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
-                Rectangle()
-                    .fill(Color.lineColor)
-                    .frame(height: 1.5)
-                Rectangle()
-                    .fill(Theme.Text.primaryFaded)
-                    .frame(width: geo.size.width * CGFloat(currentPage + 1) / CGFloat(pages.count), height: 1.5)
+                HairlineDivider(height: 1.5)
+                HairlineDivider(color: Theme.Text.primaryFaded, height: 1.5)
+                    .frame(width: geo.size.width * CGFloat(currentPage + 1) / CGFloat(pages.count))
                     .animation(.easeInOut(duration: 0.25), value: currentPage)
             }
         }
         .frame(height: 1.5)
         .padding(.horizontal, 28)
         .padding(.bottom, 6)
-        .accessibilityIdentifier("onboarding_progress_bar")
+        .aid("onboarding_progress_bar")
     }
 
     // MARK: - Folio
@@ -133,7 +124,7 @@ struct OnboardingView: View {
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.Text.secondaryFaded)
                 .accessibilityLabel("\(currentPage + 1) ページ目、全 \(pages.count) ページ中")
-                .accessibilityIdentifier("onboarding_folio_label")
+                .aid("onboarding_folio_label")
         }
         .padding(.horizontal, 28)
         .padding(.bottom, 4)
@@ -161,7 +152,7 @@ struct OnboardingView: View {
                 }
                 .glassEffect(.regular, in: .capsule)
                 .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "撮影をはじめる")
-                .accessibilityIdentifier("onboarding_continue_button")
+                .aid("onboarding_continue_button")
             }
         }
         .frame(height: 60)

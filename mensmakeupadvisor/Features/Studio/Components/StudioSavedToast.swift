@@ -29,9 +29,7 @@ struct StudioSavedToast: View {
                             .foregroundStyle(Color.appBackground)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
-                            .overlay(
-                                Rectangle().stroke(Theme.Line.onAccentSubtle, lineWidth: 1)
-                            )
+                            .hairlineBorder(Theme.Line.onAccentSubtle)
                     }
                     .accessibilityLabel("編集を続ける")
                     .aid("studio_saved_keep_editing")

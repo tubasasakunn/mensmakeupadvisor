@@ -13,7 +13,7 @@ struct HomeCreateTab: View {
                     .padding(.top, 32)
                 titleSection
                     .padding(.top, 12)
-                dividerLine
+                HairlineDivider()
                     .padding(.top, 24)
 
                 Spacer()
@@ -68,10 +68,6 @@ struct HomeCreateTab: View {
                 .font(.system(size: 32, weight: .bold))
                 .foregroundStyle(Color.ivory)
         }
-    }
-
-    private var dividerLine: some View {
-        Rectangle().fill(Color.lineColor).frame(height: 1)
     }
 
     private var heroBlock: some View {

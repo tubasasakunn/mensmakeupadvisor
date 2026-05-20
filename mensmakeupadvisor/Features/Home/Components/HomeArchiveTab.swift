@@ -42,7 +42,7 @@ struct HomeArchiveTab: View {
             titleSection
                 .padding(.top, 12)
                 .padding(.horizontal, 28)
-            Rectangle().fill(Color.lineColor).frame(height: 1)
+            HairlineDivider()
                 .padding(.top, 20)
                 .padding(.horizontal, 28)
 

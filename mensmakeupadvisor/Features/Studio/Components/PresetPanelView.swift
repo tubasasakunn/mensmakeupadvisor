@@ -32,7 +32,7 @@ struct PresetPanelView: View {
                     presetCard(preset: preset, index: index)
                 }
             }
-            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+            .hairlineBorder()
         }
     }
 

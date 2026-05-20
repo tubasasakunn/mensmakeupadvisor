@@ -33,9 +33,7 @@ struct TutorialStepInfoArea: View {
     }
 
     private var divider: some View {
-        Rectangle()
-            .fill(Color.lineColor)
-            .frame(height: 1)
+        HairlineDivider()
             .padding(.vertical, 14)
     }
 

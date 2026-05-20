@@ -15,10 +15,7 @@ struct DiagnosisProportionPlate: View {
             }
             .aspectRatio(imageAspect, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: 4))
-            .overlay(
-                RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color.lineColor, lineWidth: 1)
-            )
+            .hairlineBorder(cornerRadius: 4)
 
             captionLabel
                 .padding(12)

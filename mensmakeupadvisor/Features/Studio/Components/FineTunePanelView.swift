@@ -83,12 +83,13 @@ struct FineTunePanelView: View {
                     .frame(width: 36, alignment: .trailing)
             }
 
-            StudioSlider(
+            HairlineSlider(
                 value: Binding(
                     get: { Double(appState.composition.intensity(of: kind)) * 100 },
                     set: { appState.composition.setIntensity(Float($0 / 100), for: kind) }
                 ),
-                range: 0...100
+                range: 0...100,
+                style: .studio
             )
             .accessibilityLabel("\(kind.labelJP)の強さ")
             .accessibilityValue("\(Int(value))")
@@ -134,7 +135,7 @@ struct FineTunePanelView: View {
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
                 .background(isActive ? Color.ivory : Color.clear)
-                .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+                .hairlineBorder()
         }
         .accessibilityLabel("眉のかたち\(entry.label)" + (isActive ? "。選択中" : ""))
         .aid("studio_brow_type_\(aidValue)")

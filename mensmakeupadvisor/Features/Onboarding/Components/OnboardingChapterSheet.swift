@@ -53,7 +53,7 @@ struct OnboardingChapterSheet: View {
                 )
                 .aid("onboarding_chapter_\(ch.id)")
 
-                Rectangle().fill(Color.lineColor).frame(height: 1)
+                HairlineDivider()
             }
         }
     }

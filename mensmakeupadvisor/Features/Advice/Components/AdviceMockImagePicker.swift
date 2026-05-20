@@ -32,10 +32,7 @@ struct AdviceMockImagePicker: View {
                 .foregroundStyle(Theme.Status.warning)
         }
         .padding(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 4)
-                .stroke(Theme.Status.warningBorder, lineWidth: 1)
-        )
+        .hairlineBorder(Theme.Status.warningBorder, cornerRadius: 4)
         .aid("advice_mock_image_picker")
     }
 }

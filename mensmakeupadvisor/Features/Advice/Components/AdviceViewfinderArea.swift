@@ -36,10 +36,7 @@ struct AdviceViewfinderArea: View {
         }
         .frame(height: 280)
         .clipShape(RoundedRectangle(cornerRadius: 4))
-        .overlay(
-            RoundedRectangle(cornerRadius: 4)
-                .stroke(Color.lineColor, lineWidth: 1)
-        )
+        .hairlineBorder(cornerRadius: 4)
     }
 
     private var viewfinderCorners: some View {

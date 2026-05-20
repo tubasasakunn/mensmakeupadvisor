@@ -38,7 +38,7 @@ struct DiagnosisSharePrompt: View {
                 }
             }
             .padding(14)
-            .overlay(RoundedRectangle(cornerRadius: 2).stroke(result.gradeColor.opacity(0.5), lineWidth: 1))
+            .hairlineBorder(result.gradeColor.opacity(0.5), cornerRadius: 2)
         }
         .aid("diagnosis_share_button")
         .disabled(isRendering)
@@ -71,7 +71,7 @@ struct DiagnosisSharePrompt: View {
                 }
                 .padding(.horizontal, 6)
 
-                Rectangle().fill(Color.lineColor).frame(height: 0.5)
+                HairlineDivider(height: 0.5)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 3)
 
@@ -85,7 +85,7 @@ struct DiagnosisSharePrompt: View {
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 2))
-        .overlay(RoundedRectangle(cornerRadius: 2).stroke(Color.lineStrong, lineWidth: 0.5))
+        .hairlineBorder(Color.lineStrong, cornerRadius: 2, lineWidth: 0.5)
     }
 
     private func shareResult() async {

@@ -145,7 +145,7 @@ struct StudioView: View {
                 aid: "studio_finetune_button"
             )
         }
-        .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+        .hairlineBorder()
     }
 
     private var resetButton: some View {
@@ -161,7 +161,7 @@ struct StudioView: View {
             .foregroundStyle(hasAnyIntensity ? Color.ivory : Color.inkTertiary)
             .frame(width: 60)
             .padding(.vertical, 10)
-            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+            .hairlineBorder()
         }
         .disabled(!hasAnyIntensity)
         .accessibilityLabel("メイクをリセット")

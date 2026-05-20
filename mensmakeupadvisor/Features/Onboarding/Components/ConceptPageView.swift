@@ -21,9 +21,7 @@ struct ConceptPageView: View {
                     .padding(.bottom, 20)
             }
 
-            Rectangle()
-                .fill(Color.lineColor)
-                .frame(height: 1)
+            HairlineDivider()
                 .padding(.bottom, 16)
 
             if let body = page.body {

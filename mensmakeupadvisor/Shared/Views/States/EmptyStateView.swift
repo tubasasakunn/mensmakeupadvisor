@@ -20,8 +20,8 @@ struct EmptyStateView: View {
                 .multilineTextAlignment(.center)
         }
         .padding(48)
-        .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
-        .accessibilityIdentifier("empty_state_view")
+        .hairlineBorder()
+        .aid("empty_state_view")
     }
 }
 

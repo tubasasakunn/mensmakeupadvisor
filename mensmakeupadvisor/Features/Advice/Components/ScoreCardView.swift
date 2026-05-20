@@ -44,9 +44,7 @@ struct ScoreCardView: View {
             }
         }
         .overlay(alignment: .bottom) {
-            Rectangle()
-                .fill(Color.lineColor)
-                .frame(height: 1)
+            HairlineDivider()
         }
         .aid("diagnosis_score_card_\(score.name)")
         .onAppear {

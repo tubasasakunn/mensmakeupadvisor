@@ -54,7 +54,7 @@ struct TutorialEyebrowPicker: View {
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
             .background(isActive ? Color.ivory : Color.clear)
-            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+            .hairlineBorder()
         }
         .accessibilityLabel("眉のかたち\(entry.label)" + (isRecommended ? "、おすすめ" : "") + (isActive ? "、選択中" : ""))
         .aid("tutorial_brow_type_\(aidValue)")

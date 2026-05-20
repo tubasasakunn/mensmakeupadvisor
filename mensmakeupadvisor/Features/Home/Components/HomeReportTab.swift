@@ -15,7 +15,7 @@ struct HomeReportTab: View {
                         .padding(.top, 32)
                     titleSection
                         .padding(.top, 12)
-                    dividerLine
+                    HairlineDivider()
                         .padding(.top, 24)
                     contentSection
                         .padding(.top, 28)
@@ -39,10 +39,6 @@ struct HomeReportTab: View {
                 .font(.system(size: 32, weight: .bold))
                 .foregroundStyle(Color.ivory)
         }
-    }
-
-    private var dividerLine: some View {
-        Rectangle().fill(Color.lineColor).frame(height: 1)
     }
 
     @ViewBuilder
@@ -83,7 +79,7 @@ struct HomeReportTab: View {
                 .foregroundStyle(Color.inkTertiary)
         }
         .padding(20)
-        .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+        .hairlineBorder()
     }
 
     private func scorePreviewList(result: AnalysisResult) -> some View {
@@ -108,7 +104,7 @@ struct HomeReportTab: View {
                             .frame(width: 44, alignment: .trailing)
                     }
                     .overlay(alignment: .bottom) {
-                        Rectangle().fill(Color.lineColor).frame(height: 1).offset(y: 6)
+                        HairlineDivider().offset(y: 6)
                     }
                 }
             }
@@ -130,7 +126,7 @@ struct HomeReportTab: View {
                 .foregroundStyle(Color.ivory)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .overlay(Rectangle().stroke(Theme.Line.outlineIvory, lineWidth: 1))
+                .hairlineBorder(Theme.Line.outlineIvory)
             }
             .aid("home_report_open_button")
 

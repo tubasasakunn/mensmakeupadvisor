@@ -252,9 +252,7 @@ struct StudioImagePlate: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
         .background(Theme.Surface.labelBackdrop)
-        .overlay(
-            Rectangle().stroke(Color.lineColor, lineWidth: 1)
-        )
+        .hairlineBorder()
         .accessibilityLabel("診断スコア \(result.totalScore)")
     }
 }

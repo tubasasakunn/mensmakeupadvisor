@@ -56,7 +56,7 @@ struct SavedLookDetailSheet: View {
         SavedLookMeshThumbnail(look: look, geometry: SavedLookMeshGeometry.makeLatest())
             .frame(maxWidth: 320)
             .frame(maxWidth: .infinity)
-            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+            .hairlineBorder()
     }
 
     private var appliedZoneList: some View {
@@ -119,7 +119,7 @@ struct SavedLookDetailSheet: View {
                 .foregroundStyle(Color.inkSecondary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .overlay(Rectangle().stroke(Theme.Line.outlineSoft, lineWidth: 1))
+                .hairlineBorder(Theme.Line.outlineSoft)
             }
             .accessibilityLabel("このルックを削除")
             .aid("home_archive_detail_delete")

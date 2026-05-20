@@ -27,7 +27,7 @@ struct DiagnosisView: View {
                             .padding(.top, 8)
                             .padding(.horizontal, 24)
 
-                        dividerLine
+                        HairlineDivider()
                             .padding(.top, 20)
                             .padding(.horizontal, 24)
 
@@ -48,7 +48,7 @@ struct DiagnosisView: View {
                             .padding(.top, 16)
                             .padding(.horizontal, 24)
 
-                        dividerLine
+                        HairlineDivider()
                             .padding(.top, 24)
                             .padding(.horizontal, 24)
 
@@ -131,12 +131,6 @@ struct DiagnosisView: View {
             .kerning(1.5)
     }
 
-    private var dividerLine: some View {
-        Rectangle()
-            .fill(Color.lineColor)
-            .frame(height: 1)
-    }
-
     // MARK: - Bottom Buttons
 
     private var bottomButtons: some View {
@@ -185,10 +179,7 @@ struct DiagnosisView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
                     .background(Color.clear)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 2)
-                            .stroke(Theme.Line.outlineSoft, lineWidth: 1)
-                    )
+                    .hairlineBorder(Theme.Line.outlineSoft, cornerRadius: 2)
                 }
                 .accessibilityLabel("ガイドを飛ばしてスタジオへ。メイクの経験がある方向け")
                 .aid("diagnosis_skip_button")

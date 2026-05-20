@@ -12,7 +12,7 @@ struct LoadingView: View {
                 .font(.system(.caption, design: .monospaced))
                 .foregroundStyle(Color.inkSecondary)
         }
-        .accessibilityIdentifier("loading_view")
+        .aid("loading_view")
     }
 }
 

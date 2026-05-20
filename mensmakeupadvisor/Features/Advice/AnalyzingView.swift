@@ -138,10 +138,7 @@ struct AnalyzingView: View {
                         .foregroundStyle(Color.inkSecondary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 2)
-                                .stroke(Theme.Line.outlineSoft, lineWidth: 1)
-                        )
+                        .hairlineBorder(Theme.Line.outlineSoft, cornerRadius: 2)
                 }
                 .aid("analyzing_back_button")
             }
@@ -167,9 +164,7 @@ struct AnalyzingView: View {
 
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    Rectangle()
-                        .fill(Color.lineColor)
-                        .frame(height: 2)
+                    HairlineDivider(height: 2)
 
                     Rectangle()
                         .fill(Color.brandPrimary)

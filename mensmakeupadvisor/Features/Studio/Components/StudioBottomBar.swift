@@ -25,9 +25,7 @@ struct StudioBottomBar: View {
             .foregroundStyle(Color.ivory)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
-            .overlay(
-                Rectangle().stroke(Color.lineStrong, lineWidth: 1)
-            )
+            .hairlineBorder(Color.lineStrong)
         }
         .accessibilityLabel("このルックを保存")
         .aid("studio_save_button")
@@ -50,7 +48,7 @@ struct StudioBottomBar: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
-            .overlay(Rectangle().stroke(Color.lineStrong, lineWidth: 1))
+            .hairlineBorder(Color.lineStrong)
         }
         .accessibilityLabel(isRenderingShare ? "シェア画像を準備中" : "シェアする")
         .aid("studio_share_button")

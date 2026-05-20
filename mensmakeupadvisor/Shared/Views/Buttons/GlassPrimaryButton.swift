@@ -20,7 +20,7 @@ struct GlassPrimaryButton: View {
             .foregroundStyle(Color.ivory)
         }
         .glassEffect(.regular, in: .capsule)
-        .accessibilityIdentifier(accessibilityID)
+        .aid(accessibilityID)
     }
 }
 

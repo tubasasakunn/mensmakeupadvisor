@@ -14,10 +14,7 @@ struct AnalyzingScanArea: View {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Theme.Surface.imageDim)
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 4)
-                        .stroke(Color.lineColor, lineWidth: 1)
-                )
+                .hairlineBorder(cornerRadius: 4)
 
             Rectangle()
                 .fill(

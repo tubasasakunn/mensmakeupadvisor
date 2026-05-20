@@ -32,7 +32,7 @@ struct SplashView: View {
             try? await Task.sleep(for: .seconds(2.2))
             appState.navigate(to: .onboarding)
         }
-        .accessibilityIdentifier("splash_view")
+        .aid("splash_view")
     }
 
     // MARK: - Subviews
@@ -81,9 +81,7 @@ struct SplashView: View {
                 .foregroundStyle(Color.brandPrimary)
 
             // 区切り線
-            Rectangle()
-                .fill(Color.lineColor)
-                .frame(height: 1)
+            HairlineDivider()
                 .padding(.top, 24)
                 .padding(.bottom, 16)
 
