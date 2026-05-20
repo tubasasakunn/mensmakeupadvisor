@@ -21,20 +21,20 @@ struct AdviceMockImagePicker: View {
                     .foregroundStyle(Color.ivory)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Color.white.opacity(0.08))
+                    .background(Theme.Surface.glassMedium)
                     .clipShape(RoundedRectangle(cornerRadius: 2))
                     .aid("advice_mock_image_\(index)")
                 }
             }
 
             Text("[MOCK] 画像ピッカー")
-                .font(.system(size: 10, design: .monospaced))
-                .foregroundStyle(Color.orange.opacity(0.8))
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(Theme.Status.warning)
         }
         .padding(12)
         .overlay(
             RoundedRectangle(cornerRadius: 4)
-                .stroke(Color.orange.opacity(0.4), lineWidth: 1)
+                .stroke(Theme.Status.warningBorder, lineWidth: 1)
         )
         .aid("advice_mock_image_picker")
     }

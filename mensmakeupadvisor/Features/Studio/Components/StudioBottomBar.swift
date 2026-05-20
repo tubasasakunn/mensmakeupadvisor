@@ -17,11 +17,10 @@ struct StudioBottomBar: View {
     private var archiveButton: some View {
         Button(action: onArchive) {
             HStack(spacing: 8) {
-                Text("♥")
+                Image(systemName: "heart.fill")
                     .font(.system(size: 14))
-                Text("ARCHIVE THIS LOOK")
-                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                    .kerning(2)
+                Text("このルックを保存")
+                    .font(.system(size: 15, weight: .semibold))
             }
             .foregroundStyle(Color.ivory)
             .frame(maxWidth: .infinity)
@@ -30,6 +29,7 @@ struct StudioBottomBar: View {
                 Rectangle().stroke(Color.lineStrong, lineWidth: 1)
             )
         }
+        .accessibilityLabel("このルックを保存")
         .aid("studio_save_button")
     }
 
@@ -43,8 +43,8 @@ struct StudioBottomBar: View {
                         .tint(Color.inkSecondary)
                         .scaleEffect(0.7)
                 } else {
-                    Text("↑")
-                        .font(.system(size: 18, weight: .light, design: .monospaced))
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 17, weight: .regular))
                         .foregroundStyle(Color.ivory)
                 }
             }
@@ -52,6 +52,7 @@ struct StudioBottomBar: View {
             .padding(.vertical, 14)
             .overlay(Rectangle().stroke(Color.lineStrong, lineWidth: 1))
         }
+        .accessibilityLabel(isRenderingShare ? "シェア画像を準備中" : "シェアする")
         .aid("studio_share_button")
         .disabled(isRenderingShare)
     }

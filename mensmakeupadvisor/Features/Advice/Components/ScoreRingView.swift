@@ -4,6 +4,7 @@ struct ScoreRingView: View {
     let value: Int
     let size: CGFloat
     @State private var animatedValue: Int = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -19,7 +20,8 @@ struct ScoreRingView: View {
                     style: StrokeStyle(lineWidth: 2, lineCap: .butt)
                 )
                 .rotationEffect(.degrees(-90))
-                .animation(.interpolatingSpring(duration: 1.4), value: animatedValue)
+                .animation(reduceMotion ? .none : .interpolatingSpring(duration: 1.4),
+                           value: animatedValue)
 
             // カウントアップはせず最終値を即表示（アニメ中の数値変化が視覚的に煩雑なため）
             VStack(spacing: 2) {
@@ -28,16 +30,21 @@ struct ScoreRingView: View {
                     .italic()
                     .foregroundStyle(Color.ivory)
 
-                Text("OF 100")
-                    .font(.system(size: size * 0.07, design: .monospaced))
+                Text("100 点満点")
+                    .font(.system(size: max(11, size * 0.09)))
                     .foregroundStyle(Color.inkSecondary)
-                    .kerning(1)
             }
         }
         .frame(width: size, height: size)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("総合スコア \(value) 点 / 100 点満点")
         .onAppear {
-            withAnimation(.interpolatingSpring(duration: 1.4)) {
+            if reduceMotion {
                 animatedValue = value
+            } else {
+                withAnimation(.interpolatingSpring(duration: 1.4)) {
+                    animatedValue = value
+                }
             }
         }
     }
@@ -56,7 +63,7 @@ struct ScoreRingView: View {
                 var path = Path()
                 path.move(to: CGPoint(x: x1, y: y1))
                 path.addLine(to: CGPoint(x: x2, y: y2))
-                context.stroke(path, with: .color(Color.ivory.opacity(0.15)), lineWidth: 0.5)
+                context.stroke(path, with: .color(Theme.Mesh.tickMark), lineWidth: 0.5)
             }
         }
     }

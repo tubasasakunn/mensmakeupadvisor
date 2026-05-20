@@ -107,15 +107,15 @@ final class AppState {
     private func makePlaceholderImage() -> UIImage {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 500))
         return renderer.image { ctx in
-            UIColor(red: 0.24, green: 0.21, blue: 0.18, alpha: 1).setFill()
+            Theme.UIKitColor.placeholderFaceBackground.setFill()
             ctx.fill(CGRect(x: 0, y: 0, width: 400, height: 500))
 
-            UIColor.white.withAlphaComponent(0.45).setStroke()
+            Theme.UIKitColor.placeholderFaceOval.setStroke()
             let face = UIBezierPath(ovalIn: CGRect(x: 85, y: 60, width: 230, height: 290))
             face.lineWidth = 1.5
             face.stroke()
 
-            UIColor.white.withAlphaComponent(0.15).setStroke()
+            Theme.UIKitColor.placeholderFaceLine.setStroke()
             for (y, width) in [(CGFloat(165), CGFloat(160)), (210, 100), (270, 130)] as [(CGFloat, CGFloat)] {
                 let line = UIBezierPath()
                 line.move(to: CGPoint(x: 200 - width / 2, y: y))

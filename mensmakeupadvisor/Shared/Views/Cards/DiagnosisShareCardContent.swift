@@ -82,7 +82,7 @@ extension DiagnosisShareCardView {
             VStack(alignment: .leading, spacing: 4) {
                 Text("MensMakeupAdvisor")
                     .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(Color.ivory.opacity(0.7))
+                    .foregroundStyle(Theme.Text.primaryFaded)
                     .kerning(1)
                 Text("あなたは何点？/ What's yours?")
                     .font(.system(size: 9, weight: .regular, design: .monospaced))

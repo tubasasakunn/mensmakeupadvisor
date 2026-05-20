@@ -17,22 +17,22 @@ struct HowtoEyesAnimation: View {
     private let eyeshadows: [EyeStroke] = [
         // 左目上
         .init(from: .init(x: 213, y: 220), to: .init(x: 165, y: 220), control: .init(x: 188, y: 195),
-              width: 14, color: Color(red: 0.612, green: 0.482, blue: 0.439),
+              width: 14, color: Theme.Howto.skinStroke,
               maxOpacity: 0.45, blur: 4, drawStart: 0.05, drawEnd: 0.30, fadeIn: 0.10),
         // 右目上
         .init(from: .init(x: 287, y: 220), to: .init(x: 335, y: 220), control: .init(x: 312, y: 195),
-              width: 14, color: Color(red: 0.612, green: 0.482, blue: 0.439),
+              width: 14, color: Theme.Howto.skinStroke,
               maxOpacity: 0.45, blur: 4, drawStart: 0.05, drawEnd: 0.30, fadeIn: 0.10),
     ]
 
     private let teardrops: [EyeStroke] = [
         // 左目下
         .init(from: .init(x: 202, y: 242), to: .init(x: 175, y: 242), control: .init(x: 192, y: 255),
-              width: 2, color: Color(red: 0.129, green: 0.129, blue: 0.129),
+              width: 2, color: Theme.Howto.darkStroke,
               maxOpacity: 0.65, blur: 1, drawStart: 0.10, drawEnd: 0.35, fadeIn: 0.15),
         // 右目下
         .init(from: .init(x: 298, y: 242), to: .init(x: 325, y: 242), control: .init(x: 308, y: 255),
-              width: 2, color: Color(red: 0.129, green: 0.129, blue: 0.129),
+              width: 2, color: Theme.Howto.darkStroke,
               maxOpacity: 0.65, blur: 1, drawStart: 0.10, drawEnd: 0.35, fadeIn: 0.15),
     ]
 
@@ -79,5 +79,5 @@ struct HowtoEyesAnimation: View {
 #Preview {
     HowtoEyesAnimation()
         .frame(width: 260, height: 260)
-        .background(Color.gray.opacity(0.1))
+        .background(Theme.Howto.canvas)
 }

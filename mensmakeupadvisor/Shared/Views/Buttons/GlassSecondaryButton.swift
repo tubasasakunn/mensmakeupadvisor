@@ -10,7 +10,7 @@ struct GlassSecondaryButton: View {
             Text(title)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 14)
-                .overlay(Capsule().stroke(Color.ivory.opacity(0.4), lineWidth: 1))
+                .overlay(Capsule().stroke(Theme.Diagram.jawLine, lineWidth: 1))
                 .foregroundStyle(Color.ivory)
         }
         .accessibilityIdentifier(accessibilityID)

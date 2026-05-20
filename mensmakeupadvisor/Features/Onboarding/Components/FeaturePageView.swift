@@ -47,7 +47,7 @@ struct FeaturePageView: View {
                     }
                     if let jp = page.featureLabelJP {
                         Text(jp)
-                            .font(.system(size: 10, design: .monospaced))
+                            .font(.system(size: 11, design: .monospaced))
                             .foregroundStyle(Color.inkSecondary)
                             .kerning(1.5)
                     }
@@ -115,13 +115,13 @@ struct StepBeforeAfterSlider: View {
 
             ZStack(alignment: .leading) {
                 // After — 底レイヤー: 常に full size で固定
-                stepImageLayer(img: afterImage, w: w, h: h, placeholder: Color(white: 0.22))
+                stepImageLayer(img: afterImage, w: w, h: h, placeholder: Theme.Placeholder.stepAfterSoft)
                     .overlay(alignment: .bottomTrailing) {
-                        stepBadge("AFTER", color: Color.ivory.opacity(0.9))
+                        stepBadge("AFTER", color: Theme.Plate.labelText)
                     }
 
                 // Before — 上レイヤー: full size だが左端からクリップ
-                stepImageLayer(img: beforeImage, w: w, h: h, placeholder: Color(white: 0.15))
+                stepImageLayer(img: beforeImage, w: w, h: h, placeholder: Theme.Placeholder.stepBeforeSoft)
                     .overlay(alignment: .bottomLeading) {
                         stepBadge("BEFORE", color: Color.inkSecondary)
                     }
@@ -130,14 +130,14 @@ struct StepBeforeAfterSlider: View {
                 // ハンドル
                 ZStack {
                     Rectangle()
-                        .fill(Color.ivory.opacity(0.9))
+                        .fill(Theme.Plate.labelText)
                         .frame(width: 2)
                     Circle()
                         .fill(Color.ivory)
                         .frame(width: 26, height: 26)
                         .overlay(
                             Image(systemName: "arrow.left.arrow.right")
-                                .font(.system(size: 9, weight: .bold))
+                                .font(.system(size: 11, weight: .bold))
                                 .foregroundStyle(Color.appBackground)
                         )
                 }
@@ -170,11 +170,11 @@ struct StepBeforeAfterSlider: View {
 
     private func stepBadge(_ text: String, color: Color) -> some View {
         Text(text)
-            .font(.system(size: 9, design: .monospaced))
+            .font(.system(size: 11, design: .monospaced))
             .foregroundStyle(color)
             .kerning(2)
             .padding(6)
-            .background(Color.black.opacity(0.5))
+            .background(Theme.Surface.scrim)
             .padding(8)
     }
 }

@@ -7,6 +7,8 @@ struct SavedLookDetailSheet: View {
     let onApply: () -> Void
     let onDelete: () -> Void
 
+    @State private var showDeleteConfirmation = false
+
     var body: some View {
         ZStack {
             Color.appBackground.ignoresSafeArea()
@@ -21,19 +23,30 @@ struct SavedLookDetailSheet: View {
                 .padding(24)
             }
         }
+        .confirmationDialog(
+            "このルックを削除しますか？",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("削除する", role: .destructive) {
+                onDelete()
+            }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("削除すると元に戻せません。")
+        }
         .aid("home_archive_detail_sheet")
     }
 
     private var headerRow: some View {
         HStack {
             Text(look.createdAt, format: .dateTime.year().month().day().hour().minute())
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
+                .font(.system(size: 12))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(1)
             Spacer()
             if look.totalScore > 0 {
-                Text("\(look.totalScore)pt")
-                    .font(.system(size: 12, design: .monospaced))
+                Text("\(look.totalScore) 点")
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.inkSecondary)
             }
         }
@@ -48,11 +61,11 @@ struct SavedLookDetailSheet: View {
 
     private var appliedZoneList: some View {
         VStack(alignment: .leading, spacing: 10) {
-            zoneRow(title: "HIGHLIGHT", names: Array(look.highlightAreaSet))
-            zoneRow(title: "SHADOW",    names: Array(look.shadowAreaSet))
-            zoneRow(title: "EYE",       names: Array(look.eyeAreaSet))
+            zoneRow(title: "ハイライト", names: Array(look.highlightAreaSet))
+            zoneRow(title: "シェーディング", names: Array(look.shadowAreaSet))
+            zoneRow(title: "目元", names: Array(look.eyeAreaSet))
             if let raw = look.eyebrowTypeRaw, !raw.isEmpty {
-                zoneRow(title: "BROW", names: [raw])
+                zoneRow(title: "眉のかたち", names: [raw])
             }
         }
     }
@@ -60,62 +73,70 @@ struct SavedLookDetailSheet: View {
     private func zoneRow(title: String, names: [String]) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
             Text(names.isEmpty ? "—" : names.map(MakeupAreaLabel.display).joined(separator: " · "))
-                .font(.system(size: 12))
+                .font(.system(size: 13))
                 .foregroundStyle(Color.ivory)
         }
     }
 
     private var intensityRows: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("INTENSITY")
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
+            Text("強さ")
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
-            intensityRow("BASE",      look.base)
-            intensityRow("HIGHLIGHT", look.highlight)
-            intensityRow("SHADOW",    look.shadow)
-            intensityRow("EYE",       look.eye)
+            intensityRow("ベース",       look.base)
+            intensityRow("ハイライト",   look.highlight)
+            intensityRow("シェーディング", look.shadow)
+            intensityRow("目元",         look.eye)
         }
     }
 
     private func intensityRow(_ label: String, _ value: Double) -> some View {
         HStack {
             Text(label)
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
+                .font(.system(size: 12))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(1.2)
             Spacer()
             Text(String(format: "%.0f", value))
-                .font(.system(size: 14, weight: .light, design: .serif))
-                .italic()
+                .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Color.ivory)
         }
     }
 
     private var actionRow: some View {
         HStack(spacing: 12) {
-            Button(action: onDelete) {
-                Text("削除")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.inkSecondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .overlay(Rectangle().stroke(Color.inkSecondary.opacity(0.35), lineWidth: 1))
+            Button(role: .destructive) {
+                showDeleteConfirmation = true
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 12, weight: .medium))
+                    Text("削除")
+                        .font(.system(size: 13, weight: .medium))
+                }
+                .foregroundStyle(Color.inkSecondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .overlay(Rectangle().stroke(Theme.Line.outlineSoft, lineWidth: 1))
             }
+            .accessibilityLabel("このルックを削除")
             .aid("home_archive_detail_delete")
 
             Button(action: onApply) {
-                Text("このルックを編集 →")
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(Color.appBackground)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color.ivory)
+                HStack(spacing: 6) {
+                    Text("このルックを編集")
+                        .font(.system(size: 14, weight: .semibold))
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                }
+                .foregroundStyle(Color.appBackground)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(Color.ivory)
             }
+            .accessibilityLabel("このルックをスタジオで編集")
             .aid("home_archive_detail_apply")
         }
     }

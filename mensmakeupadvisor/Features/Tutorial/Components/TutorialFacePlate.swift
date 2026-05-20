@@ -23,7 +23,7 @@ struct TutorialFacePlate: View {
             let height = width / max(displayAspect, 0.5)
 
             ZStack(alignment: .topLeading) {
-                Color.black
+                Theme.Surface.imageBackdrop
                 faceImage(width: width, height: height)
                 stepTag
             }
@@ -55,25 +55,24 @@ struct TutorialFacePlate: View {
     private var stepTag: some View {
         Text(currentStep.tag)
             .font(.system(size: 11, weight: .light, design: .monospaced))
-            .foregroundStyle(Color.ivory.opacity(0.6))
+            .foregroundStyle(Theme.Step.labelTag)
             .padding(10)
     }
 
     @ViewBuilder
     private func placeholderFace(width: CGFloat, height: CGFloat) -> some View {
         ZStack {
-            Color(white: 0.10)
+            Theme.Surface.raised
 
             Ellipse()
-                .stroke(Color.ivory.opacity(0.25), lineWidth: 1)
+                .stroke(Theme.Plate.placeholderEllipse, lineWidth: 1)
                 .frame(width: width * 0.55, height: height * 0.68)
 
             VStack(spacing: 4) {
                 Spacer()
-                Text("ACT \(currentStep.tag) · \(currentStep.titleJP)")
-                    .font(.system(size: 8, weight: .light, design: .monospaced))
+                Text("ステップ \(currentStep.tagNumeric) · \(currentStep.titleJP)")
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(Color.inkSecondary)
-                    .kerning(2)
                     .padding(.bottom, 12)
             }
         }

@@ -5,6 +5,12 @@ import UIKit
 struct StudioImagePlate: View {
     let viewModel: StudioViewModel
     @Environment(AppState.self) private var appState
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    // Compare 入場時のオート・デモを 1 回だけ走らせる。スライダーが
+    // 動くことを言葉で説明する代わりに、目で覚えてもらう。
+    @State private var didPlayCompareIntro = false
+    @State private var showCompareHint = false
 
     // capturedImage 実物のアスペクト比を使う。
     // 顔まわりトリミングで 5:7 などになり得るため、固定 4:5 だと顔が切れる。
@@ -38,11 +44,63 @@ struct StudioImagePlate: View {
                         Spacer()
                     }
                 }
+
+                if showCompareHint && viewModel.displayMode == .compare {
+                    compareHintOverlay
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
             }
             .frame(width: width, height: height)
             .clipped()
         }
         .aspectRatio(displayAspect, contentMode: .fit)
+        .task {
+            if !didPlayCompareIntro {
+                didPlayCompareIntro = true
+                await playCompareIntro()
+            }
+        }
+    }
+
+    // 左右どちらが Before / After かを身体で覚えてもらう短いデモ。
+    // 0.5 → 0.25 → 0.75 → 0.5 とゆっくり振ってから、ヒントテキストを出す。
+    // Reduce Motion 設定時はアニメーションせず、ヒントだけ表示する。
+    @MainActor
+    private func playCompareIntro() async {
+        if reduceMotion {
+            try? await Task.sleep(for: .milliseconds(400))
+            showCompareHint = true
+            try? await Task.sleep(for: .seconds(3.0))
+            showCompareHint = false
+            return
+        }
+        try? await Task.sleep(for: .milliseconds(400))
+        withAnimation(.easeInOut(duration: 0.8)) { viewModel.comparePosition = 0.25 }
+        try? await Task.sleep(for: .milliseconds(800))
+        withAnimation(.easeInOut(duration: 0.9)) { viewModel.comparePosition = 0.75 }
+        try? await Task.sleep(for: .milliseconds(900))
+        withAnimation(.easeInOut(duration: 0.6)) { viewModel.comparePosition = 0.5 }
+        withAnimation(.easeInOut(duration: 0.3)) { showCompareHint = true }
+        try? await Task.sleep(for: .seconds(2.5))
+        withAnimation(.easeInOut(duration: 0.4)) { showCompareHint = false }
+    }
+
+    private var compareHintOverlay: some View {
+        VStack {
+            HStack(spacing: 6) {
+                Image(systemName: "hand.draw.fill")
+                    .font(.system(size: 12))
+                Text("中央をドラッグして比べる")
+                    .font(.system(size: 12, weight: .medium))
+            }
+            .foregroundStyle(Color.appBackground)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Theme.Surface.toastBackground)
+            .clipShape(Capsule())
+            .padding(.top, 12)
+            Spacer()
+        }
     }
 
     private func compareView(width: CGFloat, height: CGFloat) -> some View {
@@ -64,7 +122,7 @@ struct StudioImagePlate: View {
                     )
 
                 Rectangle()
-                    .fill(Color.ivory.opacity(0.8))
+                    .fill(Theme.Plate.beforeAfterDivider)
                     .frame(width: 1, height: height)
                     .offset(x: viewModel.comparePosition * width - 0.5)
             } else {
@@ -74,10 +132,12 @@ struct StudioImagePlate: View {
             VStack {
                 Spacer()
                 HStack {
-                    Text("FIG. A — BEFORE")
-                        .font(.system(size: 8, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Color.ivory.opacity(0.7))
-                        .kerning(1.2)
+                    Text("Before · 素のまま")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Theme.Plate.labelText)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Theme.Surface.labelBackdrop)
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)
                     Spacer()
@@ -88,10 +148,12 @@ struct StudioImagePlate: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    Text("FIG. B — AFTER")
-                        .font(.system(size: 8, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Color.ivory.opacity(0.7))
-                        .kerning(1.2)
+                    Text("After · メイク後")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Theme.Plate.labelText)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Theme.Surface.labelBackdrop)
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)
                 }
@@ -113,7 +175,7 @@ struct StudioImagePlate: View {
 
     private func afterView(width: CGFloat, height: CGFloat) -> some View {
         ZStack {
-            Color.black
+            Theme.Surface.imageBackdrop
 
             // makeup_claude の MakeupRenderer で実際に化粧が乗った画像があればそれを、
             // まだなければ撮影画像 + 簡易グラデーションを表示。
@@ -134,15 +196,14 @@ struct StudioImagePlate: View {
                     .clipped()
             } else {
                 ZStack {
-                    Color(white: 0.10)
+                    Theme.Surface.raised
                     VStack(spacing: 8) {
                         Ellipse()
-                            .stroke(Color.ivory.opacity(0.25), lineWidth: 1)
+                            .stroke(Theme.Plate.placeholderEllipse, lineWidth: 1)
                             .frame(width: width * 0.55, height: height * 0.68)
-                        Text("FIG. B · AFTER")
-                            .font(.system(size: 8, weight: .light, design: .monospaced))
+                        Text("メイク後のプレビュー")
+                            .font(.system(size: 11))
                             .foregroundStyle(Color.inkSecondary)
-                            .kerning(2)
                     }
                 }
                 .frame(width: width, height: height)
@@ -157,13 +218,17 @@ struct StudioImagePlate: View {
     private var renderingOverlay: some View {
         VStack {
             HStack {
-                Text("RENDERING…")
-                    .font(.system(size: 8, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.ivory.opacity(0.85))
-                    .kerning(1.4)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.appBackground.opacity(0.55))
+                HStack(spacing: 6) {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                        .tint(Theme.Plate.renderingTint)
+                    Text("反映中…")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Theme.Plate.renderingTint)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Theme.Surface.labelBackdrop)
                 Spacer()
             }
             Spacer()
@@ -172,20 +237,25 @@ struct StudioImagePlate: View {
     }
 
     private func placeholderHalf(width: CGFloat, height: CGFloat) -> some View {
-        Color(white: 0.06).frame(width: width, height: height)
+        Theme.Surface.sunken.frame(width: width, height: height)
     }
 
     private func scoreChip(result: AnalysisResult) -> some View {
-        Text("SCORE \(result.totalScore)")
-            .font(.system(size: 9, weight: .medium, design: .monospaced))
-            .foregroundStyle(Color.ivory)
-            .kerning(1.5)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(Color.appBackground.opacity(0.7))
-            .overlay(
-                Rectangle().stroke(Color.lineColor, lineWidth: 1)
-            )
+        HStack(spacing: 4) {
+            Text("スコア")
+                .font(.system(size: 11))
+                .opacity(0.75)
+            Text("\(result.totalScore)")
+                .font(.system(size: 14, weight: .semibold))
+        }
+        .foregroundStyle(Color.ivory)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(Theme.Surface.labelBackdrop)
+        .overlay(
+            Rectangle().stroke(Color.lineColor, lineWidth: 1)
+        )
+        .accessibilityLabel("診断スコア \(result.totalScore)")
     }
 }
 

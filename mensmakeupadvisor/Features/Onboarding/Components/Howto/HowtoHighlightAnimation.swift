@@ -27,9 +27,9 @@ struct HowtoHighlightAnimation: View {
     // 元 SVG の radialGradient (#hl-grad) を踏襲: 中心 ほぼ白 → 0.4 黄 → 1.0 透明 のソフトグロー
     private let highlightGradient = EllipticalGradient(
         gradient: Gradient(stops: [
-            .init(color: Color(red: 1.0, green: 1.0,   blue: 1.0,   opacity: 0.95), location: 0.0),
-            .init(color: Color(red: 1.0, green: 0.961, blue: 0.616, opacity: 0.8 ), location: 0.4),
-            .init(color: Color(red: 1.0, green: 0.961, blue: 0.616, opacity: 0.0 ), location: 1.0),
+            .init(color: Theme.Howto.highlightCoreBright, location: 0.0),
+            .init(color: Theme.Howto.highlightGoldFaded,  location: 0.4),
+            .init(color: Color.clear,                     location: 1.0),
         ]),
         center: .center,
         startRadiusFraction: 0,
@@ -90,7 +90,7 @@ struct HowtoHighlightAnimation: View {
             (min(p + 0.03, 1), spot.ringMaxScale), (1.00, spot.ringMaxScale)
         ])
         return Ellipse()
-            .stroke(Color(red: 1.0, green: 0.961, blue: 0.616), lineWidth: 4)
+            .stroke(Theme.Howto.highlightGold, lineWidth: 4)
             .frame(width: spot.rx * 2, height: spot.ry * 2)
             .scaleEffect(scale)
             .opacity(opacity)
@@ -109,7 +109,7 @@ struct HowtoHighlightAnimation: View {
             (0.00, 0), (0.38, 0), (0.43, 90), (0.48, 180), (0.75, 180), (0.80, 180), (1.00, 180)
         ])
         return SparkleShape()
-            .fill(Color.white)
+            .fill(Theme.Howto.highlightCore)
             .frame(width: 24, height: 24)
             .rotationEffect(.degrees(rotation))
             .scaleEffect(scale)
@@ -136,5 +136,5 @@ private struct SparkleShape: Shape {
 #Preview {
     HowtoHighlightAnimation()
         .frame(width: 260, height: 260)
-        .background(Color.gray.opacity(0.1))
+        .background(Theme.Howto.canvas)
 }

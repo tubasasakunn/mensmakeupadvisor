@@ -39,7 +39,7 @@ struct ExampleItemView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 8) {
                 Text("Q")
-                    .font(.system(size: 9, design: .monospaced))
+                    .font(.system(size: 11, design: .monospaced))
                     .foregroundStyle(Color.inkSecondary)
                     .padding(.top, 2)
                 Text(concern)
@@ -62,7 +62,7 @@ struct ExampleItemView: View {
             }
         }
         .padding(14)
-        .background(Color.ivory.opacity(0.04))
+        .background(Theme.Surface.glassWeakIvory)
         .overlay(
             RoundedRectangle(cornerRadius: 6)
                 .stroke(Color.lineColor, lineWidth: 1)

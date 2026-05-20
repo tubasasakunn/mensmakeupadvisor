@@ -1,12 +1,17 @@
 import SwiftUI
 
+// 旧 API 互換のための薄いエイリアス層。
+//
+// `Color.brandPrimary` 等の意匠名は既存コードから多数参照されているため
+// 後方互換として残す。実体は Shared/Theme/Theme.swift にあり、
+// 新規コードでは `Theme.Accent.primary` のような意味ベースの参照を使うこと。
 extension Color {
-    nonisolated static let brandPrimary  = Color(red: 0xB8/255, green: 0x33/255, blue: 0x2A/255)
-    nonisolated static let ivory         = Color(red: 0xF4/255, green: 0xEF/255, blue: 0xE6/255)
-    nonisolated static let appBackground = Color(red: 0x0E/255, green: 0x0E/255, blue: 0x0C/255)
-    nonisolated static let inkSecondary  = Color(red: 0x9A/255, green: 0x95/255, blue: 0x8C/255)
-    nonisolated static let inkTertiary   = Color(red: 0x5A/255, green: 0x55/255, blue: 0x4C/255)
-    nonisolated static let sulphur       = Color(red: 0.9,      green: 0.85,     blue: 0.4)
-    nonisolated static let lineColor     = Color(white: 1.0, opacity: 0.12)
-    nonisolated static let lineStrong    = Color(white: 1.0, opacity: 0.25)
+    nonisolated static let brandPrimary  = Theme.Accent.primary
+    nonisolated static let ivory         = Theme.Text.primary
+    nonisolated static let appBackground = Theme.Surface.canvas
+    nonisolated static let inkSecondary  = Theme.Text.secondary
+    nonisolated static let inkTertiary   = Theme.Text.tertiary
+    nonisolated static let sulphur       = Theme.Accent.highlight
+    nonisolated static let lineColor     = Theme.Line.subtle
+    nonisolated static let lineStrong    = Theme.Line.strong
 }

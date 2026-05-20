@@ -63,7 +63,7 @@ struct GoalPageView: View {
             Spacer()
         }
         .padding(.vertical, 16)
-        .background(Color.white.opacity(0.04))
+        .background(Theme.Surface.glassWeak)
         .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 
@@ -71,13 +71,13 @@ struct GoalPageView: View {
         VStack(spacing: 8) {
             Image(systemName: symbol)
                 .font(.system(size: 26))
-                .foregroundStyle(Color.brandPrimary.opacity(0.85))
+                .foregroundStyle(Theme.Accent.primaryFaded)
                 .frame(width: 56, height: 56)
-                .background(Color.white.opacity(0.06))
+                .background(Theme.Surface.glassWeak)
                 .clipShape(Circle())
 
             Text(label)
-                .font(.system(size: 9, design: .monospaced))
+                .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(0.5)
         }

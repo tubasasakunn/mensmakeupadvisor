@@ -5,6 +5,7 @@ struct StudioView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = StudioViewModel()
+    @State private var showResetConfirmation = false
 
     var body: some View {
         ZStack {
@@ -18,7 +19,7 @@ struct StudioView: View {
                     .padding(.horizontal, 28)
                     .padding(.top, 12)
 
-                modeSegment
+                modeRow
                     .padding(.top, 16)
                     .padding(.horizontal, 28)
 
@@ -36,16 +37,38 @@ struct StudioView: View {
             }
 
             if viewModel.showSavedNotification {
-                StudioSavedToast()
+                StudioSavedToast(
+                    onGoHome: {
+                        viewModel.dismissSavedNotification()
+                        appState.navigate(to: .home)
+                    },
+                    onKeepEditing: {
+                        viewModel.dismissSavedNotification()
+                    }
+                )
             }
         }
-        // 親 identifier が子の Button/Toggle 等に継承されないようにする
+        .confirmationDialog(
+            "メイクを全部リセットしますか？",
+            isPresented: $showResetConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("リセットする", role: .destructive) {
+                viewModel.resetAll(appState: appState)
+            }
+            Button("やめる", role: .cancel) {}
+        } message: {
+            Text("すべての強さを 0 に、眉の選択を解除します。")
+        }
         .accessibilityElement(children: .contain)
         .aid("studio_view")
-        // composition の変化で task が再起動 → AppState 側で debounce している。
         .task(id: compositionKey) {
             await MainActor.run { appState.requestMakeupRender() }
         }
+    }
+
+    private var hasAnyIntensity: Bool {
+        viewModel.hasAnyIntensity(appState.composition)
     }
 
     // 全化粧単位の強度 + 眉 type を 1 つのキーに集約して task(id:) で監視する。
@@ -64,56 +87,105 @@ struct StudioView: View {
             Button {
                 appState.navigate(to: .diagnosis)
             } label: {
-                Text("← REPORT")
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.inkSecondary)
-                    .kerning(1.5)
+                HStack(spacing: 4) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text("診断結果")
+                        .font(.system(size: 13, weight: .regular))
+                }
+                .foregroundStyle(Color.inkSecondary)
             }
+            .accessibilityLabel("診断結果に戻る")
             .aid("studio_back_button")
 
             Spacer()
 
-            Text("ATELIER · STUDIO")
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
+            Text("スタジオ")
+                .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Color.ivory)
-                .kerning(2)
 
             Spacer()
 
             Button {
                 appState.navigate(to: .home)
             } label: {
-                Text("HOME →")
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.inkSecondary)
-                    .kerning(1.5)
+                HStack(spacing: 4) {
+                    Image(systemName: "house.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text("ホーム")
+                        .font(.system(size: 13, weight: .regular))
+                }
+                .foregroundStyle(Color.inkSecondary)
             }
+            .accessibilityLabel("ホームに戻る")
             .aid("studio_header_home_button")
         }
         .padding(.horizontal, 28)
     }
 
+    private var modeRow: some View {
+        HStack(spacing: 10) {
+            modeSegment
+            resetButton
+        }
+    }
+
     private var modeSegment: some View {
         HStack(spacing: 0) {
-            modeButton(title: "COMPARE", mode: .compare, aid: "studio_compare_button")
-            modeButton(title: "FINE TUNE", mode: .fineTune, aid: "studio_finetune_button")
+            modeButton(
+                title: "比べる",
+                subtitle: "Before / After",
+                mode: .compare,
+                aid: "studio_compare_button"
+            )
+            modeButton(
+                title: "細かく調整",
+                subtitle: "色味と強さ",
+                mode: .fineTune,
+                aid: "studio_finetune_button"
+            )
         }
         .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
     }
 
-    private func modeButton(title: String, mode: StudioViewModel.DisplayMode, aid: String) -> some View {
+    private var resetButton: some View {
+        Button {
+            showResetConfirmation = true
+        } label: {
+            VStack(spacing: 2) {
+                Image(systemName: "arrow.counterclockwise")
+                    .font(.system(size: 14, weight: .regular))
+                Text("リセット")
+                    .font(.system(size: 11, weight: .regular))
+            }
+            .foregroundStyle(hasAnyIntensity ? Color.ivory : Color.inkTertiary)
+            .frame(width: 60)
+            .padding(.vertical, 10)
+            .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
+        }
+        .disabled(!hasAnyIntensity)
+        .accessibilityLabel("メイクをリセット")
+        .aid("studio_reset_button")
+    }
+
+    private func modeButton(title: String, subtitle: String, mode: StudioViewModel.DisplayMode, aid: String) -> some View {
         let isActive = viewModel.displayMode == mode
         return Button {
             withAnimation(.easeInOut(duration: 0.2)) { viewModel.displayMode = mode }
         } label: {
-            Text(title)
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .kerning(1.5)
-                .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(isActive ? Color.ivory : Color.clear)
+            VStack(spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                Text(subtitle)
+                    .font(.system(size: 11, weight: .regular))
+                    .opacity(0.65)
+            }
+            .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(isActive ? Color.ivory : Color.clear)
         }
+        .accessibilityLabel("\(title)モード。\(subtitle)")
         .aid(aid)
         .animation(.easeInOut(duration: 0.2), value: viewModel.displayMode)
     }

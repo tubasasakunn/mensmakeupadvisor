@@ -18,7 +18,7 @@ struct StudioSlider: View {
                     .frame(height: 1)
 
                 Rectangle()
-                    .fill(Color.ivory.opacity(0.5))
+                    .fill(Theme.Step.baseDot)
                     .frame(width: handleX, height: 1)
 
                 Rectangle()

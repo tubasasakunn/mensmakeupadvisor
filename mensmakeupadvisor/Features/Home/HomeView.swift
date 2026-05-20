@@ -17,21 +17,21 @@ struct HomeView: View {
         TabView(selection: $selection) {
             HomeReportTab()
                 .tabItem {
-                    Label("REPORT", systemImage: "doc.text.magnifyingglass")
+                    Label("診断", systemImage: "doc.text.magnifyingglass")
                 }
                 .tag(Tab.report)
                 .aid("home_tab_report")
 
             HomeCreateTab()
                 .tabItem {
-                    Label("CREATE", systemImage: "sparkles")
+                    Label("撮影", systemImage: "camera.fill")
                 }
                 .tag(Tab.create)
                 .aid("home_tab_create")
 
             HomeArchiveTab()
                 .tabItem {
-                    Label("ARCHIVE", systemImage: "square.grid.2x2")
+                    Label("保存", systemImage: "square.grid.2x2")
                 }
                 .tag(Tab.archive)
                 .aid("home_tab_archive")

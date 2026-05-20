@@ -41,9 +41,9 @@ struct DiagnosisFaceMeshPlate: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: size.width, height: size.height)
-                    .overlay(Color.appBackground.opacity(0.55))
+                    .overlay(Theme.Surface.imageDim)
             } else {
-                Rectangle().fill(Color.white.opacity(0.08))
+                Rectangle().fill(Theme.Surface.glassMedium)
             }
 
             if let landmarks = result?.landmarksNormalized, !landmarks.isEmpty {
@@ -64,7 +64,7 @@ struct DiagnosisFaceMeshPlate: View {
                 meshPath.move(to: CGPoint(x: pa.x * size.width, y: pa.y * size.height))
                 meshPath.addLine(to: CGPoint(x: pb.x * size.width, y: pb.y * size.height))
             }
-            context.stroke(meshPath, with: .color(Color.ivory.opacity(0.28)), lineWidth: 0.4)
+            context.stroke(meshPath, with: .color(Theme.Diagram.highlightArea), lineWidth: 0.4)
 
             for p in landmarks {
                 let r: CGFloat = 0.9
@@ -72,7 +72,7 @@ struct DiagnosisFaceMeshPlate: View {
                     x: p.x * size.width - r, y: p.y * size.height - r,
                     width: r * 2, height: r * 2
                 )
-                context.fill(Path(ellipseIn: rect), with: .color(Color.ivory.opacity(0.65)))
+                context.fill(Path(ellipseIn: rect), with: .color(Theme.Mesh.landmarkDot))
             }
         }
         .allowsHitTesting(false)
@@ -86,14 +86,14 @@ struct DiagnosisFaceMeshPlate: View {
                 let x = CGFloat(col) * size.width / CGFloat(cols)
                 p.move(to: CGPoint(x: x, y: 0))
                 p.addLine(to: CGPoint(x: x, y: size.height))
-                context.stroke(p, with: .color(Color.ivory.opacity(0.12)), lineWidth: 0.5)
+                context.stroke(p, with: .color(Theme.Mesh.placeholderGrid), lineWidth: 0.5)
             }
             for row in 0...rows {
                 var p = Path()
                 let y = CGFloat(row) * size.height / CGFloat(rows)
                 p.move(to: CGPoint(x: 0, y: y))
                 p.addLine(to: CGPoint(x: size.width, y: y))
-                context.stroke(p, with: .color(Color.ivory.opacity(0.12)), lineWidth: 0.5)
+                context.stroke(p, with: .color(Theme.Mesh.placeholderGrid), lineWidth: 0.5)
             }
         }
         .allowsHitTesting(false)
@@ -101,14 +101,12 @@ struct DiagnosisFaceMeshPlate: View {
 
     private var captionLabel: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("FIG. 01")
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
+            Text("図 1")
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
-            Text("FACE MESH · 478 PTS")
-                .font(.system(size: 8, weight: .regular, design: .monospaced))
+            Text("顔メッシュ · 478 点")
+                .font(.system(size: 11, weight: .regular))
                 .foregroundStyle(Color.inkTertiary)
-                .kerning(1.5)
         }
     }
 

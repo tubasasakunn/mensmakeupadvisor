@@ -16,7 +16,7 @@ struct PrinciplePageView: View {
                 Text(num)
                     .font(.system(size: 80, weight: .bold, design: .serif))
                     .italic()
-                    .foregroundStyle(Color.brandPrimary.opacity(0.7))
+                    .foregroundStyle(Theme.Accent.primarySoft)
                     .padding(.bottom, -8)
             }
 
@@ -61,8 +61,8 @@ struct PrinciplePageView: View {
                     .padding(.bottom, 10)
 
                 Text(footer)
-                    .font(.system(size: 10))
-                    .foregroundStyle(Color.inkSecondary.opacity(0.7))
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.Text.secondaryFaded)
                     .lineSpacing(4)
             }
 
@@ -91,7 +91,7 @@ struct PrincipleItemRow: View {
         .padding(.leading, 12)
         .overlay(
             Rectangle()
-                .fill(Color.brandPrimary.opacity(0.6))
+                .fill(Theme.Plate.scanLineGlow)
                 .frame(width: 2),
             alignment: .leading
         )

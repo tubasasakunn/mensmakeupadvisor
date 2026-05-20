@@ -53,25 +53,26 @@ nonisolated struct AnalysisResult: Sendable {
 
     var gradeDescription: String {
         switch totalScore {
-        case 85...: "exceptional"
-        case 75...: "excellent"
-        case 65...: "good balance"
-        case 55...: "standard"
-        default: "needs care"
+        case 85...: "理想的なバランス"
+        case 75...: "とても整っている"
+        case 65...: "バランス良好"
+        case 55...: "標準的"
+        default: "伸びしろあり"
         }
     }
 
     var rankPercentile: String {
+        // 否定的・競争的表現を避け、ポジティブリフレーミングする
         switch totalScore {
-        case 90...: "上位 約3%"
-        case 85...: "上位 約8%"
-        case 80...: "上位 約15%"
-        case 75...: "上位 約22%"
-        case 70...: "上位 約31%"
-        case 65...: "上位 約42%"
-        case 60...: "上位 約55%"
-        case 55...: "上位 約67%"
-        default: "上位 約80%"
+        case 90...: "整いやすいタイプ"
+        case 85...: "バランスが良い"
+        case 80...: "強みが多い"
+        case 75...: "平均より高め"
+        case 70...: "平均より少し高め"
+        case 65...: "平均的"
+        case 60...: "改善で印象が変わる"
+        case 55...: "伸びしろが大きい"
+        default: "伸びしろが大きい"
         }
     }
 

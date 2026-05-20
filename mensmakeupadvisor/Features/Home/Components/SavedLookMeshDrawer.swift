@@ -11,7 +11,7 @@ struct SavedLookMeshDrawer {
     let look: SavedLook
     let geometry: SavedLookMeshGeometry?
 
-    private let meshColor = Color.ivory.opacity(0.16)
+    private let meshColor = Theme.Mesh.savedLookOverlay
 
     func draw() {
         drawBackground()
@@ -31,7 +31,7 @@ struct SavedLookMeshDrawer {
     private func drawBackground() {
         var ctx = context
         ctx.fill(Path(CGRect(origin: .zero, size: size)),
-                 with: .color(Color(red: 0.10, green: 0.09, blue: 0.08)))
+                 with: .color(Theme.Mesh.backdrop))
     }
 
     // メッシュ未取得 (診断前に保存されたルック等) のフォールバック。
@@ -43,14 +43,14 @@ struct SavedLookMeshDrawer {
             let x = CGFloat(c) * size.width / CGFloat(cols)
             p.move(to: CGPoint(x: x, y: 0))
             p.addLine(to: CGPoint(x: x, y: size.height))
-            ctx.stroke(p, with: .color(Color.ivory.opacity(0.10)), lineWidth: 0.5)
+            ctx.stroke(p, with: .color(Theme.Mesh.wireSubtle), lineWidth: 0.5)
         }
         for r in 0...rows {
             var p = Path()
             let y = CGFloat(r) * size.height / CGFloat(rows)
             p.move(to: CGPoint(x: 0, y: y))
             p.addLine(to: CGPoint(x: size.width, y: y))
-            ctx.stroke(p, with: .color(Color.ivory.opacity(0.10)), lineWidth: 0.5)
+            ctx.stroke(p, with: .color(Theme.Mesh.wireSubtle), lineWidth: 0.5)
         }
     }
 

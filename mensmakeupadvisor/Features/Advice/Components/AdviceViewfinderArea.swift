@@ -4,14 +4,14 @@ struct AdviceViewfinderArea: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color.white.opacity(0.03))
+                .fill(Theme.Surface.glassWeak)
                 .frame(height: 280)
 
             Ellipse()
                 .stroke(
                     style: StrokeStyle(lineWidth: 1, dash: [6, 4])
                 )
-                .foregroundStyle(Color.ivory.opacity(0.3))
+                .foregroundStyle(Theme.Plate.dashedEllipse)
                 .padding(32)
 
             viewfinderCorners
@@ -55,28 +55,28 @@ struct AdviceViewfinderArea: View {
                     p.addLine(to: CGPoint(x: 8, y: 8))
                     p.addLine(to: CGPoint(x: 8 + arm, y: 8))
                 }
-                .stroke(Color.ivory.opacity(0.6), lineWidth: thick)
+                .stroke(Theme.Step.labelTag, lineWidth: thick)
 
                 Path { p in
                     p.move(to: CGPoint(x: w - 8 - arm, y: 8))
                     p.addLine(to: CGPoint(x: w - 8, y: 8))
                     p.addLine(to: CGPoint(x: w - 8, y: 8 + arm))
                 }
-                .stroke(Color.ivory.opacity(0.6), lineWidth: thick)
+                .stroke(Theme.Step.labelTag, lineWidth: thick)
 
                 Path { p in
                     p.move(to: CGPoint(x: 8, y: h - 8 - arm))
                     p.addLine(to: CGPoint(x: 8, y: h - 8))
                     p.addLine(to: CGPoint(x: 8 + arm, y: h - 8))
                 }
-                .stroke(Color.ivory.opacity(0.6), lineWidth: thick)
+                .stroke(Theme.Step.labelTag, lineWidth: thick)
 
                 Path { p in
                     p.move(to: CGPoint(x: w - 8 - arm, y: h - 8))
                     p.addLine(to: CGPoint(x: w - 8, y: h - 8))
                     p.addLine(to: CGPoint(x: w - 8, y: h - 8 - arm))
                 }
-                .stroke(Color.ivory.opacity(0.6), lineWidth: thick)
+                .stroke(Theme.Step.labelTag, lineWidth: thick)
             }
         }
     }

@@ -62,12 +62,12 @@ appId: com.tubasasakun.mensmakeupadvisor
 - tapOn:
     id: "studio_save_button"
 
-- waitForAnimationToEnd:
-    timeout: 2000
+- assertVisible:
+    id: "studio_saved_notification"
 
-# アーカイブへ移動
+# トーストの「ホームへ」でホームに戻る
 - tapOn:
-    id: "studio_header_saved_button"
+    id: "studio_saved_go_home"
 
 - assertVisible:
-    id: "archive_view"
+    id: "home_view"

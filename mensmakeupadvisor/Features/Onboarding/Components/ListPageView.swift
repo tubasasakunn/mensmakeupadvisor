@@ -37,7 +37,7 @@ struct NumberedListItem: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Text(number)
-                .font(.system(size: 10, design: .monospaced))
+                .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(Color.brandPrimary)
                 .padding(.top, 2)
 

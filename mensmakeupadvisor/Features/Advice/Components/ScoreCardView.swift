@@ -58,31 +58,27 @@ struct ScoreCardView: View {
 
     private var headerRow: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text(String(format: "n°%02d", index + 1))
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
+            Text("\(index + 1).")
+                .font(.system(size: 13, weight: .regular))
                 .foregroundStyle(Color.inkTertiary)
-                .kerning(1)
 
             Text(score.name)
-                .font(.system(size: 14, weight: .medium, design: .serif))
-                .italic()
+                .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(Color.ivory)
 
             Spacer()
 
             Text(score.grade)
-                .font(.system(size: 18, weight: .light, design: .serif))
-                .italic()
+                .font(.system(size: 18, weight: .heavy))
                 .foregroundStyle(score.gradeColor)
                 .frame(minWidth: 24, alignment: .trailing)
 
-            Text("\(score.score)pt")
-                .font(.system(size: 11, weight: .regular, design: .monospaced))
+            Text("\(score.score) 点")
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.inkSecondary)
 
-            // expand chevron
             Image(systemName: "chevron.down")
-                .font(.system(size: 10, weight: .medium))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.inkSecondary)
                 .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 .animation(.easeInOut(duration: 0.25), value: isExpanded)
@@ -126,9 +122,8 @@ struct ScoreCardView: View {
                     landmarks: landmarks
                 )
                 Text(annotationCaption)
-                    .font(.system(size: 9, weight: .regular, design: .monospaced))
+                    .font(.system(size: 11, weight: .regular))
                     .foregroundStyle(Color.inkTertiary)
-                    .kerning(1.2)
             }
         } else {
             Text("画像が読み込まれていないため、評価線を表示できません。")
@@ -139,13 +134,13 @@ struct ScoreCardView: View {
 
     private var annotationCaption: String {
         switch score.name {
-        case "骨格バランス": "FIG · 顔幅・顔高・頬骨ライン"
-        case "三分割比率":   "FIG · 額／中顔面／下顔面"
-        case "五分割比率":   "FIG · こめかみ〜目尻〜目頭"
-        case "目の比率":     "FIG · 目の縦×横"
-        case "鼻のバランス": "FIG · 鼻幅と目間の対比"
-        case "口の比率":     "FIG · 口幅と上下唇の厚み"
-        case "左右対称性":   "FIG · 中央線とペア点"
+        case "骨格バランス": "図 · 顔幅・顔高・頬骨ライン"
+        case "三分割比率":   "図 · 額／中顔面／下顔面"
+        case "五分割比率":   "図 · こめかみ〜目尻〜目頭"
+        case "目の比率":     "図 · 目の縦×横"
+        case "鼻のバランス": "図 · 鼻幅と目間の対比"
+        case "口の比率":     "図 · 口幅と上下唇の厚み"
+        case "左右対称性":   "図 · 中央線とペア点"
         default: ""
         }
     }

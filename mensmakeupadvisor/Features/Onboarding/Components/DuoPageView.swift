@@ -49,7 +49,7 @@ struct DuoColumn: View {
                 .foregroundStyle(accentColor)
 
             Text(labelJP)
-                .font(.system(size: 10, design: .monospaced))
+                .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(accentColor.opacity(0.7))
                 .kerning(0.5)
                 .lineSpacing(3)

@@ -4,6 +4,7 @@ import UIKit
 struct DiagnosisHeroSection: View {
     let result: AnalysisResult
     @State private var gradeBadgeVisible = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(alignment: .center, spacing: 24) {
@@ -12,7 +13,7 @@ struct DiagnosisHeroSection: View {
                     .aid("diagnosis_score_ring")
 
                 Text(result.grade)
-                    .font(.system(size: 17, weight: .black, design: .monospaced))
+                    .font(.system(size: 18, weight: .heavy))
                     .foregroundStyle(Color.appBackground)
                     .frame(width: 44, height: 44)
                     .background(result.gradeColor)
@@ -21,42 +22,43 @@ struct DiagnosisHeroSection: View {
                     .offset(x: 8, y: 8)
                     .opacity(gradeBadgeVisible ? 1 : 0)
                     .scaleEffect(gradeBadgeVisible ? 1 : 0.4)
+                    .accessibilityLabel("総合評価 \(result.grade)")
                     .onAppear {
-                        withAnimation(.spring(duration: 0.5, bounce: 0.4).delay(1.5)) {
+                        if reduceMotion {
                             gradeBadgeVisible = true
+                        } else {
+                            withAnimation(.spring(duration: 0.5, bounce: 0.4).delay(1.5)) {
+                                gradeBadgeVisible = true
+                            }
                         }
                     }
             }
 
             VStack(alignment: .leading, spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("FACE SHAPE")
-                        .font(.system(size: 9, weight: .regular, design: .monospaced))
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("顔型")
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.inkSecondary)
-                        .kerning(2)
 
                     Text(result.faceShape.label)
-                        .font(.system(size: 24, weight: .bold, design: .serif))
-                        .italic()
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundStyle(Color.ivory)
 
                     HStack(spacing: 5) {
                         Text(result.grade)
-                            .font(.system(size: 11, weight: .black, design: .monospaced))
+                            .font(.system(size: 13, weight: .heavy))
                             .foregroundStyle(result.gradeColor)
                         Text("·")
-                            .font(.system(size: 11, design: .monospaced))
+                            .font(.system(size: 12))
                             .foregroundStyle(Color.inkTertiary)
                         Text(result.gradeDescription)
-                            .font(.system(size: 11, weight: .regular, design: .monospaced))
+                            .font(.system(size: 12, weight: .regular))
                             .foregroundStyle(result.gradeColor.opacity(0.9))
-                            .kerning(0.5)
                     }
 
                     Text(result.rankPercentile)
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.inkSecondary)
-                        .kerning(1)
                 }
 
                 Rectangle()

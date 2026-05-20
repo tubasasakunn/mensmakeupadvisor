@@ -78,12 +78,12 @@ struct DiagnosisShareCardView: View {
                         .scaledToFill()
                 } else {
                     Rectangle()
-                        .fill(Color.white.opacity(0.04))
+                        .fill(Theme.Surface.glassWeak)
                 }
             }
             .frame(width: 320, height: 200)
             .clipped()
-            .overlay(Color.appBackground.opacity(0.38))
+            .overlay(Theme.Surface.shareCardOverlay)
             .overlay(faceMeshCanvas)
             .overlay(
                 LinearGradient(
@@ -127,14 +127,14 @@ struct DiagnosisShareCardView: View {
                 let x = CGFloat(col) * cellW
                 p.move(to: CGPoint(x: x, y: 0))
                 p.addLine(to: CGPoint(x: x, y: size.height))
-                context.stroke(p, with: .color(Color.ivory.opacity(0.10)), lineWidth: 0.5)
+                context.stroke(p, with: .color(Theme.Mesh.wireSubtle), lineWidth: 0.5)
             }
             for row in 0...rows {
                 var p = Path()
                 let y = CGFloat(row) * cellH
                 p.move(to: CGPoint(x: 0, y: y))
                 p.addLine(to: CGPoint(x: size.width, y: y))
-                context.stroke(p, with: .color(Color.ivory.opacity(0.10)), lineWidth: 0.5)
+                context.stroke(p, with: .color(Theme.Mesh.wireSubtle), lineWidth: 0.5)
             }
         }
         .allowsHitTesting(false)

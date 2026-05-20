@@ -3,6 +3,7 @@ import SwiftUI
 struct OnboardingView: View {
     @Environment(AppState.self) private var appState
     @State private var currentPage = 0
+    @State private var showChapterSheet = false
 
     private let pages = OnboardingPage.all
 
@@ -26,6 +27,9 @@ struct OnboardingView: View {
                 navigationBar
             }
         }
+        .sheet(isPresented: $showChapterSheet) {
+            OnboardingChapterSheet(currentPage: $currentPage)
+        }
         // 親に付けた identifier を子に継承させない。SwiftUI のデフォルト挙動だと
         // 子の Button の identifier が "onboarding_view" で上書きされる。
         .accessibilityElement(children: .contain)
@@ -35,13 +39,16 @@ struct OnboardingView: View {
     // MARK: - Header
 
     private var headerBar: some View {
-        HStack {
+        HStack(spacing: 10) {
+            chapterIndexButton
+
             Text(pages[currentPage].tag)
-                .font(.system(size: 9, design: .monospaced))
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2.5)
+                .kerning(1.5)
                 .animation(.none, value: currentPage)
                 .accessibilityIdentifier("onboarding_page_tag")
+
             Spacer()
             skipButton
         }
@@ -50,29 +57,50 @@ struct OnboardingView: View {
         .padding(.bottom, 10)
     }
 
-    private var skipButton: some View {
+    private var chapterIndexButton: some View {
         Button {
-            appState.navigate(to: .capture)
+            showChapterSheet = true
         } label: {
             HStack(spacing: 4) {
-                Text("SKIP")
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
-                    .kerning(1.5)
-                Text("→")
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                Image(systemName: "list.bullet")
+                    .font(.system(size: 12, weight: .medium))
+                Text("目次")
+                    .font(.system(size: 12, weight: .medium))
             }
             .foregroundStyle(Color.inkSecondary)
             .padding(.horizontal, 10)
-            .padding(.vertical, 5)
+            .padding(.vertical, 6)
             .overlay(
                 RoundedRectangle(cornerRadius: 2)
-                    .stroke(Color.inkSecondary.opacity(0.4), lineWidth: 1)
+                    .stroke(Theme.Line.outlineSoft, lineWidth: 1)
             )
         }
-        // 子要素の Text を1つのアクセシビリティ要素に束ね、Maestro 等から identifier で
-        // 確実にヒットさせる。
+        .accessibilityLabel("目次を開く")
+        .accessibilityIdentifier("onboarding_chapter_button")
+    }
+
+    // Home から再読しているか (analysisResult があれば一度はアプリを使った人)。
+    // 初回フローでは「読み飛ばす → 撮影画面」、再読では「ホームに戻る」にする。
+    private var isRereadFromHome: Bool {
+        appState.analysisResult != nil
+    }
+
+    private var skipButton: some View {
+        Button {
+            appState.navigate(to: isRereadFromHome ? .home : .capture)
+        } label: {
+            Text(isRereadFromHome ? "ホームに戻る" : "読み飛ばす")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(Color.inkSecondary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 2)
+                        .stroke(Theme.Line.outlineMedium, lineWidth: 1)
+                )
+        }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Skip onboarding")
+        .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "読み飛ばして撮影画面へ")
         .accessibilityIdentifier("onboarding_skip_button")
     }
 
@@ -85,7 +113,7 @@ struct OnboardingView: View {
                     .fill(Color.lineColor)
                     .frame(height: 1.5)
                 Rectangle()
-                    .fill(Color.ivory.opacity(0.7))
+                    .fill(Theme.Text.primaryFaded)
                     .frame(width: geo.size.width * CGFloat(currentPage + 1) / CGFloat(pages.count), height: 1.5)
                     .animation(.easeInOut(duration: 0.25), value: currentPage)
             }
@@ -101,10 +129,10 @@ struct OnboardingView: View {
     private var folioBar: some View {
         HStack {
             Spacer()
-            Text("p. \(String(format: "%03d", currentPage + 1)) of \(String(format: "%03d", pages.count))")
-                .font(.system(size: 9, design: .monospaced))
-                .foregroundStyle(Color.inkSecondary.opacity(0.6))
-                .kerning(1)
+            Text("\(currentPage + 1) / \(pages.count) ページ")
+                .font(.system(size: 11))
+                .foregroundStyle(Theme.Text.secondaryFaded)
+                .accessibilityLabel("\(currentPage + 1) ページ目、全 \(pages.count) ページ中")
                 .accessibilityIdentifier("onboarding_folio_label")
         }
         .padding(.horizontal, 28)
@@ -118,21 +146,21 @@ struct OnboardingView: View {
             Spacer()
             if currentPage == pages.count - 1 {
                 Button {
-                    appState.navigate(to: .capture)
+                    appState.navigate(to: isRereadFromHome ? .home : .capture)
                 } label: {
-                    HStack(spacing: 6) {
-                        Text("BEGIN")
-                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                            .kerning(1.5)
+                    HStack(spacing: 8) {
+                        Text(isRereadFromHome ? "ホームに戻る" : "撮影をはじめる")
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(Color.ivory)
-                        Text("→")
-                            .font(.system(size: 12, weight: .semibold))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(Color.ivory)
                     }
                     .padding(.horizontal, 24)
-                    .padding(.vertical, 13)
+                    .padding(.vertical, 14)
                 }
                 .glassEffect(.regular, in: .capsule)
+                .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "撮影をはじめる")
                 .accessibilityIdentifier("onboarding_continue_button")
             }
         }

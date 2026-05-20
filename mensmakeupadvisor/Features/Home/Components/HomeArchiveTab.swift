@@ -56,37 +56,33 @@ struct HomeArchiveTab: View {
     }
 
     private var headerSection: some View {
-        Text("ARCHIVE · YOUR LOOKS")
-            .font(.system(size: 10, weight: .regular, design: .monospaced))
+        Text("保存したルック")
+            .font(.system(size: 12))
             .foregroundStyle(Color.inkSecondary)
-            .kerning(2.5)
     }
 
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("your archive.")
-                .font(.system(size: 38, weight: .light, design: .serif))
-                .italic()
-                .foregroundStyle(Color.brandPrimary)
+            Text("マイ・コレクション")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(Color.ivory)
 
-            Text("\(savedLooks.count) looks saved")
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
+            Text(savedLooks.isEmpty ? "保存ゼロ件" : "保存 \(savedLooks.count) 件")
+                .font(.system(size: 12))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(1)
         }
     }
 
     private var emptyState: some View {
         VStack(spacing: 16) {
-            Text("♡")
-                .font(.system(size: 36))
+            Image(systemName: "heart")
+                .font(.system(size: 36, weight: .light))
                 .foregroundStyle(Color.inkSecondary)
-            Text("まだ、保存はありません")
-                .font(.system(size: 14, weight: .light, design: .serif))
-                .italic()
+            Text("まだ保存したルックがありません")
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Color.ivory)
-            Text("CREATE タブからルックを作って\nスタジオで保存してください。")
-                .font(.system(size: 11))
+            Text("「撮影」タブから自分の顔を撮って、\nスタジオで気に入った仕上がりを保存できます。")
+                .font(.system(size: 12))
                 .foregroundStyle(Color.inkSecondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(5)
@@ -113,7 +109,7 @@ struct HomeArchiveTab: View {
                         Text(grade(for: look.totalScore))
                             .font(.system(size: 11, weight: .light, design: .serif))
                             .italic()
-                            .foregroundStyle(Color.ivory.opacity(0.6))
+                            .foregroundStyle(Theme.Step.labelTag)
                             .padding(6)
                     }
                 }

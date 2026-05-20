@@ -42,9 +42,9 @@ struct DiagnosisProportionPlate: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: size.width, height: size.height)
-                    .overlay(Color.appBackground.opacity(0.65))
+                    .overlay(Theme.Surface.imageDimStrong)
             } else {
-                Rectangle().fill(Color.white.opacity(0.08))
+                Rectangle().fill(Theme.Surface.glassMedium)
             }
 
             if let landmarks = result?.landmarksNormalized, landmarks.count >= 478 {
@@ -69,7 +69,7 @@ struct DiagnosisProportionPlate: View {
             let subnasalY = pt(FaceLandmarkID.subnasal).y
             let chinY     = pt(FaceLandmarkID.chinBottom).y
 
-            let thirdsColor = Color.brandPrimary.opacity(0.85)
+            let thirdsColor = Theme.Accent.primaryFaded
             for y in [foreheadY, glabellaY, subnasalY, chinY] {
                 var p = Path()
                 p.move(to: CGPoint(x: 0, y: y))
@@ -98,7 +98,7 @@ struct DiagnosisProportionPlate: View {
                 pt(FaceLandmarkID.eyeOuterL).x,
                 pt(FaceLandmarkID.templeL).x,
             ]
-            let fifthsColor = Color.sulphur.opacity(0.85)
+            let fifthsColor = Theme.Annotation.fifthsLine
             // 縦線は顔の高さ全体ではなく、額〜顎の範囲で描く
             for x in xs {
                 var p = Path()
@@ -108,7 +108,7 @@ struct DiagnosisProportionPlate: View {
             }
 
             // ─── 目幅・口幅・鼻幅 ───
-            let highlight = Color.ivory.opacity(0.95)
+            let highlight = Theme.Annotation.primary
 
             // 目幅（左右）
             drawRange(context: &context,
@@ -172,14 +172,12 @@ struct DiagnosisProportionPlate: View {
 
     private var captionLabel: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("FIG. 02")
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
+            Text("図 2")
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
-            Text("PROPORTIONS · 3RDS / 5THS")
-                .font(.system(size: 8, weight: .regular, design: .monospaced))
+            Text("比率 · 三分割 / 五分割")
+                .font(.system(size: 11, weight: .regular))
                 .foregroundStyle(Color.inkTertiary)
-                .kerning(1.5)
         }
     }
 }

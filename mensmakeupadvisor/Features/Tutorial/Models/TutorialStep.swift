@@ -14,6 +14,12 @@ struct TutorialStep: Identifiable, Sendable {
     let explanation: String
     let oneLiner: String
 
+    // ステップ番号 (1-based) を算用数字で。Roman 表記 (tag) と並行で持つ。
+    var tagNumeric: Int {
+        let romans = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV"]
+        return (romans.firstIndex(of: tag) ?? -1) + 1
+    }
+
     // 顔型に応じた tutorial シーケンス。tag は出現順で振り直す。
     static func sequence(for shape: FaceShape?) -> [TutorialStep] {
         let f = shape ?? .tamago

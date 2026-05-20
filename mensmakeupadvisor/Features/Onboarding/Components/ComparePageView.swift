@@ -45,13 +45,13 @@ struct BeforeAfterSlider: View {
 
             ZStack(alignment: .leading) {
                 // After — 底レイヤー: 常に full size で固定
-                sliderImageLayer(img: afterImage, w: w, h: h, placeholder: Color(white: 0.26))
+                sliderImageLayer(img: afterImage, w: w, h: h, placeholder: Theme.Placeholder.stepAfterMed)
                     .overlay(alignment: .bottomTrailing) {
-                        sliderBadge("AFTER", color: Color.ivory.opacity(0.8))
+                        sliderBadge("AFTER", color: Theme.Plate.beforeAfterDivider)
                     }
 
                 // Before — 上レイヤー: full size だが左端からクリップ
-                sliderImageLayer(img: beforeImage, w: w, h: h, placeholder: Color(white: 0.18))
+                sliderImageLayer(img: beforeImage, w: w, h: h, placeholder: Theme.Placeholder.stepBeforeMed)
                     .overlay(alignment: .bottomLeading) {
                         sliderBadge("BEFORE", color: Color.inkSecondary)
                     }
@@ -85,25 +85,25 @@ struct BeforeAfterSlider: View {
 
     private func sliderBadge(_ text: String, color: Color) -> some View {
         Text(text)
-            .font(.system(size: 9, design: .monospaced))
+            .font(.system(size: 11, design: .monospaced))
             .foregroundStyle(color)
             .kerning(2)
             .padding(6)
-            .background(Color.black.opacity(0.5))
+            .background(Theme.Surface.scrim)
             .padding(8)
     }
 
     private func dragHandle(h: CGFloat, x: CGFloat) -> some View {
         ZStack {
             Rectangle()
-                .fill(Color.ivory.opacity(0.9))
+                .fill(Theme.Plate.labelText)
                 .frame(width: 2)
             Circle()
                 .fill(Color.ivory)
                 .frame(width: 28, height: 28)
                 .overlay(
                     Image(systemName: "arrow.left.arrow.right")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(Color.appBackground)
                 )
         }

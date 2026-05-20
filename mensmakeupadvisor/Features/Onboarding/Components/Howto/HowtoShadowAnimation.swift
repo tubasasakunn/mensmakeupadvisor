@@ -31,7 +31,7 @@ struct HowtoShadowAnimation: View {
         }, width: 12),
     ]
 
-    private let strokeColor = Color(red: 0.365, green: 0.227, blue: 0.161)
+    private let strokeColor = Theme.Howto.shadowStroke
     private let maxOpacity: Double = 0.6
 
     var body: some View {
@@ -68,5 +68,5 @@ struct HowtoShadowAnimation: View {
 #Preview {
     HowtoShadowAnimation()
         .frame(width: 260, height: 260)
-        .background(Color.gray.opacity(0.1))
+        .background(Theme.Howto.canvas)
 }
