@@ -11,11 +11,15 @@ struct FineTunePanelView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("FINE TUNE")
-                .font(.system(.caption, design: .monospaced))
-                .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
-                .padding(.bottom, 16)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("細かく調整する")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.ivory)
+                Text("0 で何もしない、50 が標準、100 で最大")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.inkSecondary)
+            }
+            .padding(.bottom, 16)
 
             VStack(spacing: 20) {
                 ForEach(sliderKinds, id: \.self) { kind in
@@ -31,11 +35,10 @@ struct FineTunePanelView: View {
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .lastTextBaseline) {
-                Text(kind.label.uppercased())
-                    .font(.system(size: 9, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.inkSecondary)
-                    .kerning(2)
-                    .frame(width: 88, alignment: .leading)
+                Text(kind.labelJP)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color.ivory)
+                    .frame(width: 100, alignment: .leading)
 
                 Spacer()
 
@@ -53,26 +56,27 @@ struct FineTunePanelView: View {
                 ),
                 range: 0...100
             )
+            .accessibilityLabel("\(kind.labelJP)の強さ")
+            .accessibilityValue("\(Int(value))")
             .aid("studio_intensity_\(kind.rawValue)")
         }
     }
 
     private var browTypeRow: some View {
         let options: [(label: String, value: EyebrowApplier.BrowType?)] = [
-            ("OFF", nil),
-            ("NATURAL", .natural),
-            ("STRAIGHT", .straight),
-            ("ARCH", .arch),
-            ("PARALLEL", .parallel),
-            ("CORNER", .corner),
+            ("なし", nil),
+            ("ナチュラル", .natural),
+            ("ストレート", .straight),
+            ("アーチ", .arch),
+            ("平行", .parallel),
+            ("角度あり", .corner),
         ]
         return VStack(alignment: .leading, spacing: 8) {
-            Text("BROW TYPE")
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
-                .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
+            Text("眉のかたち")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color.ivory)
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 88), spacing: 6)], spacing: 6) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 6)], spacing: 6) {
                 ForEach(0..<options.count, id: \.self) { i in
                     browTypeButton(options[i])
                 }
@@ -90,15 +94,15 @@ struct FineTunePanelView: View {
             }
         } label: {
             Text(entry.label)
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
-                .kerning(1.2)
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
                 .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
                 .background(isActive ? Color.ivory : Color.clear)
                 .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
         }
+        .accessibilityLabel("眉のかたち\(entry.label)" + (isActive ? "。選択中" : ""))
         .aid("studio_brow_type_\(aidValue)")
     }
 }

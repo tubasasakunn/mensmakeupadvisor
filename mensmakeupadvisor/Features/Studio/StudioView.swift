@@ -64,30 +64,37 @@ struct StudioView: View {
             Button {
                 appState.navigate(to: .diagnosis)
             } label: {
-                Text("← REPORT")
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.inkSecondary)
-                    .kerning(1.5)
+                HStack(spacing: 4) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text("診断結果")
+                        .font(.system(size: 13, weight: .regular))
+                }
+                .foregroundStyle(Color.inkSecondary)
             }
+            .accessibilityLabel("診断結果に戻る")
             .aid("studio_back_button")
 
             Spacer()
 
-            Text("ATELIER · STUDIO")
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
+            Text("スタジオ")
+                .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Color.ivory)
-                .kerning(2)
 
             Spacer()
 
             Button {
                 appState.navigate(to: .home)
             } label: {
-                Text("HOME →")
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.inkSecondary)
-                    .kerning(1.5)
+                HStack(spacing: 4) {
+                    Image(systemName: "house.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text("ホーム")
+                        .font(.system(size: 13, weight: .regular))
+                }
+                .foregroundStyle(Color.inkSecondary)
             }
+            .accessibilityLabel("ホームに戻る")
             .aid("studio_header_home_button")
         }
         .padding(.horizontal, 28)
@@ -95,25 +102,40 @@ struct StudioView: View {
 
     private var modeSegment: some View {
         HStack(spacing: 0) {
-            modeButton(title: "COMPARE", mode: .compare, aid: "studio_compare_button")
-            modeButton(title: "FINE TUNE", mode: .fineTune, aid: "studio_finetune_button")
+            modeButton(
+                title: "比べる",
+                subtitle: "Before / After",
+                mode: .compare,
+                aid: "studio_compare_button"
+            )
+            modeButton(
+                title: "細かく調整",
+                subtitle: "色味と強さ",
+                mode: .fineTune,
+                aid: "studio_finetune_button"
+            )
         }
         .overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))
     }
 
-    private func modeButton(title: String, mode: StudioViewModel.DisplayMode, aid: String) -> some View {
+    private func modeButton(title: String, subtitle: String, mode: StudioViewModel.DisplayMode, aid: String) -> some View {
         let isActive = viewModel.displayMode == mode
         return Button {
             withAnimation(.easeInOut(duration: 0.2)) { viewModel.displayMode = mode }
         } label: {
-            Text(title)
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .kerning(1.5)
-                .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(isActive ? Color.ivory : Color.clear)
+            VStack(spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                Text(subtitle)
+                    .font(.system(size: 9, weight: .regular))
+                    .opacity(0.65)
+            }
+            .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(isActive ? Color.ivory : Color.clear)
         }
+        .accessibilityLabel("\(title)モード。\(subtitle)")
         .aid(aid)
         .animation(.easeInOut(duration: 0.2), value: viewModel.displayMode)
     }

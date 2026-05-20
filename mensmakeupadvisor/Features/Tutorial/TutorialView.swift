@@ -102,34 +102,38 @@ struct TutorialView: View {
     // MARK: - Subviews
 
     private var headerBar: some View {
-        HStack {
+        let isFirst = appState.tutorialStep == 0
+        return HStack {
             Button {
                 viewModel.prevStep(appState: appState)
             } label: {
-                Text("← BACK")
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.inkSecondary)
-                    .kerning(1.5)
+                HStack(spacing: 4) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text(isFirst ? "診断結果へ" : "前へ")
+                        .font(.system(size: 13, weight: .regular))
+                }
+                .foregroundStyle(Color.inkSecondary)
             }
+            .accessibilityLabel(isFirst ? "診断結果に戻る" : "前のステップに戻る")
             .aid("tutorial_back_button")
 
             Spacer()
 
-            Text("ACT \(currentStep.tag) OF \(steps.count)")
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
+            Text("ステップ \(appState.tutorialStep + 1) / \(steps.count)")
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.ivory)
-                .kerning(1.5)
 
             Spacer()
 
             Button {
                 viewModel.skip(appState: appState)
             } label: {
-                Text("SKIP →")
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                Text("あとで")
+                    .font(.system(size: 13, weight: .regular))
                     .foregroundStyle(Color.inkSecondary)
-                    .kerning(1.5)
             }
+            .accessibilityLabel("ガイドを終了してスタジオへ")
             .aid("tutorial_skip_button")
         }
         .padding(.horizontal, 28)
@@ -169,14 +173,18 @@ struct TutorialView: View {
             Button {
                 viewModel.nextStep(appState: appState)
             } label: {
-                Text(isLast ? "COMPOSE →" : "NEXT ACT →")
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(Color.appBackground)
-                    .kerning(1.5)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(Color.ivory)
+                HStack(spacing: 8) {
+                    Text(isLast ? "スタジオで仕上げる" : "次のステップへ")
+                        .font(.system(size: 15, weight: .semibold))
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                .foregroundStyle(Color.appBackground)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 14)
+                .background(Color.ivory)
             }
+            .accessibilityLabel(isLast ? "スタジオで仕上げる" : "次のステップへ")
             .aid("tutorial_next_button")
         }
     }

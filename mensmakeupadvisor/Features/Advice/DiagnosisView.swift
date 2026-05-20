@@ -82,22 +82,22 @@ struct DiagnosisView: View {
                 appState.navigate(to: .capture)
             } label: {
                 HStack(spacing: 6) {
-                    Image(systemName: "arrow.left")
-                        .font(.system(size: 11, weight: .regular, design: .monospaced))
-                    Text("BACK")
-                        .font(.system(size: 11, weight: .regular, design: .monospaced))
-                        .kerning(1.5)
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text("撮影に戻る")
+                        .font(.system(size: 13, weight: .regular))
                 }
                 .foregroundStyle(Color.inkSecondary)
             }
+            .accessibilityLabel("撮影画面に戻る")
             .aid("diagnosis_back_button")
 
             Spacer()
 
-            Text("DIAGNOSIS · REPORT")
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
+            Text("診断結果")
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.inkSecondary)
-                .kerning(2)
+                .kerning(1)
         }
     }
 
@@ -140,22 +140,26 @@ struct DiagnosisView: View {
     // MARK: - Bottom Buttons
 
     private var bottomButtons: some View {
-        VStack(spacing: 12) {
+        let isSkipFlow = appState.skipTutorialOnNextFlow
+        return VStack(spacing: 12) {
             Button {
-                // Home → CREATE で来た場合は tutorial をスキップ
-                if appState.skipTutorialOnNextFlow {
+                if isSkipFlow {
                     appState.skipTutorialOnNextFlow = false
                     appState.navigate(to: .studio)
                 } else {
                     appState.navigate(to: .tutorial)
                 }
             } label: {
-                HStack(spacing: 8) {
-                    Text(appState.skipTutorialOnNextFlow ? "OPEN STUDIO" : "BEGIN COMPOSITION")
-                        .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                        .kerning(0.5)
-                    Text("→")
-                        .font(.system(size: 14, weight: .regular, design: .monospaced))
+                VStack(spacing: 4) {
+                    HStack(spacing: 8) {
+                        Text(isSkipFlow ? "スタジオを開く" : "メイクを試してみる")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("→")
+                            .font(.system(size: 15, weight: .regular))
+                    }
+                    Text(isSkipFlow ? "すぐにプリセットや細かい調整ができます" : "5ステップのガイドに沿って進めます")
+                        .font(.system(size: 11, weight: .regular))
+                        .foregroundStyle(Color.appBackground.opacity(0.65))
                 }
                 .foregroundStyle(Color.appBackground)
                 .frame(maxWidth: .infinity)
@@ -163,23 +167,32 @@ struct DiagnosisView: View {
                 .background(Color.ivory)
                 .clipShape(RoundedRectangle(cornerRadius: 2))
             }
+            .accessibilityLabel(isSkipFlow ? "スタジオを開く。すぐにプリセットや細かい調整ができます" : "メイクを試してみる。5ステップのガイドに沿って進めます")
             .aid("diagnosis_begin_button")
 
-            Button {
-                appState.navigate(to: .studio)
-            } label: {
-                Text("Skip to fine tuning")
-                    .font(.system(size: 13, weight: .regular, design: .monospaced))
+            if !isSkipFlow {
+                Button {
+                    appState.navigate(to: .studio)
+                } label: {
+                    VStack(spacing: 2) {
+                        Text("ガイドを飛ばしてスタジオへ")
+                            .font(.system(size: 14, weight: .medium))
+                        Text("メイクの経験がある方向け")
+                            .font(.system(size: 10, weight: .regular))
+                            .foregroundStyle(Color.inkSecondary.opacity(0.7))
+                    }
                     .foregroundStyle(Color.inkSecondary)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                    .padding(.vertical, 12)
                     .background(Color.clear)
                     .overlay(
                         RoundedRectangle(cornerRadius: 2)
                             .stroke(Color.inkSecondary.opacity(0.35), lineWidth: 1)
                     )
+                }
+                .accessibilityLabel("ガイドを飛ばしてスタジオへ。メイクの経験がある方向け")
+                .aid("diagnosis_skip_button")
             }
-            .aid("diagnosis_skip_button")
         }
     }
 }

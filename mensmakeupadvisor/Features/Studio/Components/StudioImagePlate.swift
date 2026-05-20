@@ -74,10 +74,12 @@ struct StudioImagePlate: View {
             VStack {
                 Spacer()
                 HStack {
-                    Text("FIG. A — BEFORE")
-                        .font(.system(size: 8, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Color.ivory.opacity(0.7))
-                        .kerning(1.2)
+                    Text("Before · 素のまま")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(Color.ivory.opacity(0.85))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.appBackground.opacity(0.55))
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)
                     Spacer()
@@ -88,10 +90,12 @@ struct StudioImagePlate: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    Text("FIG. B — AFTER")
-                        .font(.system(size: 8, weight: .medium, design: .monospaced))
-                        .foregroundStyle(Color.ivory.opacity(0.7))
-                        .kerning(1.2)
+                    Text("After · メイク後")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(Color.ivory.opacity(0.85))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.appBackground.opacity(0.55))
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)
                 }
@@ -139,10 +143,9 @@ struct StudioImagePlate: View {
                         Ellipse()
                             .stroke(Color.ivory.opacity(0.25), lineWidth: 1)
                             .frame(width: width * 0.55, height: height * 0.68)
-                        Text("FIG. B · AFTER")
-                            .font(.system(size: 8, weight: .light, design: .monospaced))
+                        Text("メイク後のプレビュー")
+                            .font(.system(size: 11))
                             .foregroundStyle(Color.inkSecondary)
-                            .kerning(2)
                     }
                 }
                 .frame(width: width, height: height)
@@ -157,13 +160,17 @@ struct StudioImagePlate: View {
     private var renderingOverlay: some View {
         VStack {
             HStack {
-                Text("RENDERING…")
-                    .font(.system(size: 8, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.ivory.opacity(0.85))
-                    .kerning(1.4)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.appBackground.opacity(0.55))
+                HStack(spacing: 6) {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                        .tint(Color.ivory.opacity(0.85))
+                    Text("反映中…")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Color.ivory.opacity(0.85))
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.appBackground.opacity(0.6))
                 Spacer()
             }
             Spacer()
@@ -176,16 +183,21 @@ struct StudioImagePlate: View {
     }
 
     private func scoreChip(result: AnalysisResult) -> some View {
-        Text("SCORE \(result.totalScore)")
-            .font(.system(size: 9, weight: .medium, design: .monospaced))
-            .foregroundStyle(Color.ivory)
-            .kerning(1.5)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(Color.appBackground.opacity(0.7))
-            .overlay(
-                Rectangle().stroke(Color.lineColor, lineWidth: 1)
-            )
+        HStack(spacing: 4) {
+            Text("スコア")
+                .font(.system(size: 10))
+                .opacity(0.75)
+            Text("\(result.totalScore)")
+                .font(.system(size: 13, weight: .semibold))
+        }
+        .foregroundStyle(Color.ivory)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(Color.appBackground.opacity(0.7))
+        .overlay(
+            Rectangle().stroke(Color.lineColor, lineWidth: 1)
+        )
+        .accessibilityLabel("診断スコア \(result.totalScore)")
     }
 }
 
