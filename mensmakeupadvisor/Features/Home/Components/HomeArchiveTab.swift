@@ -132,7 +132,18 @@ struct HomeArchiveTab: View {
                 }
                 .contentShape(Rectangle())
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel(for: look))
+        .accessibilityHint("タップで詳細を開く")
         .aid("home_archive_card_\(look.id)")
+    }
+
+    private func accessibilityLabel(for look: SavedLook) -> String {
+        let date = look.createdAt.formatted(.dateTime.year().month().day())
+        if look.totalScore > 0 {
+            return "保存ルック · \(date) · 評価 \(grade(for: look.totalScore))"
+        }
+        return "保存ルック · \(date)"
     }
 
     // MARK: - Actions

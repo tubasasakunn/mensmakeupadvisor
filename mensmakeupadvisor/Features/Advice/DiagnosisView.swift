@@ -122,7 +122,7 @@ struct DiagnosisView: View {
             Text("step two.")
                 .font(.system(size: 40, weight: .light, design: .serif))
                 .italic()
-                .foregroundStyle(Color.brandPrimary)
+                .foregroundStyle(Theme.Text.primaryFaded)
 
             Text("診断結果.")
                 .font(.system(size: 46, weight: .bold, design: .serif))

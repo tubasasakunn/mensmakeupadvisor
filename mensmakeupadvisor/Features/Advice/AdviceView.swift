@@ -118,7 +118,7 @@ struct AdviceView: View {
             Text("step one.")
                 .font(.system(size: 44, weight: .light, design: .serif))
                 .italic()
-                .foregroundStyle(Color.brandPrimary)
+                .foregroundStyle(Theme.Text.primaryFaded)
 
             Text("まず、あなたの顔を\nちゃんと、知る。")
                 .font(.system(size: 30, weight: .bold, design: .serif))
