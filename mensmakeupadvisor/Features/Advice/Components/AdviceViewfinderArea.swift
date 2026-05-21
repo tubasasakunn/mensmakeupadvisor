@@ -25,7 +25,7 @@ struct AdviceViewfinderArea: View {
                 }
                 .padding(.horizontal, Theme.Spacing.md)
                 .padding(.vertical, 6)
-                .glassEffect(.regular, in: .capsule)
+                .glassSurface(in: .capsule)
                 .padding(.bottom, Theme.Spacing.lg)
             }
 
@@ -35,7 +35,7 @@ struct AdviceViewfinderArea: View {
                 .foregroundStyle(Theme.Text.primaryFaded)
         }
         .frame(height: 280)
-        .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.md))
+        .glassSurface(in: .rect(cornerRadius: Theme.Radius.md))
         .overlay(
             RoundedRectangle(cornerRadius: Theme.Radius.md)
                 .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)

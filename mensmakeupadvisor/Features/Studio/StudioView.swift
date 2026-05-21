@@ -180,7 +180,7 @@ struct StudioView: View {
                 aid: "studio_finetune_button"
             )
         }
-        .glassEffect(.regular, in: .capsule)
+        .glassSurface(in: .capsule)
     }
 
     private var resetButton: some View {
@@ -197,7 +197,7 @@ struct StudioView: View {
             .foregroundStyle(hasAnyIntensity ? Color.ivory : Theme.Text.tertiary)
             .frame(width: 56, height: 56)
         }
-        .glassEffect(.regular, in: .circle)
+        .glassSurface(in: .circle)
         .disabled(!hasAnyIntensity)
         .accessibilityLabel("メイクをリセット")
         .aid("studio_reset_button")

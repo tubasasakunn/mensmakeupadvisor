@@ -14,7 +14,7 @@ struct LoadingView: View {
                 .foregroundStyle(Theme.Text.primaryFaded)
         }
         .padding(Theme.Spacing.xxl)
-        .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.lg))
+        .glassSurface(in: .rect(cornerRadius: Theme.Radius.lg))
         .aid("loading_view")
     }
 }

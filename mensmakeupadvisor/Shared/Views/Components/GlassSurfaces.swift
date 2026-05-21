@@ -21,20 +21,15 @@ struct GlassCard<Content: View>: View {
         content()
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
+            .background {
                 // tint を入れて欲しい場合 (active state など) のために
                 // 1 枚薄い色を下敷きにできる。角丸は下地と揃える。
-                tint.map { tintColor in
+                if let tint {
                     RoundedRectangle(cornerRadius: radius)
-                        .fill(tintColor.opacity(0.22))
+                        .fill(tint.opacity(0.22))
                 }
-            )
-            .background(
-                // ガラスが暗背景の上で明るく浮かないよう、暗い下地を 1 枚敷く。
-                RoundedRectangle(cornerRadius: radius)
-                    .fill(Theme.Surface.glassUnderlay)
-            )
-            .glassEffect(.regular, in: .rect(cornerRadius: radius))
+            }
+            .glassSurface(in: .rect(cornerRadius: radius))
             .overlay(
                 // ガラスの輪郭を ivory で 1px 強調すると luxury 感が出る。
                 RoundedRectangle(cornerRadius: radius)
@@ -54,12 +49,7 @@ struct GlassPanel<Content: View>: View {
         content()
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                // ガラスが暗背景の上で明るく浮かないよう、暗い下地を 1 枚敷く。
-                RoundedRectangle(cornerRadius: radius)
-                    .fill(Theme.Surface.glassUnderlay)
-            )
-            .glassEffect(.regular, in: .rect(cornerRadius: radius))
+            .glassSurface(in: .rect(cornerRadius: radius))
             .overlay(
                 RoundedRectangle(cornerRadius: radius)
                     .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
@@ -78,7 +68,7 @@ struct GlassPill<Content: View>: View {
         content()
             .padding(.horizontal, hPadding)
             .padding(.vertical, vPadding)
-            .glassEffect(.regular, in: .capsule)
+            .glassSurface(in: .capsule)
     }
 }
 
@@ -101,9 +91,22 @@ struct GlassIconButton: View {
                 .foregroundStyle(tint)
                 .frame(width: size, height: size)
         }
-        .glassEffect(.regular, in: .circle)
+        .glassSurface(in: .circle)
         .accessibilityLabel(accessibilityLabel ?? systemImage)
         .aid(accessibilityID)
+    }
+}
+
+// MARK: - glassSurface (暗いテーマに馴染む regular glass)
+
+extension View {
+    // `.glassEffect(.regular, in:)` の下に暗い下地を 1 枚敷くヘルパ。
+    // 暗背景の上でガラスが明るいグレーとして浮くのを抑え、
+    // ivory テキストのコントラストを確保する。regular glass を使う
+    // パネル・チップ・丸ボタンはすべてこれを通すこと。
+    func glassSurface(in shape: some Shape) -> some View {
+        background { shape.fill(Theme.Surface.glassUnderlay) }
+            .glassEffect(.regular, in: shape)
     }
 }
 

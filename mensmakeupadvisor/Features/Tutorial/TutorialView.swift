@@ -130,7 +130,7 @@ struct TutorialView: View {
                 .foregroundStyle(Theme.Text.primaryFaded)
                 .padding(.horizontal, Theme.Spacing.md)
                 .padding(.vertical, 7)
-                .glassEffect(.regular, in: .capsule)
+                .glassSurface(in: .capsule)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("ステップ \(appState.tutorialStep + 1) / \(steps.count)")
 

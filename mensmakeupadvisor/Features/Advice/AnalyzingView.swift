@@ -59,7 +59,7 @@ struct AnalyzingView: View {
             }
             .padding(.horizontal, Theme.Spacing.md)
             .padding(.vertical, Theme.Spacing.sm)
-            .glassEffect(.regular, in: .capsule)
+            .glassSurface(in: .capsule)
 
             Spacer()
 

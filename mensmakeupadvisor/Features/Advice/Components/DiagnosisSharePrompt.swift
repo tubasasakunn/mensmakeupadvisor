@@ -41,12 +41,7 @@ struct DiagnosisSharePrompt: View {
                 }
             }
             .padding(Theme.Spacing.md)
-            .background(
-                // ガラスが暗背景の上で明るく浮かないよう、暗い下地を 1 枚敷く。
-                RoundedRectangle(cornerRadius: Theme.Radius.lg)
-                    .fill(Theme.Surface.glassUnderlay)
-            )
-            .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.lg))
+            .glassSurface(in: .rect(cornerRadius: Theme.Radius.lg))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.Radius.lg)
                     .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.8)

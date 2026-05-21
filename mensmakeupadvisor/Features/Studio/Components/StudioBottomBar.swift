@@ -45,7 +45,7 @@ struct StudioBottomBar: View {
             }
             .frame(width: 56, height: 56)
         }
-        .glassEffect(.regular, in: .circle)
+        .glassSurface(in: .circle)
         .accessibilityLabel(isRenderingShare ? "シェア画像を準備中" : "シェアする")
         .aid("studio_share_button")
         .disabled(isRenderingShare)

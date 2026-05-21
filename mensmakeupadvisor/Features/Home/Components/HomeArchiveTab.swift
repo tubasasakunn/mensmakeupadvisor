@@ -126,7 +126,7 @@ struct HomeArchiveTab: View {
                             .foregroundStyle(Color.ivory)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
-                            .glassEffect(.regular, in: .capsule)
+                            .glassSurface(in: .capsule)
                             .padding(6)
                     }
                 }

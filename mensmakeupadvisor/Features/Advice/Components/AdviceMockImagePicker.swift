@@ -21,7 +21,7 @@ struct AdviceMockImagePicker: View {
                     .foregroundStyle(Color.ivory)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .glassEffect(.regular, in: .capsule)
+                    .glassSurface(in: .capsule)
                     .aid("advice_mock_image_\(index)")
                 }
             }
