@@ -59,7 +59,7 @@ struct AnalyzingView: View {
             }
             .padding(.horizontal, Theme.Spacing.md)
             .padding(.vertical, Theme.Spacing.sm)
-            .glassSurface(in: .capsule)
+            .background { Capsule().fill(Theme.Surface.labelBackdrop) }
 
             Spacer()
 

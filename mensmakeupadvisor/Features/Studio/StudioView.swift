@@ -158,10 +158,13 @@ struct StudioView: View {
         .aid(aid)
     }
 
+    // 隣接するガラスコントロールは GlassEffectContainer でまとめる (Apple HIG)。
     private var modeRow: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            modeSegment
-            resetButton
+        GlassEffectContainer {
+            HStack(spacing: Theme.Spacing.md) {
+                modeSegment
+                resetButton
+            }
         }
     }
 
@@ -180,7 +183,7 @@ struct StudioView: View {
                 aid: "studio_finetune_button"
             )
         }
-        .glassSurface(in: .capsule)
+        .glassEffect(.regular, in: .capsule)
     }
 
     private var resetButton: some View {
@@ -197,7 +200,7 @@ struct StudioView: View {
             .foregroundStyle(hasAnyIntensity ? Color.ivory : Theme.Text.tertiary)
             .frame(width: 56, height: 56)
         }
-        .glassSurface(in: .circle)
+        .glassEffect(.regular, in: .circle)
         .disabled(!hasAnyIntensity)
         .accessibilityLabel("メイクをリセット")
         .aid("studio_reset_button")

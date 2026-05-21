@@ -41,7 +41,10 @@ struct DiagnosisSharePrompt: View {
                 }
             }
             .padding(Theme.Spacing.md)
-            .glassSurface(in: .rect(cornerRadius: Theme.Radius.lg))
+            .background {
+                RoundedRectangle(cornerRadius: Theme.Radius.lg)
+                    .fill(Theme.Surface.card)
+            }
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.Radius.lg)
                     .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.8)

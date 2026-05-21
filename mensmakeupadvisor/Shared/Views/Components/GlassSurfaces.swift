@@ -1,15 +1,19 @@
 import SwiftUI
 
-// iOS 26 Liquid Glass の標準的な見た目を提供するラッパー群。
-// 直接 `.glassEffect(...)` を書き散らさず、これらを使うことで
+// コンテンツ容器・チップ・操作ボタンの共通ラッパー群。
 // 角丸スケール・余白・hairline 補強の規約を 1 箇所に集約する。
 //
-// 配置のルール:
-//   - Glass の上に Glass を重ねない (CLAUDE.md 違反になる)
-//   - 必ず LuxeBackground のような有彩な背景の上に置く
-//   - テキストは .primary / .ivory / Theme.Text.primarySoft を使い、可読性を担保
+// Liquid Glass の使い分け (Apple HIG):
+//   - Liquid Glass は「コンテンツの上に浮かぶナビゲーション/操作層」専用。
+//     ツールバー・タブバー・フローティングボタン・操作コントロールに使う。
+//   - コンテンツ層 (カード・パネル・リスト・背景) にはガラスを使わない。
+//     不透明な面 (Theme.Surface.card) にして階層を明確にする。
+//   - ガラスの上にガラスを重ねない。
+//
+// そのため GlassCard / GlassPanel はコンテンツ容器として「不透明」。
+// ガラスは GlassIconButton や各画面の操作チップなど操作層だけに残す。
 
-// MARK: - GlassCard (汎用カード)
+// MARK: - GlassCard (コンテンツカード — 不透明)
 
 struct GlassCard<Content: View>: View {
     var radius: CGFloat = Theme.Radius.lg
@@ -22,23 +26,26 @@ struct GlassCard<Content: View>: View {
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background {
-                // tint を入れて欲しい場合 (active state など) のために
-                // 1 枚薄い色を下敷きにできる。角丸は下地と揃える。
+                // active state などで薄い色を乗せたい場合の tint。
                 if let tint {
                     RoundedRectangle(cornerRadius: radius)
                         .fill(tint.opacity(0.22))
                 }
             }
-            .glassSurface(in: .rect(cornerRadius: radius))
+            .background {
+                // コンテンツ層なので不透明な面にする (ガラスは使わない)。
+                RoundedRectangle(cornerRadius: radius)
+                    .fill(Theme.Surface.card)
+            }
             .overlay(
-                // ガラスの輪郭を ivory で 1px 強調すると luxury 感が出る。
+                // 輪郭を ivory で 1px 強調して面を引き締める。
                 RoundedRectangle(cornerRadius: radius)
                     .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
             )
     }
 }
 
-// MARK: - GlassPanel (大型コンテナ、controls 全体を載せる用)
+// MARK: - GlassPanel (大型コンテンツコンテナ — 不透明)
 
 struct GlassPanel<Content: View>: View {
     var radius: CGFloat = Theme.Radius.xl
@@ -49,7 +56,10 @@ struct GlassPanel<Content: View>: View {
         content()
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .glassSurface(in: .rect(cornerRadius: radius))
+            .background {
+                RoundedRectangle(cornerRadius: radius)
+                    .fill(Theme.Surface.card)
+            }
             .overlay(
                 RoundedRectangle(cornerRadius: radius)
                     .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
@@ -57,8 +67,10 @@ struct GlassPanel<Content: View>: View {
     }
 }
 
-// MARK: - GlassPill (小さいチップ・ラベル)
+// MARK: - GlassPill (小さいチップ・ラベル — 不透明)
 
+// 非操作のラベル/バッジはオーバーレイ層。ガラスではなく不透明な
+// ラベル面 (labelBackdrop) を使う。
 struct GlassPill<Content: View>: View {
     var hPadding: CGFloat = Theme.Spacing.md
     var vPadding: CGFloat = Theme.Spacing.sm
@@ -68,11 +80,11 @@ struct GlassPill<Content: View>: View {
         content()
             .padding(.horizontal, hPadding)
             .padding(.vertical, vPadding)
-            .glassSurface(in: .capsule)
+            .background { Capsule().fill(Theme.Surface.labelBackdrop) }
     }
 }
 
-// MARK: - GlassIconButton (丸いアイコンボタン)
+// MARK: - GlassIconButton (丸いアイコンボタン — 操作層なのでガラス)
 
 struct GlassIconButton: View {
     let systemImage: String
@@ -91,29 +103,14 @@ struct GlassIconButton: View {
                 .foregroundStyle(tint)
                 .frame(width: size, height: size)
         }
-        .glassSurface(in: .circle)
+        .glassEffect(.regular, in: .circle)
         .accessibilityLabel(accessibilityLabel ?? systemImage)
         .aid(accessibilityID)
     }
 }
 
-// MARK: - glassSurface (暗いテーマに馴染む regular glass)
+// MARK: - GlassDivider (不透明面の上で使う極薄ライン)
 
-extension View {
-    // `.glassEffect(.regular, in:)` の下に暗い下地を 1 枚敷くヘルパ。
-    // 暗背景の上でガラスが明るいグレーとして浮くのを抑え、
-    // ivory テキストのコントラストを確保する。regular glass を使う
-    // パネル・チップ・丸ボタンはすべてこれを通すこと。
-    func glassSurface(in shape: some Shape) -> some View {
-        background { shape.fill(Theme.Surface.glassUnderlay) }
-            .glassEffect(.regular, in: shape)
-    }
-}
-
-// MARK: - GlassDivider (ガラス上で使う極薄ライン)
-
-// HairlineDivider は不透明背景向けだが、ガラス上では ivory ベースで
-// もう少し明るくないとなじまない。
 struct GlassDivider: View {
     var body: some View {
         Rectangle()
