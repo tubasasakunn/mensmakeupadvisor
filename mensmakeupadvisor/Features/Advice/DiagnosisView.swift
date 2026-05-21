@@ -175,17 +175,19 @@ struct DiagnosisView: View {
             .padding(.horizontal, Theme.Spacing.xl)
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
-            .background(
-                Group {
-                    if isProminent {
+            .background {
+                // GlassPrimaryButton と同じく、bordeaux 下敷きは capsule で
+                // 形状クリップする (矩形のままだと丸ボタンの角外に赤がはみ出す)。
+                if isProminent {
+                    Capsule().fill(
                         LinearGradient(
-                            colors: [Theme.Accent.primaryFaded, Theme.Accent.primarySoft],
+                            colors: [Theme.Accent.primarySoft, Theme.Accent.primarySubtle],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
-                    }
+                    )
                 }
-            )
+            }
             .glassEffect(isProminent ? .regular : .clear, in: .capsule)
             .overlay(
                 Capsule()

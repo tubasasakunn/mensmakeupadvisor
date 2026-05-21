@@ -34,9 +34,12 @@ struct ScoreCardView: View {
             isExpanded.toggle()
         }
         .overlay(alignment: .leading) {
+            // 高スコア (>=75) の行に ivory の細いレールを引いて目立たせる。
+            // 旧実装は gradeColor (赤や黄) で個別に色をつけていたが、7 行並ぶと
+            // 鮮やかな縦線が乱立して見にくくなるため、単一の落ち着いた色に統一。
             if score.score >= 75 {
                 Rectangle()
-                    .fill(score.gradeColor)
+                    .fill(Theme.Line.outlineIvory)
                     .frame(width: 2)
                     .offset(x: -10)
             }
@@ -89,7 +92,7 @@ struct ScoreCardView: View {
                     .frame(height: 3)
 
                 Capsule()
-                    .fill(score.gradeColor.opacity(0.8))
+                    .fill(Theme.Line.progressFill)
                     .frame(width: geo.size.width * barProgress, height: 3)
                     .animation(
                         .easeOut(duration: 0.8).delay(Double(index) * 0.07),

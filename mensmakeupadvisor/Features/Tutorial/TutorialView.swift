@@ -153,27 +153,25 @@ struct TutorialView: View {
     }
 
     private var stepDots: some View {
-        // 多くなりがちなのでドットは小さく、レイヤー切り替わりで色を変える
+        // ドット色は active / visited / unvisited の 3 段階に統一。
+        // 旧実装はレイヤーごとに 5 色 (ivory/bordeaux/sulphur/brown/dim) を使い分け、
+        // 並びが派手になり進捗が読みづらかった。色を 1 系統に揃える。
         HStack(spacing: 5) {
-            ForEach(Array(steps.enumerated()), id: \.offset) { idx, step in
+            ForEach(Array(steps.enumerated()), id: \.offset) { idx, _ in
+                let isActive = idx == appState.tutorialStep
+                let isVisited = idx <= appState.tutorialStep
                 Circle()
-                    .fill(idx <= appState.tutorialStep ? layerColor(step.layer) : Color.lineColor)
+                    .fill(
+                        isActive ? Color.ivory
+                        : isVisited ? Theme.Text.primaryFaded
+                        : Color.lineColor
+                    )
                     .frame(
-                        width: idx == appState.tutorialStep ? 7 : 4,
-                        height: idx == appState.tutorialStep ? 7 : 4
+                        width: isActive ? 7 : 4,
+                        height: isActive ? 7 : 4
                     )
                     .animation(.easeInOut(duration: 0.2), value: appState.tutorialStep)
             }
-        }
-    }
-
-    private func layerColor(_ layer: MakeupLayer) -> Color {
-        switch layer {
-        case .base:      return Theme.Step.baseDot
-        case .highlight: return Color.ivory
-        case .shadow:    return Color.brandPrimary
-        case .eye:       return Color.sulphur
-        case .eyebrow:   return Theme.Accent.eyebrow
         }
     }
 

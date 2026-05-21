@@ -16,9 +16,10 @@ struct DiagnosisHeroSection: View {
                     .font(.system(size: 18, weight: .heavy))
                     .foregroundStyle(Color.appBackground)
                     .frame(width: 44, height: 44)
-                    .background(result.gradeColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 3))
-                    .shadow(color: result.gradeColor.opacity(0.5), radius: 8, x: 0, y: 2)
+                    .background(
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(result.gradeColor)
+                    )
                     .offset(x: 8, y: 8)
                     .opacity(gradeBadgeVisible ? 1 : 0)
                     .scaleEffect(gradeBadgeVisible ? 1 : 0.4)
@@ -44,16 +45,18 @@ struct DiagnosisHeroSection: View {
                         .font(.system(size: 24, weight: .bold))
                         .foregroundStyle(Color.ivory)
 
+                    // grade 色のバッジは ScoreRing 横で既に主張しているので、
+                    // ここでは ivory ベースで text 階層に揃え、色を増やさない。
                     HStack(spacing: 5) {
                         Text(result.grade)
                             .font(.system(size: 13, weight: .heavy))
-                            .foregroundStyle(result.gradeColor)
+                            .foregroundStyle(Color.ivory)
                         Text("·")
                             .font(.system(size: 12))
                             .foregroundStyle(Color.inkTertiary)
                         Text(result.gradeDescription)
                             .font(.system(size: 12, weight: .regular))
-                            .foregroundStyle(result.gradeColor.opacity(0.9))
+                            .foregroundStyle(Theme.Text.primaryFaded)
                     }
 
                     Text(result.rankPercentile)

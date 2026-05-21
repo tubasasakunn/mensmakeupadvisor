@@ -27,17 +27,15 @@ struct DiagnosisSharePrompt: View {
                 Spacer()
 
                 if isRendering {
-                    ProgressView().tint(result.gradeColor).scaleEffect(0.7)
+                    ProgressView().tint(Color.ivory).scaleEffect(0.7)
                         .frame(width: 40, height: 40)
                 } else {
+                    // 共有ボタンはスコアの良し悪しと無関係なので、grade 色ではなく
+                    // ニュートラルな ivory アクセントで主張を抑える。
                     Image(systemName: "arrow.up.forward")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Color.ivory)
                         .frame(width: 40, height: 40)
-                        .background(
-                            Circle()
-                                .fill(result.gradeColor.opacity(0.85))
-                        )
                         .glassEffect(.regular, in: .circle)
                 }
             }
@@ -45,7 +43,7 @@ struct DiagnosisSharePrompt: View {
             .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.lg))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.Radius.lg)
-                    .stroke(result.gradeColor.opacity(0.5), lineWidth: 0.8)
+                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
             )
         }
         .aid("diagnosis_share_button")

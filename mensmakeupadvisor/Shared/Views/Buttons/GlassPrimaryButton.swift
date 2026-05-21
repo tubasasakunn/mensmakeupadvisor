@@ -37,21 +37,24 @@ struct GlassPrimaryButton: View {
             .padding(.horizontal, Theme.Spacing.xl)
             .padding(.vertical, 16)
             .frame(maxWidth: .infinity)
-            .background(
-                ZStack {
-                    if isProminent {
-                        // bordeaux の発光下敷き — glass 越しに暖かい光になる
+            .background {
+                // bordeaux の発光下敷きは必ず capsule で切り抜く。
+                // .background(LinearGradient) だと矩形のままになり、
+                // capsule の角の外に赤がはみ出して「丸ボタンなのに背景も赤い」
+                // 見た目になっていた。Capsule().fill で形状にクリップする。
+                if isProminent {
+                    Capsule().fill(
                         LinearGradient(
                             colors: [
-                                Theme.Accent.primaryFaded,
-                                Theme.Accent.primarySoft
+                                Theme.Accent.primarySoft,
+                                Theme.Accent.primarySubtle
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
-                    }
+                    )
                 }
-            )
+            }
             .glassEffect(.regular, in: .capsule)
             .overlay(
                 // ハイライトのリム — ガラスの上端を ivory で薄く光らせる
