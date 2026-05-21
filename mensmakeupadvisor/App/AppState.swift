@@ -8,6 +8,12 @@ enum AppScreen: Equatable {
     case splash, onboarding, home, capture, analyzing, diagnosis, tutorial, studio
 }
 
+// HomeView 内のタブ。Archive 経由で Studio に行って戻ってきた時に
+// 「保存」タブを開き直したいので、選択状態を AppState 側に上げる。
+enum HomeTab: Hashable {
+    case report, create, archive
+}
+
 @Observable @MainActor
 final class AppState {
     var currentScreen: AppScreen = .splash
@@ -44,6 +50,10 @@ final class AppState {
     var captureOrigin: AppScreen = .onboarding
     var studioOrigin: AppScreen = .diagnosis
 
+    // HomeView がどのタブを開いているか。Archive からの編集フローで
+    // Studio から戻った際に Archive タブへ復帰させるための共有状態。
+    var homeTab: HomeTab = .create
+
     private var presetsInitializedFromAnalysis = false
 
     // makeup_claude のアルゴリズムを移植したエンジン。
@@ -64,6 +74,7 @@ final class AppState {
         skipTutorialOnNextFlow = false
         captureOrigin = .onboarding
         studioOrigin = .diagnosis
+        homeTab = .create
         presetsInitializedFromAnalysis = false
         renderTask?.cancel(); renderTask = nil
         Task { await makeupEngine.reset() }

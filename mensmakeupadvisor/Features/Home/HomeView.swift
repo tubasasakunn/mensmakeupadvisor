@@ -7,33 +7,30 @@ import SwiftUI
 //   ③ ARCHIVE — 保存ルックのグリッド (mesh ベース)
 struct HomeView: View {
     @Environment(AppState.self) private var appState
-    @State private var selection: Tab = .create
-
-    enum Tab: Hashable {
-        case report, create, archive
-    }
 
     var body: some View {
-        TabView(selection: $selection) {
+        @Bindable var appState = appState
+
+        TabView(selection: $appState.homeTab) {
             HomeReportTab()
                 .tabItem {
                     Label("診断", systemImage: "doc.text.magnifyingglass")
                 }
-                .tag(Tab.report)
+                .tag(HomeTab.report)
                 .aid("home_tab_report")
 
             HomeCreateTab()
                 .tabItem {
                     Label("撮影", systemImage: "camera.fill")
                 }
-                .tag(Tab.create)
+                .tag(HomeTab.create)
                 .aid("home_tab_create")
 
             HomeArchiveTab()
                 .tabItem {
                     Label("保存", systemImage: "square.grid.2x2")
                 }
-                .tag(Tab.archive)
+                .tag(HomeTab.archive)
                 .aid("home_tab_archive")
         }
         .tint(Color.ivory)
