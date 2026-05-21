@@ -129,34 +129,17 @@ struct StudioImagePlate: View {
                 placeholderHalf(width: width * viewModel.comparePosition, height: height)
             }
 
+            // Before / After ラベルは 1 つの HStack にまとめる。
+            // プレートが狭いとき、左右独立配置だと中央で重なってしまうため。
             VStack {
                 Spacer()
-                HStack {
-                    Text("Before · 素のまま")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(Theme.Plate.labelText)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Theme.Surface.labelBackdrop)
-                        .padding(.horizontal, 10)
-                        .padding(.bottom, 10)
-                    Spacer()
+                HStack(alignment: .bottom, spacing: Theme.Spacing.sm) {
+                    compareLabel("Before · 素のまま")
+                    Spacer(minLength: Theme.Spacing.sm)
+                    compareLabel("After · メイク後")
                 }
-            }
-
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    Text("After · メイク後")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(Theme.Plate.labelText)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Theme.Surface.labelBackdrop)
-                        .padding(.horizontal, 10)
-                        .padding(.bottom, 10)
-                }
+                .padding(.horizontal, 10)
+                .padding(.bottom, 10)
             }
         }
         .frame(width: width, height: height)
@@ -167,6 +150,18 @@ struct StudioImagePlate: View {
                     viewModel.comparePosition = fraction
                 }
         )
+    }
+
+    // 狭いプレートでも収まるよう 1 行固定 + 縮小を許可する。
+    private func compareLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 11, weight: .semibold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .foregroundStyle(Theme.Plate.labelText)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Theme.Surface.labelBackdrop)
     }
 
     private func afterLayer(width: CGFloat, height: CGFloat) -> some View {

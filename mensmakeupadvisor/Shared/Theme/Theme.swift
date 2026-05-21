@@ -33,6 +33,10 @@ enum Theme {
         // glass の暖色版。Onboarding カード等で ivory ベースの淡い半透明にしたいときに使う。
         nonisolated static let glassWeakIvory   = Palette.ivoryAlpha04
         nonisolated static let glassMedium      = Palette.whiteAlpha08
+        // glass カードを暗いテーマに馴染ませるための下地。
+        // .glassEffect の下に敷くことで、ガラスが明るいグレーとして浮くのを抑え、
+        // ivory テキストのコントラストを確保する。
+        nonisolated static let glassUnderlay    = Palette.canvasAlpha70
         nonisolated static let scrim            = Palette.blackAlpha50
         nonisolated static let labelBackdrop    = Palette.canvasAlpha60
         nonisolated static let imageDim         = Palette.canvasAlpha55

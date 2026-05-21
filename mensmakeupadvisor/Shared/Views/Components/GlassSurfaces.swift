@@ -23,8 +23,16 @@ struct GlassCard<Content: View>: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 // tint を入れて欲しい場合 (active state など) のために
-                // 1 枚薄い色を下敷きにできる。
-                tint.map { $0.opacity(0.22) }
+                // 1 枚薄い色を下敷きにできる。角丸は下地と揃える。
+                tint.map { tintColor in
+                    RoundedRectangle(cornerRadius: radius)
+                        .fill(tintColor.opacity(0.22))
+                }
+            )
+            .background(
+                // ガラスが暗背景の上で明るく浮かないよう、暗い下地を 1 枚敷く。
+                RoundedRectangle(cornerRadius: radius)
+                    .fill(Theme.Surface.glassUnderlay)
             )
             .glassEffect(.regular, in: .rect(cornerRadius: radius))
             .overlay(
@@ -46,6 +54,11 @@ struct GlassPanel<Content: View>: View {
         content()
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                // ガラスが暗背景の上で明るく浮かないよう、暗い下地を 1 枚敷く。
+                RoundedRectangle(cornerRadius: radius)
+                    .fill(Theme.Surface.glassUnderlay)
+            )
             .glassEffect(.regular, in: .rect(cornerRadius: radius))
             .overlay(
                 RoundedRectangle(cornerRadius: radius)
