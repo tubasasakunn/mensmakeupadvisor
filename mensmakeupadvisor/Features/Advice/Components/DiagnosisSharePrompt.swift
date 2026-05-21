@@ -27,25 +27,24 @@ struct DiagnosisSharePrompt: View {
                 Spacer()
 
                 if isRendering {
-                    ProgressView().tint(result.gradeColor).scaleEffect(0.7)
+                    ProgressView().tint(Color.ivory).scaleEffect(0.7)
                         .frame(width: 40, height: 40)
                 } else {
+                    // 親が glassEffect を持つので、ここでは glass を重ねず
+                    // 塗りつぶしの円のみ。grade 色ではなく bordeaux 固定で
+                    // 「シェア = アクション」を一義に示す。
                     Image(systemName: "arrow.up.forward")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Color.ivory)
                         .frame(width: 40, height: 40)
-                        .background(
-                            Circle()
-                                .fill(result.gradeColor.opacity(0.85))
-                        )
-                        .glassEffect(.regular, in: .circle)
+                        .background(Circle().fill(Theme.Accent.primary))
                 }
             }
             .padding(Theme.Spacing.md)
             .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.lg))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.Radius.lg)
-                    .stroke(result.gradeColor.opacity(0.5), lineWidth: 0.8)
+                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.8)
             )
         }
         .aid("diagnosis_share_button")
@@ -59,7 +58,7 @@ struct DiagnosisSharePrompt: View {
             VStack(spacing: 0) {
                 Text("M·M·A")
                     .font(.system(size: 5, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.brandPrimary)
+                    .foregroundStyle(Theme.Text.secondary)
                     .padding(.top, 5)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 6)

@@ -7,6 +7,7 @@ struct SavedLookDetailSheet: View {
     let onApply: () -> Void
     let onDelete: () -> Void
 
+    @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirmation = false
 
     var body: some View {
@@ -44,7 +45,7 @@ struct SavedLookDetailSheet: View {
     }
 
     private var headerRow: some View {
-        HStack {
+        HStack(spacing: Theme.Spacing.md) {
             Text(look.createdAt, format: .dateTime.year().month().day().hour().minute())
                 .font(.system(size: 12))
                 .foregroundStyle(Color.inkSecondary)
@@ -54,7 +55,29 @@ struct SavedLookDetailSheet: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.inkSecondary)
             }
+            closeButton
         }
+    }
+
+    // シートを閉じてアーカイブ画面に戻る明示的な出口。
+    // .sheet(item:) 経由なのでスワイプダウンでも閉じられるが、
+    // 「戻る術が無い」と感じさせないため可視のボタンを置く。
+    private var closeButton: some View {
+        Button {
+            Haptics.soft()
+            dismiss()
+        } label: {
+            Image(systemName: "xmark")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Theme.Text.primarySoft)
+                .frame(width: 28, height: 28)
+                .glassEffect(.clear, in: .circle)
+                .overlay(
+                    Circle().strokeBorder(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
+                )
+        }
+        .accessibilityLabel("閉じる")
+        .aid("home_archive_detail_close")
     }
 
     private var thumbnail: some View {

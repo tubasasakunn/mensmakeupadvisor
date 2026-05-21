@@ -127,7 +127,7 @@ struct HomeCreateTab: View {
             Text(number)
                 .font(.system(size: 16, weight: .light, design: .serif))
                 .italic()
-                .foregroundStyle(Color.brandPrimary)
+                .foregroundStyle(Theme.Text.secondary)
             Text(label)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.ivory)

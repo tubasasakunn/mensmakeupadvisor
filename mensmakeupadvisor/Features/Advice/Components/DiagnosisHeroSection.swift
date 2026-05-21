@@ -45,6 +45,8 @@ struct DiagnosisHeroSection: View {
                         .foregroundStyle(Color.ivory)
 
                     HStack(spacing: 5) {
+                        // グレード文字だけ色を持たせ、説明文は中立色にする。
+                        // バッジ・リング・文字で 3 重に色が乗ると煩いため。
                         Text(result.grade)
                             .font(.system(size: 13, weight: .heavy))
                             .foregroundStyle(result.gradeColor)
@@ -53,7 +55,7 @@ struct DiagnosisHeroSection: View {
                             .foregroundStyle(Color.inkTertiary)
                         Text(result.gradeDescription)
                             .font(.system(size: 12, weight: .regular))
-                            .foregroundStyle(result.gradeColor.opacity(0.9))
+                            .foregroundStyle(Theme.Text.primarySoft)
                     }
 
                     Text(result.rankPercentile)

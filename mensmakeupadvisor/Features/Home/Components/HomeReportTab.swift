@@ -88,7 +88,7 @@ struct HomeReportTab: View {
                 HStack(spacing: 6) {
                     Image(systemName: "chart.bar.fill")
                         .font(.system(size: 10))
-                        .foregroundStyle(Color.brandPrimary.opacity(0.85))
+                        .foregroundStyle(Theme.Text.secondary)
                     Text(result.rankPercentile)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Theme.Text.primarySoft)

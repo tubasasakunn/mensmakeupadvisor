@@ -122,7 +122,7 @@ struct DiagnosisView: View {
             Text("step two.")
                 .font(.system(size: 40, weight: .light, design: .serif))
                 .italic()
-                .foregroundStyle(Color.brandPrimary)
+                .foregroundStyle(Theme.Text.primaryFaded)
 
             Text("診断結果.")
                 .font(.system(size: 46, weight: .bold, design: .serif))
@@ -175,22 +175,7 @@ struct DiagnosisView: View {
             .padding(.horizontal, Theme.Spacing.xl)
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
-            .background(
-                Group {
-                    if isProminent {
-                        LinearGradient(
-                            colors: [Theme.Accent.primaryFaded, Theme.Accent.primarySoft],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    }
-                }
-            )
-            .glassEffect(isProminent ? .regular : .clear, in: .capsule)
-            .overlay(
-                Capsule()
-                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
-            )
+            .modifier(GlassPrimaryButtonSurface(isProminent: isProminent))
         }
         .buttonStyle(GlassPressedButtonStyle())
         .accessibilityLabel("\(title)。\(subtitle)")

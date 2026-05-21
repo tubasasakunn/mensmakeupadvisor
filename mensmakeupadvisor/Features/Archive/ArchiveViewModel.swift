@@ -23,6 +23,8 @@ final class ArchiveViewModel {
         // Archive 経由で Studio を開いた場合、戻る先は Home (Archive タブ) にする。
         // デフォルトの .diagnosis にすると「診断結果がない/別物」に戻ってしまい混乱する。
         appState.studioOrigin = .home
+        // Studio の「戻る」で Home に戻った時、Create ではなく Archive タブに着地させる。
+        appState.homeTab = .archive
         appState.navigate(to: .studio)
     }
 }
