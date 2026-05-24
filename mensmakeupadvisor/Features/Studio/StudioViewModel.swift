@@ -6,11 +6,18 @@ final class StudioViewModel {
     // Before / After スライダーの位置 (0.0 = Before 全面、1.0 = After 全面)。
     var comparePosition: CGFloat = 0.5
 
-    func saveLook(appState: AppState, modelContext: ModelContext) {
+    func saveLook(
+        appState: AppState,
+        modelContext: ModelContext,
+        title: String? = nil,
+        memo: String? = nil
+    ) {
         let comp = appState.composition
         let eyeIntensity = max(comp.intensity(of: .eyeshadow),
                                comp.intensity(of: .tearbag),
                                comp.intensity(of: .eyeliner))
+        let cleanedTitle = title?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanedMemo = memo?.trimmingCharacters(in: .whitespacesAndNewlines)
         let look = SavedLook(
             id: UUID().uuidString,
             createdAt: .now,
@@ -25,10 +32,20 @@ final class StudioViewModel {
             highlightAreas: MakeupCompositionBuilder.coveredAreaNames(.highlight, unit: comp.unit(.highlight)),
             shadowAreas: MakeupCompositionBuilder.coveredAreaNames(.shadow, unit: comp.unit(.shadow)),
             eyeAreas: eyeAreaNames(comp),
-            eyebrowTypeRaw: comp.browType?.rawValue
+            eyebrowTypeRaw: comp.browType?.rawValue,
+            title: (cleanedTitle?.isEmpty == false) ? cleanedTitle : nil,
+            memo: (cleanedMemo?.isEmpty == false) ? cleanedMemo : nil
         )
         modelContext.insert(look)
         try? modelContext.save()
+    }
+
+    // タイトル入力シートのデフォルト名。
+    static func defaultTitle(for date: Date = .now) -> String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "ja_JP")
+        f.dateFormat = "M月d日のメイク"
+        return f.string(from: date)
     }
 
     private func eyeAreaNames(_ comp: MakeupComposition) -> Set<String> {

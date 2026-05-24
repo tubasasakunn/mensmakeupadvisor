@@ -122,15 +122,32 @@ struct SavedLookDetailSheet: View {
     // MARK: - Content
 
     private var meta: some View {
-        HStack {
-            Text(look.createdAt, format: .dateTime.year().month().day().hour().minute())
-                .font(.system(size: 12))
-                .foregroundStyle(Color.inkSecondary)
-            Spacer()
-            if look.totalScore > 0 {
-                Text("\(look.totalScore) 点")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(Color.inkSecondary)
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 4) {
+                    if let title = look.title, !title.isEmpty {
+                        Text(title)
+                            .font(.system(size: 22, weight: .semibold, design: .serif))
+                            .italic()
+                            .foregroundStyle(Color.ivory)
+                    }
+                    Text(look.createdAt, format: .dateTime.year().month().day().hour().minute())
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.inkSecondary)
+                }
+                Spacer()
+                if look.totalScore > 0 {
+                    Text("\(look.totalScore) 点")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Color.inkSecondary)
+                }
+            }
+            if let memo = look.memo, !memo.isEmpty {
+                Text(memo)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Theme.Text.primaryFaded)
+                    .lineSpacing(4)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }

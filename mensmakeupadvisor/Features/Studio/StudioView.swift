@@ -9,6 +9,8 @@ struct StudioView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = StudioViewModel()
     @State private var isPreparingShare = false
+    // 「次へ」を押したあと、tryingSavedLook == false なら名前付けシートを挟む。
+    @State private var showSaveSheet = false
 
     var body: some View {
         ZStack {
@@ -33,6 +35,25 @@ struct StudioView: View {
         .aid("studio_view")
         .task(id: compositionKey) {
             await MainActor.run { appState.requestMakeupRender() }
+        }
+        .sheet(isPresented: $showSaveSheet) {
+            SaveTitleSheet(
+                onSave: { title, memo in
+                    viewModel.saveLook(
+                        appState: appState,
+                        modelContext: modelContext,
+                        title: title,
+                        memo: memo
+                    )
+                    showSaveSheet = false
+                    appState.tryingSavedLook = false
+                    appState.navigate(to: .completion)
+                },
+                onCancel: { showSaveSheet = false }
+            )
+            .presentationBackground(Theme.Ambient.backdrop)
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
     }
 
@@ -109,7 +130,7 @@ struct StudioView: View {
         }
     }
 
-    // 通常フロー: 保存 → 完了画面 (CompletionView) → ホーム。
+    // 通常フロー: 「次へ」→ 名前付けシート → 保存 → 完了画面 → ホーム。
     // Try フロー (Archive 経由): 保存せず直接ホームへ。
     // 試すたびに SavedLook が増えるとアーカイブが汚れるので保存しない。
     private var nextButton: some View {
@@ -118,12 +139,13 @@ struct StudioView: View {
             title: isTrying ? "完了" : "次へ",
             accessibilityID: "studio_next_button"
         ) {
-            Haptics.success()
-            if !isTrying {
-                viewModel.saveLook(appState: appState, modelContext: modelContext)
+            Haptics.medium()
+            if isTrying {
+                appState.tryingSavedLook = false
+                appState.navigate(to: .home)
+            } else {
+                showSaveSheet = true
             }
-            appState.tryingSavedLook = false
-            appState.navigate(to: isTrying ? .home : .completion)
         }
     }
 }

@@ -57,16 +57,13 @@ struct DiagnosisView: View {
                             .padding(.top, Theme.Spacing.xs)
                             .padding(.horizontal, Theme.Spacing.xl)
 
-                        // Home 経由の閲覧フロー（再訪）は静かに眺める画面なので、
-                        // 強い CTA を置かない。新規解析フローからのみ次工程へ送り出す。
-                        if appState.diagnosisOrigin != .home {
-                            bottomButtons
-                                .padding(.top, Theme.Spacing.xxxl)
-                                .padding(.horizontal, Theme.Spacing.xl)
-                                .padding(.bottom, Theme.Spacing.huge)
-                        } else {
-                            Color.clear.frame(height: Theme.Spacing.huge)
-                        }
+                        // 新規フロー: 太い primary。
+                        // 閲覧（Home 経由）: 控えめ secondary「このメイクを試す」。
+                        // どちらの場合も「行き止まり」にしない。
+                        bottomButtons
+                            .padding(.top, Theme.Spacing.xxxl)
+                            .padding(.horizontal, Theme.Spacing.xl)
+                            .padding(.bottom, Theme.Spacing.huge)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -180,22 +177,41 @@ struct DiagnosisView: View {
     }
 
     private var bottomButtons: some View {
+        let isHomeReview = appState.diagnosisOrigin == .home
         let isSkipFlow = appState.skipTutorialOnNextFlow
+
         return VStack(spacing: Theme.Spacing.md) {
-            ctaWithSubtitle(
-                title: isSkipFlow ? "スタジオを開く" : "メイクを試してみる",
-                subtitle: isSkipFlow ? "プリセットや細かい調整ができます" : "5ステップのガイドに沿って進めます",
-                icon: isSkipFlow ? "paintbrush.pointed.fill" : "wand.and.stars",
-                isProminent: true,
-                accessibilityID: "diagnosis_begin_button"
-            ) {
-                Haptics.medium()
-                appState.studioOrigin = .diagnosis
-                if isSkipFlow {
+            if isHomeReview {
+                // 閲覧モード: 過去診断に対して「今すぐメイクを試す」副 CTA。
+                // Tutorial は飛ばして Studio に直行（既に診ているので二重に学ばせない）。
+                // 戻り先は Home。
+                GlassSecondaryButton(
+                    title: "このメイクを試す",
+                    icon: "paintbrush.pointed",
+                    accessibilityID: "diagnosis_review_try_button"
+                ) {
+                    Haptics.medium()
+                    appState.studioOrigin = .home
                     appState.skipTutorialOnNextFlow = false
                     appState.navigate(to: .studio)
-                } else {
-                    appState.navigate(to: .tutorial)
+                }
+            } else {
+                // 新規フロー: 太い primary。
+                ctaWithSubtitle(
+                    title: isSkipFlow ? "スタジオを開く" : "メイクを試してみる",
+                    subtitle: isSkipFlow ? "プリセットや細かい調整ができます" : "5ステップのガイドに沿って進めます",
+                    icon: isSkipFlow ? "paintbrush.pointed.fill" : "wand.and.stars",
+                    isProminent: true,
+                    accessibilityID: "diagnosis_begin_button"
+                ) {
+                    Haptics.medium()
+                    appState.studioOrigin = .diagnosis
+                    if isSkipFlow {
+                        appState.skipTutorialOnNextFlow = false
+                        appState.navigate(to: .studio)
+                    } else {
+                        appState.navigate(to: .tutorial)
+                    }
                 }
             }
         }

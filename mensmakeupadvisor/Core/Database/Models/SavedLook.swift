@@ -22,6 +22,10 @@ final class SavedLook {
     var eyeAreasCSV: String = ""
     var eyebrowTypeRaw: String? = nil
 
+    // 保存時に付ける任意ラベル。Optional + 既定 nil で SwiftData 自動マイグレーション。
+    var title: String? = nil
+    var memo: String? = nil
+
     init(
         id: String = UUID().uuidString,
         createdAt: Date = .now,
@@ -36,7 +40,9 @@ final class SavedLook {
         highlightAreas: Set<String> = [],
         shadowAreas: Set<String> = [],
         eyeAreas: Set<String> = [],
-        eyebrowTypeRaw: String? = nil
+        eyebrowTypeRaw: String? = nil,
+        title: String? = nil,
+        memo: String? = nil
     ) {
         self.id = id
         self.createdAt = createdAt
@@ -52,6 +58,8 @@ final class SavedLook {
         self.shadowAreasCSV = shadowAreas.sorted().joined(separator: ",")
         self.eyeAreasCSV = eyeAreas.sorted().joined(separator: ",")
         self.eyebrowTypeRaw = eyebrowTypeRaw
+        self.title = title
+        self.memo = memo
     }
 
     var highlightAreaSet: Set<String> {
