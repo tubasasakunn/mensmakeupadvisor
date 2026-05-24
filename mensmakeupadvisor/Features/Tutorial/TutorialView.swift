@@ -5,6 +5,9 @@ struct TutorialView: View {
     @Environment(AppState.self) private var appState
     @State private var viewModel = TutorialViewModel()
     @State private var didInitialize = false
+    // step 0 で戻るを押したとき、これまでのレイヤー操作が消えることを明示するため
+    // 確認ダイアログを挟む。暗黙 exit は事故の元。
+    @State private var showExitConfirmation = false
 
     private var steps: [TutorialStep] { viewModel.steps(for: appState) }
 
@@ -69,6 +72,23 @@ struct TutorialView: View {
         .task(id: renderKey) {
             await viewModel.render(appState: appState)
         }
+        .confirmationDialog(
+            "メイクの試着を終わりますか？",
+            isPresented: $showExitConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(exitConfirmationCTA, role: .destructive) {
+                Haptics.warning()
+                appState.navigate(to: appState.studioOrigin)
+            }
+            Button("続ける", role: .cancel) {}
+        } message: {
+            Text("ここまでの調整は保存されません。")
+        }
+    }
+
+    private var exitConfirmationCTA: String {
+        appState.studioOrigin == .home ? "ホームに戻る" : "診断結果に戻る"
     }
 
     // 現在 step の部位だけを調整するスライダー用 binding。
@@ -97,6 +117,9 @@ struct TutorialView: View {
                 guard abs(dx) > abs(dy), abs(dx) > 56 else { return }
                 if dx < 0 {
                     viewModel.nextStep(appState: appState)
+                } else if appState.tutorialStep == 0 {
+                    // 右端スワイプでの暗黙 exit を防ぐ。明示的な確認を求める。
+                    showExitConfirmation = true
                 } else {
                     viewModel.prevStep(appState: appState)
                 }
@@ -107,40 +130,23 @@ struct TutorialView: View {
 
     private var headerBar: some View {
         let isFirst = appState.tutorialStep == 0
-        let backLabel: String = isFirst ? (appState.studioOrigin == .home ? "ホームへ" : "診断結果へ") : "前へ"
-        let backA11y: String = isFirst ? (appState.studioOrigin == .home ? "ホームに戻る" : "診断結果に戻る") : "前のステップに戻る"
-        return HStack {
-            Button {
-                Haptics.soft()
-                viewModel.prevStep(appState: appState)
-            } label: {
-                HStack(spacing: 5) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 11, weight: .semibold))
-                    Text(backLabel)
-                        .font(.system(size: 12, weight: .medium))
+        let backA11y: String = isFirst
+            ? "メイクの試着を終わるか確認する"
+            : "前のステップに戻る"
+        return ScreenHeader(
+            variant: .push,
+            kicker: "GUIDE \(appState.tutorialStep + 1)/\(steps.count)",
+            backAccessibilityLabel: backA11y,
+            backAccessibilityID: "tutorial_back_button",
+            onBack: {
+                // step 0 のときは暗黙的に exit せず、破棄確認を出す。
+                if isFirst {
+                    showExitConfirmation = true
+                } else {
+                    viewModel.prevStep(appState: appState)
                 }
-                .foregroundStyle(Theme.Text.primarySoft)
-                .padding(.horizontal, Theme.Spacing.md)
-                .padding(.vertical, 7)
-                .glassEffect(.clear, in: .capsule)
             }
-            .accessibilityLabel(backA11y)
-            .aid("tutorial_back_button")
-
-            Spacer()
-
-            Text("\(appState.tutorialStep + 1) / \(steps.count)")
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .kerning(1.5)
-                .foregroundStyle(Theme.Text.primaryFaded)
-                .padding(.horizontal, Theme.Spacing.md)
-                .padding(.vertical, 7)
-                .glassEffect(.regular, in: .capsule)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("ステップ \(appState.tutorialStep + 1) / \(steps.count)")
-        }
-        .padding(.horizontal, Theme.Spacing.xxl)
+        )
     }
 
     private var stepDots: some View {

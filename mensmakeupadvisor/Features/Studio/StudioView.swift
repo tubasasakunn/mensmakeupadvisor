@@ -50,43 +50,22 @@ struct StudioView: View {
     // 戻り先は AppState.studioOrigin に従う。
     // - Diagnosis 経由（新規撮影 or Tutorial 完了）: 診断結果へ
     // - Archive 経由（保存ルックの編集）: ホームへ
-    private var backLabel: String {
-        appState.studioOrigin == .home ? "ホーム" : "診断結果"
+    private var backAccessibilityLabel: String {
+        appState.studioOrigin == .home ? "ホームに戻る" : "診断結果に戻る"
     }
 
     private var headerBar: some View {
-        HStack {
-            Button {
-                Haptics.soft()
+        ScreenHeader(
+            variant: .push,
+            kicker: "STUDIO",
+            backAccessibilityLabel: backAccessibilityLabel,
+            backAccessibilityID: "studio_back_button",
+            onBack: {
                 appState.tryingSavedLook = false
                 appState.navigate(to: appState.studioOrigin)
-            } label: {
-                HStack(spacing: 5) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 11, weight: .semibold))
-                    Text(backLabel)
-                        .font(.system(size: 12, weight: .medium))
-                }
-                .foregroundStyle(Theme.Text.primarySoft)
-                .padding(.horizontal, Theme.Spacing.md)
-                .padding(.vertical, 7)
-                .glassEffect(.clear, in: .capsule)
-            }
-            .accessibilityLabel("\(backLabel)に戻る")
-            .aid("studio_back_button")
-
-            Spacer()
-
-            Text("STUDIO")
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .kerning(3)
-                .foregroundStyle(Theme.Text.primaryFaded)
-
-            Spacer()
-
-            shareIconButton
-        }
-        .padding(.horizontal, Theme.Spacing.xxl)
+            },
+            trailing: { shareIconButton }
+        )
     }
 
     // 右上の小さな共有アイコン。共有内容は MakeupShareCardView。

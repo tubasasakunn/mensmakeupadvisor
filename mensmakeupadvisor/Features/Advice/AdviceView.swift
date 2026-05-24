@@ -12,7 +12,6 @@ struct AdviceView: View {
             VStack(spacing: 0) {
                 navigationBar
                     .padding(.top, Theme.Spacing.md)
-                    .padding(.horizontal, Theme.Spacing.xxl)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
@@ -65,8 +64,7 @@ struct AdviceView: View {
     // 戻り先は AppState.captureOrigin に従う。
     // - 初回 (onboarding 完了直後): .onboarding に戻る
     // - Home 経由: .home に戻る
-    // ラベルはどちらの場合でも「戻る」で統一し、行き先を読み上げる
-    // accessibilityLabel だけ文脈に応じて切り替える。
+    // 視覚ラベルは「戻る」一語、accessibilityLabel だけ文脈に応じて切り替える。
     private var backDestination: AppScreen { appState.captureOrigin }
     private var backAccessibilityLabel: String {
         switch backDestination {
@@ -77,27 +75,13 @@ struct AdviceView: View {
     }
 
     private var navigationBar: some View {
-        HStack {
-            Button {
-                Haptics.soft()
-                appState.navigate(to: backDestination)
-            } label: {
-                HStack(spacing: 5) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 11, weight: .semibold))
-                    Text("戻る")
-                        .font(.system(size: 12, weight: .medium))
-                }
-                .foregroundStyle(Theme.Text.primarySoft)
-                .padding(.horizontal, Theme.Spacing.md)
-                .padding(.vertical, 7)
-                .glassEffect(.clear, in: .capsule)
-            }
-            .accessibilityLabel(backAccessibilityLabel)
-            .aid("advice_back_button")
-
-            Spacer()
-        }
+        ScreenHeader(
+            variant: .push,
+            kicker: "SCAN",
+            backAccessibilityLabel: backAccessibilityLabel,
+            backAccessibilityID: "advice_back_button",
+            onBack: { appState.navigate(to: backDestination) }
+        )
     }
 
     // MARK: - Header

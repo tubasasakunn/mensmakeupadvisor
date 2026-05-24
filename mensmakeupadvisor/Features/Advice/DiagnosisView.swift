@@ -11,7 +11,6 @@ struct DiagnosisView: View {
             VStack(spacing: 0) {
                 navigationBar
                     .padding(.top, Theme.Spacing.md)
-                    .padding(.horizontal, Theme.Spacing.xl)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
@@ -97,32 +96,13 @@ struct DiagnosisView: View {
     }
 
     private var navigationBar: some View {
-        HStack {
-            Button {
-                Haptics.soft()
-                appState.navigate(to: backDestination)
-            } label: {
-                HStack(spacing: 5) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 11, weight: .semibold))
-                    Text("戻る")
-                        .font(.system(size: 12, weight: .medium))
-                }
-                .foregroundStyle(Theme.Text.primarySoft)
-                .padding(.horizontal, Theme.Spacing.md)
-                .padding(.vertical, 7)
-                .glassEffect(.clear, in: .capsule)
-            }
-            .accessibilityLabel(backAccessibilityLabel)
-            .aid("diagnosis_back_button")
-
-            Spacer()
-
-            Text("RESULT")
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .kerning(2.5)
-                .foregroundStyle(Theme.Text.primaryFaded)
-        }
+        ScreenHeader(
+            variant: .push,
+            kicker: "RESULT",
+            backAccessibilityLabel: backAccessibilityLabel,
+            backAccessibilityID: "diagnosis_back_button",
+            onBack: { appState.navigate(to: backDestination) }
+        )
     }
 
     // MARK: - Header
