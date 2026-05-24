@@ -3,7 +3,6 @@ import UIKit
 
 struct DiagnosisSharePrompt: View {
     let result: AnalysisResult
-    let capturedImage: UIImage?
     @State private var isRendering = false
 
     var body: some View {
@@ -94,7 +93,7 @@ struct DiagnosisSharePrompt: View {
     private func shareResult() async {
         isRendering = true
         defer { isRendering = false }
-        let card = DiagnosisShareCardView(result: result, capturedImage: capturedImage)
+        let card = DiagnosisShareCardView(result: result)
         if let image = ShareHelper.render(card) {
             ShareHelper.present([image])
         }
@@ -102,7 +101,7 @@ struct DiagnosisSharePrompt: View {
 }
 
 #Preview {
-    DiagnosisSharePrompt(result: .mock, capturedImage: nil)
+    DiagnosisSharePrompt(result: .mock)
         .padding(24)
         .background(Color.appBackground)
 }

@@ -42,7 +42,12 @@ struct HomeView: View {
         // Home に戻ってきた時点で Create フラグはクリアする。
         // HomeCreateTab で立てた後、別タブから Diagnosis に行くなどの
         // 経路で残留して Tutorial がスキップされる事故を防ぐ。
-        .task { appState.skipTutorialOnNextFlow = false }
+        // 併せて「ホーム到達済み」フラグを立て、次回起動時に Onboarding を
+        // 飛ばして直接 Home に来られるようにする。
+        .task {
+            appState.skipTutorialOnNextFlow = false
+            AppEnvironment.didReachHomeOnce = true
+        }
     }
 }
 

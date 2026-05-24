@@ -2,9 +2,11 @@ import SwiftUI
 import UIKit
 
 // 320×568 = 9:16 シェアカード (scale×3 → 960×1704px)
+// 顔写真は載せず、検出したランドマークから描いた face mesh と
+// 7 指標の数値だけで「素顔の構造」を語る。プライバシー上の懸念も避けつつ
+// 「これは私の分析結果」として晒しても抵抗が少ない見せ方にする。
 struct DiagnosisShareCardView: View {
     let result: AnalysisResult
-    var capturedImage: UIImage? = nil
 
     var body: some View {
         ZStack {
@@ -20,7 +22,7 @@ struct DiagnosisShareCardView: View {
                     .padding(.top, 28)
                     .padding(.horizontal, 28)
 
-                facePhotoSection
+                faceMeshSection
                     .padding(.top, 16)
 
                 VStack(alignment: .leading, spacing: 0) {
@@ -67,31 +69,17 @@ struct DiagnosisShareCardView: View {
         .allowsHitTesting(false)
     }
 
-    // MARK: - Face Photo Section
+    // MARK: - Face Mesh Section
 
-    private var facePhotoSection: some View {
+    // 320×200 の暗色プレートに、検出済み landmarks の wireframe だけを描く。
+    // 顔の縦横比に合わせて mesh を contentMode: .fit で配置し、写真は載せない。
+    private var faceMeshSection: some View {
         ZStack(alignment: .bottomTrailing) {
-            Group {
-                if let img = capturedImage {
-                    Image(uiImage: img)
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    Rectangle()
-                        .fill(Theme.Surface.glassWeak)
-                }
-            }
-            .frame(width: 320, height: 200)
-            .clipped()
-            .overlay(Theme.Surface.shareCardOverlay)
-            .overlay(faceMeshCanvas)
-            .overlay(
-                LinearGradient(
-                    colors: [Color.appBackground, .clear],
-                    startPoint: .bottom,
-                    endPoint: .init(x: 0.5, y: 0.5)
-                )
-            )
+            Rectangle()
+                .fill(Theme.Surface.glassWeak)
+
+            meshCanvas
+                .padding(20)
 
             VStack(alignment: .leading, spacing: 2) {
                 Spacer()
@@ -114,9 +102,37 @@ struct DiagnosisShareCardView: View {
                 .padding(.bottom, 10)
         }
         .frame(width: 320, height: 200)
+        .clipped()
+        .overlay(
+            LinearGradient(
+                colors: [Color.appBackground, .clear],
+                startPoint: .bottom,
+                endPoint: .init(x: 0.5, y: 0.6)
+            )
+            .allowsHitTesting(false)
+        )
     }
 
-    private var faceMeshCanvas: some View {
+    @ViewBuilder
+    private var meshCanvas: some View {
+        if let landmarks = result.landmarksNormalized, !landmarks.isEmpty {
+            FaceMeshWireframe(landmarks: landmarks, aspect: meshAspect)
+                .aspectRatio(meshAspect, contentMode: .fit)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            placeholderGrid
+        }
+    }
+
+    // 顔画像のアスペクト比 (撮影画像のもの)。情報がなければ 4:5 を仮置き。
+    private var meshAspect: CGFloat {
+        let w = result.imageWidthPx ?? 0
+        let h = result.imageHeightPx ?? 0
+        guard w > 0, h > 0 else { return 4.0 / 5.0 }
+        return CGFloat(w) / CGFloat(h)
+    }
+
+    private var placeholderGrid: some View {
         Canvas { context, size in
             let cols = 10
             let rows = 12
@@ -163,6 +179,41 @@ struct DiagnosisShareCardView: View {
     }
 }
 
+// MARK: - Mesh wireframe (landmarks-based)
+
+// シェアカード用に切り出した face mesh 描画。
+// DiagnosisFaceMeshPlate と同じ tesselation edges を共有する。
+private struct FaceMeshWireframe: View {
+    let landmarks: [CGPoint]
+    let aspect: CGFloat
+
+    var body: some View {
+        Canvas { context, size in
+            let edges = Self.cachedEdges
+            var meshPath = Path()
+            for (a, b) in edges where a < landmarks.count && b < landmarks.count {
+                let pa = landmarks[a]
+                let pb = landmarks[b]
+                meshPath.move(to: CGPoint(x: pa.x * size.width, y: pa.y * size.height))
+                meshPath.addLine(to: CGPoint(x: pb.x * size.width, y: pb.y * size.height))
+            }
+            context.stroke(meshPath, with: .color(Theme.Diagram.highlightArea), lineWidth: 0.4)
+
+            for p in landmarks {
+                let r: CGFloat = 0.8
+                let rect = CGRect(
+                    x: p.x * size.width - r, y: p.y * size.height - r,
+                    width: r * 2, height: r * 2
+                )
+                context.fill(Path(ellipseIn: rect), with: .color(Theme.Mesh.landmarkDot))
+            }
+        }
+        .allowsHitTesting(false)
+    }
+
+    nonisolated(unsafe) private static var cachedEdges: [(Int, Int)] = FaceMeshResources.tesselationConnections()
+}
+
 #Preview {
-    DiagnosisShareCardView(result: .mock, capturedImage: nil)
+    DiagnosisShareCardView(result: .mock)
 }

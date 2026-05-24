@@ -139,23 +139,6 @@ struct TutorialView: View {
                 .glassEffect(.regular, in: .capsule)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("ステップ \(appState.tutorialStep + 1) / \(steps.count)")
-
-            Spacer()
-
-            Button {
-                Haptics.soft()
-                // studioOrigin は遷移元 (Diagnosis / Archive) が設定した値を尊重する。
-                viewModel.skip(appState: appState)
-            } label: {
-                Text("あとで")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Theme.Text.primarySoft)
-                    .padding(.horizontal, Theme.Spacing.md)
-                    .padding(.vertical, 7)
-                    .glassEffect(.clear, in: .capsule)
-            }
-            .accessibilityLabel("ガイドを終了してスタジオへ")
-            .aid("tutorial_skip_button")
         }
         .padding(.horizontal, Theme.Spacing.xxl)
     }

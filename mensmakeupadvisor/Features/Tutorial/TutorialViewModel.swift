@@ -67,10 +67,6 @@ final class TutorialViewModel {
         }
     }
 
-    func skip(appState: AppState) {
-        finishToStudio(appState: appState)
-    }
-
     private func finishToStudio(appState: AppState) {
         let seq = steps(for: appState)
         // skip 時など眉未選択ならおすすめタイプを既定で入れる。

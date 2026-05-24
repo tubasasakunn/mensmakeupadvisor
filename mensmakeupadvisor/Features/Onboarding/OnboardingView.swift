@@ -50,7 +50,6 @@ struct OnboardingView: View {
                 .aid("onboarding_page_tag")
 
             Spacer()
-            skipButton
         }
         .padding(.horizontal, 28)
         .padding(.top, 12)
@@ -78,29 +77,9 @@ struct OnboardingView: View {
     }
 
     // Home から再読しているか (analysisResult があれば一度はアプリを使った人)。
-    // 初回フローでは「読み飛ばす → 撮影画面」、再読では「ホームに戻る」にする。
+    // 最終ページの CTA ラベル/遷移先を「ホームに戻る」「撮影をはじめる」で出し分けるためだけに使う。
     private var isRereadFromHome: Bool {
         appState.analysisResult != nil
-    }
-
-    private var skipButton: some View {
-        Button {
-            Haptics.soft()
-            if !isRereadFromHome {
-                appState.captureOrigin = .onboarding
-            }
-            appState.navigate(to: isRereadFromHome ? .home : .capture)
-        } label: {
-            Text(isRereadFromHome ? "ホームに戻る" : "読み飛ばす")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Theme.Text.primarySoft)
-                .padding(.horizontal, Theme.Spacing.md)
-                .padding(.vertical, 7)
-                .glassEffect(.clear, in: .capsule)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(isRereadFromHome ? "ホームに戻る" : "読み飛ばして撮影画面へ")
-        .aid("onboarding_skip_button")
     }
 
     // MARK: - Progress hairline

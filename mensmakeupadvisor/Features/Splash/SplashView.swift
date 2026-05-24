@@ -8,7 +8,10 @@ struct SplashView: View {
     private func advance() {
         guard !didAdvance else { return }
         didAdvance = true
-        appState.navigate(to: .onboarding)
+        // 一度でもホームに到達した既存ユーザーは Onboarding を再走させずに
+        // ホームへ直行する。初回ユーザーは従来通りガイドへ。
+        let next: AppScreen = AppEnvironment.didReachHomeOnce ? .home : .onboarding
+        appState.navigate(to: next)
     }
 
     var body: some View {

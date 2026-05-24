@@ -38,7 +38,7 @@ struct DiagnosisView: View {
                             .padding(.horizontal, Theme.Spacing.xl)
 
                         // スコアを見た直後の「シェアしたい」瞬間に配置
-                        DiagnosisSharePrompt(result: result, capturedImage: appState.capturedImage)
+                        DiagnosisSharePrompt(result: result)
                             .padding(.top, Theme.Spacing.xl)
                             .padding(.horizontal, Theme.Spacing.xl)
 

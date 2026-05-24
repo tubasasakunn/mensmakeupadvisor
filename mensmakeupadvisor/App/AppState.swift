@@ -5,7 +5,7 @@ import UIKit
 private let renderLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "Render")
 
 enum AppScreen: Equatable {
-    case splash, onboarding, home, capture, analyzing, diagnosis, tutorial, studio
+    case splash, onboarding, home, capture, analyzing, diagnosis, tutorial, studio, completion
 }
 
 // HomeView 内のタブ。Archive 経由で Studio に行って戻ってきた時に
@@ -51,7 +51,9 @@ final class AppState {
     // capture / studio はオンボーディング初回フロー以外にも、Home の各タブから
     // 入ってこられるため、画面遷移元を覚えておき「戻る」をその場所へ返す。
     // 例: Archive → applyLook → studio。このとき studio の戻るは Home へ。
-    var captureOrigin: AppScreen = .onboarding
+    // 初期値は .home — 「初回オンボーディングからの遷移」だけが例外として
+    // OnboardingView 側で明示的に .onboarding を立てる。
+    var captureOrigin: AppScreen = .home
     var studioOrigin: AppScreen = .diagnosis
 
     // HomeView がどのタブを開いているか。Archive からの編集フローで
@@ -77,7 +79,7 @@ final class AppState {
         composition = MakeupComposition(); activePresetID = nil
         skipTutorialOnNextFlow = false
         tryingSavedLook = false
-        captureOrigin = .onboarding
+        captureOrigin = .home
         studioOrigin = .diagnosis
         homeTab = .create
         presetsInitializedFromAnalysis = false
@@ -127,7 +129,7 @@ final class AppState {
         capturedImage = makePlaceholderImage()
         analysisResult = .mock
 
-        let screens: [AppScreen] = [.splash, .onboarding, .home, .capture, .analyzing, .diagnosis, .tutorial, .studio]
+        let screens: [AppScreen] = [.splash, .onboarding, .home, .capture, .analyzing, .diagnosis, .tutorial, .studio, .completion]
         for screen in screens {
             navigate(to: screen)
             try? await Task.sleep(for: .seconds(3))

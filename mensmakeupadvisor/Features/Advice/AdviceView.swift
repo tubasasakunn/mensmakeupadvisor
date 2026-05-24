@@ -32,12 +32,8 @@ struct AdviceView: View {
                             .padding(.top, Theme.Spacing.lg)
                             .padding(.horizontal, Theme.Spacing.xxl)
 
-                        AdviceViewfinderArea()
-                            .padding(.top, Theme.Spacing.xxl)
-                            .padding(.horizontal, Theme.Spacing.xxl)
-
                         actionButtons
-                            .padding(.top, Theme.Spacing.xl)
+                            .padding(.top, Theme.Spacing.xxxl)
                             .padding(.horizontal, Theme.Spacing.xxl)
 
                         privacyCaption

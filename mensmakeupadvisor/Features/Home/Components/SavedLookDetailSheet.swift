@@ -1,7 +1,7 @@
 import SwiftUI
 
 // Archive グリッドのカードをタップしたときに出る詳細ボトムシート。
-// メッシュ図 + 適用ゾーン一覧 + 強度表示 + 編集 / 削除アクション。
+// メッシュ図 + 適用ゾーン一覧 + 強度表示 + 共有 / 編集 / 削除アクション。
 struct SavedLookDetailSheet: View {
     let look: SavedLook
     let onApply: () -> Void
@@ -10,6 +10,7 @@ struct SavedLookDetailSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var showDeleteConfirmation = false
+    @State private var isPreparingShare = false
 
     var body: some View {
         ZStack {
@@ -56,8 +57,78 @@ struct SavedLookDetailSheet: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.inkSecondary)
             }
+            shareButton
             closeButton
         }
+    }
+
+    // Studio と同じく右上の小さな共有アイコン。
+    // 共有内容は保存ルックから再構築した MakeupShareCardView。
+    private var shareButton: some View {
+        Button {
+            Haptics.soft()
+            Task { await shareLook() }
+        } label: {
+            Group {
+                if isPreparingShare {
+                    ProgressView()
+                        .tint(Theme.Text.primarySoft)
+                        .scaleEffect(0.6)
+                } else {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Theme.Text.primarySoft)
+                }
+            }
+            .frame(width: 28, height: 28)
+            .glassEffect(.clear, in: .circle)
+            .overlay(
+                Circle().strokeBorder(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
+            )
+        }
+        .accessibilityLabel(isPreparingShare ? "共有画像を準備中" : "このルックを共有する")
+        .aid("home_archive_detail_share")
+        .disabled(isPreparingShare)
+    }
+
+    private func shareLook() async {
+        isPreparingShare = true
+        defer { isPreparingShare = false }
+        let card = MakeupShareCardView(
+            renderedImage: nil,
+            capturedImage: nil,
+            composition: composition(from: look),
+            result: archivedResult(from: look),
+            mode: .styled,
+            date: look.createdAt
+        )
+        if let image = ShareHelper.render(card) {
+            ShareHelper.present([image])
+        }
+    }
+
+    // 保存済みのスライダー値・ゾーン集合から MakeupComposition を復元する。
+    // ArchiveViewModel.applyLook と同じ復元ロジックをここでも使う。
+    private func composition(from look: SavedLook) -> MakeupComposition {
+        MakeupCompositionBuilder.make(
+            highlightAreas: look.highlightAreaSet,
+            shadowAreas: look.shadowAreaSet,
+            eyeAreas: look.eyeAreaSet,
+            browType: EyebrowApplier.BrowType(rawValue: look.eyebrowTypeRaw ?? ""),
+            base: Float(look.base / 100),
+            highlight: Float(look.highlight / 100),
+            shadow: Float(look.shadow / 100),
+            eye: Float(look.eye / 100)
+        )
+    }
+
+    // シェアカードに必要なのは faceShape ラベルと grade だけ。
+    // スコアは保存していないので「総合点 1 つ」のミニ AnalysisResult を組む。
+    private func archivedResult(from look: SavedLook) -> AnalysisResult? {
+        guard look.totalScore > 0 else { return nil }
+        let shape = FaceShape(rawValue: look.faceShape) ?? .tamago
+        let score = FaceScore(name: "総合", score: look.totalScore, advice: "")
+        return AnalysisResult(faceShape: shape, scores: [score])
     }
 
     // シートを閉じてアーカイブ画面に戻る明示的な出口。

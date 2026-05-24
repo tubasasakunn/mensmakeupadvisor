@@ -130,8 +130,8 @@ struct StudioView: View {
         }
     }
 
-    // 通常フロー: 保存 → ホーム。
-    // Try フロー (Archive 経由): 保存せず「完了」でホーム。
+    // 通常フロー: 保存 → 完了画面 (CompletionView) → ホーム。
+    // Try フロー (Archive 経由): 保存せず直接ホームへ。
     // 試すたびに SavedLook が増えるとアーカイブが汚れるので保存しない。
     private var nextButton: some View {
         let isTrying = appState.tryingSavedLook
@@ -144,7 +144,7 @@ struct StudioView: View {
                 viewModel.saveLook(appState: appState, modelContext: modelContext)
             }
             appState.tryingSavedLook = false
-            appState.navigate(to: .home)
+            appState.navigate(to: isTrying ? .home : .completion)
         }
     }
 }

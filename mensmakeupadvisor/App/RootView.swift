@@ -19,6 +19,7 @@ struct RootView: View {
                 case .diagnosis:  DiagnosisView()
                 case .tutorial:   TutorialView()
                 case .studio:     StudioView()
+                case .completion: CompletionView()
                 }
             }
             .transition(reduceMotion ? .identity : .opacity)
@@ -47,8 +48,9 @@ struct RootView: View {
         case .diagnosis: return .capture
         case .studio:    return appState.studioOrigin
         // Splash/Home はトップ階層、Analyzing は処理中、
-        // Tutorial/Onboarding は内側スワイプと衝突するため除外
-        case .splash, .home, .analyzing, .tutorial, .onboarding: return nil
+        // Tutorial/Onboarding は内側スワイプと衝突するため除外。
+        // Completion は送り出し画面なので戻る対象外。
+        case .splash, .home, .analyzing, .tutorial, .onboarding, .completion: return nil
         }
     }
 
