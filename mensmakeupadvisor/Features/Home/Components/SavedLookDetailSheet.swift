@@ -1,9 +1,14 @@
 import SwiftUI
 
 // Archive グリッドのカードをタップしたときに出る詳細ボトムシート。
-// メッシュ図 + 適用ゾーン一覧 + 強度表示 + 共有 / 編集 / 削除アクション。
+// レイアウトは ScreenHeader sheet バリアントで統一:
+//   左: ×（閉じる）
+//   右: 共有アイコン + 「編集」テキストボタン
+// body 末尾の primary CTA は「今の自分で試す」、secondary は「削除」。
 struct SavedLookDetailSheet: View {
     let look: SavedLook
+    let onApply: () -> Void
+    let onTry: () -> Void
     let onDelete: () -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -13,19 +18,26 @@ struct SavedLookDetailSheet: View {
     var body: some View {
         ZStack {
             LuxeBackground(intensity: 0.4)
-            ScrollView {
-                VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
-                    headerRow
-                    thumbnail
-                    // 詳細セクションは白っぽい Glass を避けて素のレイアウトで読ませる
-                    appliedZoneList
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    HairlineDivider()
-                    intensityRows
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    actionRow
+
+            VStack(spacing: 0) {
+                header
+                    .padding(.top, Theme.Spacing.sm)
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
+                        meta
+                        thumbnail
+                        appliedZoneList
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        HairlineDivider()
+                        intensityRows
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        actionRow
+                    }
+                    .padding(.horizontal, Theme.Spacing.xl)
+                    .padding(.top, Theme.Spacing.lg)
+                    .padding(.bottom, Theme.Spacing.xxl)
                 }
-                .padding(Theme.Spacing.xl)
             }
         }
         .confirmationDialog(
@@ -44,24 +56,24 @@ struct SavedLookDetailSheet: View {
         .aid("home_archive_detail_sheet")
     }
 
-    private var headerRow: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            Text(look.createdAt, format: .dateTime.year().month().day().hour().minute())
-                .font(.system(size: 12))
-                .foregroundStyle(Color.inkSecondary)
-            Spacer()
-            if look.totalScore > 0 {
-                Text("\(look.totalScore) 点")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(Color.inkSecondary)
+    // MARK: - Header
+
+    private var header: some View {
+        ScreenHeader(
+            variant: .sheet,
+            kicker: "ARCHIVE",
+            backAccessibilityLabel: "閉じる",
+            backAccessibilityID: "home_archive_detail_close",
+            onBack: { dismiss() },
+            trailing: {
+                HStack(spacing: Theme.Spacing.sm) {
+                    shareButton
+                    editButton
+                }
             }
-            shareButton
-            closeButton
-        }
+        )
     }
 
-    // Studio と同じく右上の小さな共有アイコン。
-    // 共有内容は保存ルックから再構築した MakeupShareCardView。
     private var shareButton: some View {
         Button {
             Haptics.soft()
@@ -78,92 +90,49 @@ struct SavedLookDetailSheet: View {
                         .foregroundStyle(Theme.Text.primarySoft)
                 }
             }
-            .frame(width: 28, height: 28)
+            .frame(width: 30, height: 30)
             .glassEffect(.clear, in: .circle)
-            .overlay(
-                Circle().strokeBorder(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
-            )
         }
         .accessibilityLabel(isPreparingShare ? "共有画像を準備中" : "このルックを共有する")
         .aid("home_archive_detail_share")
         .disabled(isPreparingShare)
     }
 
-    private func shareLook() async {
-        isPreparingShare = true
-        defer { isPreparingShare = false }
-        // Archive には顔写真がないため、シェアカードのビジュアル領域 (320×220)
-        // にメッシュサムネを焼き込んで「写真欠落」の空っぽカードを避ける。
-        let meshImage = renderMeshHero()
-        let card = MakeupShareCardView(
-            renderedImage: meshImage,
-            capturedImage: nil,
-            composition: composition(from: look),
-            result: archivedResult(from: look),
-            mode: .styled,
-            date: look.createdAt
-        )
-        if let image = ShareHelper.render(card) {
-            ShareHelper.present([image])
-        }
-    }
-
-    private func renderMeshHero() -> UIImage? {
-        let hero = ZStack {
-            // 透けると上のシェアカードオーバーレイで真っ黒に潰れるので、
-            // ここで明示的に背景を敷く。
-            Theme.Surface.raised
-            SavedLookMeshThumbnail(look: look, geometry: SavedLookMeshGeometry.makeLatest())
-                .aspectRatio(1, contentMode: .fit)
-                .padding(.vertical, 8)
-        }
-        .frame(width: 320, height: 220)
-        return ShareHelper.render(hero)
-    }
-
-    // 保存済みのスライダー値・ゾーン集合から MakeupComposition を復元する。
-    // ArchiveViewModel.applyLook と同じ復元ロジックをここでも使う。
-    private func composition(from look: SavedLook) -> MakeupComposition {
-        MakeupCompositionBuilder.make(
-            highlightAreas: look.highlightAreaSet,
-            shadowAreas: look.shadowAreaSet,
-            eyeAreas: look.eyeAreaSet,
-            browType: EyebrowApplier.BrowType(rawValue: look.eyebrowTypeRaw ?? ""),
-            base: Float(look.base / 100),
-            highlight: Float(look.highlight / 100),
-            shadow: Float(look.shadow / 100),
-            eye: Float(look.eye / 100)
-        )
-    }
-
-    // シェアカードに必要なのは faceShape ラベルと grade だけ。
-    // スコアは保存していないので「総合点 1 つ」のミニ AnalysisResult を組む。
-    private func archivedResult(from look: SavedLook) -> AnalysisResult? {
-        guard look.totalScore > 0 else { return nil }
-        let shape = FaceShape(rawValue: look.faceShape) ?? .tamago
-        let score = FaceScore(name: "総合", score: look.totalScore, advice: "")
-        return AnalysisResult(faceShape: shape, scores: [score])
-    }
-
-    // シートを閉じてアーカイブ画面に戻る明示的な出口。
-    // .sheet(item:) 経由なのでスワイプダウンでも閉じられるが、
-    // 「戻る術が無い」と感じさせないため可視のボタンを置く。
-    private var closeButton: some View {
+    // 「編集 = Studio で再調整」。スタジオ直行 (Tutorial スキップ)。
+    private var editButton: some View {
         Button {
-            Haptics.soft()
-            dismiss()
+            Haptics.medium()
+            onApply()
         } label: {
-            Image(systemName: "xmark")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Theme.Text.primarySoft)
-                .frame(width: 28, height: 28)
-                .glassEffect(.clear, in: .circle)
-                .overlay(
-                    Circle().strokeBorder(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
-                )
+            HStack(spacing: 4) {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 10, weight: .semibold))
+                Text("編集")
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            .foregroundStyle(Theme.Text.primarySoft)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, 7)
+            .glassEffect(.clear, in: .capsule)
         }
-        .accessibilityLabel("閉じる")
-        .aid("home_archive_detail_close")
+        .accessibilityLabel("このルックをスタジオで編集する")
+        .aid("home_archive_detail_apply")
+    }
+
+    // MARK: - Content
+
+    private var meta: some View {
+        HStack {
+            Text(look.createdAt, format: .dateTime.year().month().day().hour().minute())
+                .font(.system(size: 12))
+                .foregroundStyle(Color.inkSecondary)
+            Spacer()
+            if look.totalScore > 0 {
+                Text("\(look.totalScore) 点")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color.inkSecondary)
+            }
+        }
     }
 
     private var thumbnail: some View {
@@ -223,18 +192,87 @@ struct SavedLookDetailSheet: View {
         }
     }
 
-    // アーカイブ詳細はあくまで「保存ルックを眺める」ための画面。
-    // 「試す」「編集」のような診断/チュートリアルに飛ばす導線は撤廃して
-    // 削除だけを残す。
+    // body 末尾の CTA 2 段。
+    // primary: 「今の自分で試す」= 別の顔で試着 (capture → analyze → studio 直行・保存しない)
+    // secondary: 「削除」= 破壊的、押しづらい配置に。
     private var actionRow: some View {
-        GlassSecondaryButton(
-            title: "削除",
-            icon: "trash",
-            accessibilityID: "home_archive_detail_delete"
-        ) {
-            Haptics.warning()
-            showDeleteConfirmation = true
+        VStack(spacing: Theme.Spacing.md) {
+            GlassPrimaryButton(
+                title: "今の自分で試す",
+                icon: "camera.fill",
+                accessibilityID: "home_archive_detail_try"
+            ) {
+                Haptics.medium()
+                onTry()
+            }
+
+            GlassSecondaryButton(
+                title: "削除",
+                icon: "trash",
+                accessibilityID: "home_archive_detail_delete"
+            ) {
+                Haptics.warning()
+                showDeleteConfirmation = true
+            }
         }
+        .padding(.top, Theme.Spacing.sm)
+    }
+
+    // MARK: - Share
+
+    private func shareLook() async {
+        isPreparingShare = true
+        defer { isPreparingShare = false }
+        // Archive には顔写真がないため、シェアカードのビジュアル領域 (320×220)
+        // にメッシュサムネを焼き込んで「写真欠落」の空っぽカードを避ける。
+        let meshImage = renderMeshHero()
+        let card = MakeupShareCardView(
+            renderedImage: meshImage,
+            capturedImage: nil,
+            composition: composition(from: look),
+            result: archivedResult(from: look),
+            mode: .styled,
+            date: look.createdAt
+        )
+        if let image = ShareHelper.render(card) {
+            ShareHelper.present([image])
+        }
+    }
+
+    private func renderMeshHero() -> UIImage? {
+        let hero = ZStack {
+            // 透けると上のシェアカードオーバーレイで真っ黒に潰れるので、
+            // ここで明示的に背景を敷く。
+            Theme.Surface.raised
+            SavedLookMeshThumbnail(look: look, geometry: SavedLookMeshGeometry.makeLatest())
+                .aspectRatio(1, contentMode: .fit)
+                .padding(.vertical, 8)
+        }
+        .frame(width: 320, height: 220)
+        return ShareHelper.render(hero)
+    }
+
+    // 保存済みのスライダー値・ゾーン集合から MakeupComposition を復元する。
+    private func composition(from look: SavedLook) -> MakeupComposition {
+        MakeupCompositionBuilder.make(
+            highlightAreas: look.highlightAreaSet,
+            shadowAreas: look.shadowAreaSet,
+            eyeAreas: look.eyeAreaSet,
+            browType: EyebrowApplier.BrowType(rawValue: look.eyebrowTypeRaw ?? ""),
+            base: Float(look.base / 100),
+            highlight: Float(look.highlight / 100),
+            shadow: Float(look.shadow / 100),
+            eye: Float(look.eye / 100)
+        )
+    }
+
+    // シェアカードに必要なのは faceShape ラベルと grade だけ。
+    // スコアは保存していないので「総合点 1 つ」のミニ AnalysisResult を組む。
+    private func archivedResult(from look: SavedLook) -> AnalysisResult? {
+        guard look.totalScore > 0 else { return nil }
+        let shape = FaceShape(rawValue: look.faceShape) ?? .tamago
+        let score = FaceScore(name: "総合", score: look.totalScore, advice: "")
+        return AnalysisResult(faceShape: shape, scores: [score])
     }
 }
 
@@ -246,7 +284,7 @@ struct SavedLookDetailSheet: View {
             eyeAreas: ["eyeshadow_base", "tear_bag", "eyeliner"],
             eyebrowTypeRaw: "natural"
         ),
-        onDelete: {}
+        onApply: {}, onTry: {}, onDelete: {}
     )
     .background(Color.appBackground)
 }

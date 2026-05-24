@@ -26,6 +26,8 @@ struct HomeArchiveTab: View {
         .sheet(item: $selected) { look in
             SavedLookDetailSheet(
                 look: look,
+                onApply: { handleApply(look) },
+                onTry: { handleTry(look) },
                 onDelete: { handleDelete(look) }
             )
             .presentationBackground(Theme.Ambient.backdrop)
@@ -150,6 +152,16 @@ struct HomeArchiveTab: View {
     private func handleDelete(_ look: SavedLook) {
         viewModel.deleteLook(look, modelContext: modelContext)
         selected = nil
+    }
+
+    private func handleApply(_ look: SavedLook) {
+        selected = nil
+        viewModel.applyLook(look, appState: appState)
+    }
+
+    private func handleTry(_ look: SavedLook) {
+        selected = nil
+        viewModel.tryLook(look, appState: appState)
     }
 
     private func grade(for score: Int) -> String {
