@@ -147,8 +147,7 @@ struct HomeReportTab: View {
             ) {
                 // Home 経由の閲覧フロー。戻り先と CTA の出し分けに使う。
                 appState.skipDiagnosisOnNextFlow = false
-                appState.diagnosisOrigin = .home
-                appState.navigate(to: .diagnosis)
+                appState.navigation.openDiagnosis(from: .home)
             }
 
             GlassSecondaryButton(
@@ -157,8 +156,7 @@ struct HomeReportTab: View {
                 accessibilityID: "home_report_reeval_button"
             ) {
                 Haptics.soft()
-                appState.captureOrigin = .home
-                appState.navigate(to: .capture)
+                appState.navigation.openCapture(from: .home)
             }
         }
     }
@@ -184,8 +182,7 @@ struct HomeReportTab: View {
                     accessibilityID: "home_report_start_button"
                 ) {
                     Haptics.medium()
-                    appState.captureOrigin = .home
-                    appState.navigate(to: .capture)
+                    appState.navigation.openCapture(from: .home)
                 }
                 .padding(.top, Theme.Spacing.sm)
             }

@@ -125,10 +125,11 @@ struct OnboardingView: View {
                     accessibilityID: "onboarding_continue_button"
                 ) {
                     Haptics.medium()
-                    if !isRereadFromHome {
-                        appState.captureOrigin = .onboarding
+                    if isRereadFromHome {
+                        appState.navigation.navigate(to: .home)
+                    } else {
+                        appState.navigation.openCapture(from: .onboarding)
                     }
-                    appState.navigate(to: isRereadFromHome ? .home : .capture)
                 }
             } else {
                 // 中間ページは「スワイプで進む」を明示。タップでも次ページに送る。

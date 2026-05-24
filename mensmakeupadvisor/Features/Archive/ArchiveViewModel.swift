@@ -13,21 +13,19 @@ final class ArchiveViewModel {
     // (Tutorial をやり直させない: 編集者は既に組み終わっている前提)。
     func applyLook(_ look: SavedLook, appState: AppState) {
         loadComposition(from: look, into: appState)
-        appState.studioOrigin = .home
-        appState.homeTab = .archive
-        appState.tryingSavedLook = false
-        appState.navigate(to: .studio)
+        appState.navigation.homeTab = .archive
+        appState.session.tryingSavedLook = false
+        appState.navigation.openStudio(back: .home)
     }
 
     // 保存ルックを別の顔で当てて見る一回限りの体験。
     // 撮影 → 解析後に Studio へ直行し、CTA は「完了」(保存しない)。
     func tryLook(_ look: SavedLook, appState: AppState) {
         loadComposition(from: look, into: appState)
-        appState.studioOrigin = .home
-        appState.homeTab = .archive
-        appState.tryingSavedLook = true
-        appState.captureOrigin = .home
-        appState.navigate(to: .capture)
+        appState.navigation.homeTab = .archive
+        appState.navigation.studioOrigin = .home
+        appState.session.tryingSavedLook = true
+        appState.navigation.openCapture(from: .home)
     }
 
     private func loadComposition(from look: SavedLook, into appState: AppState) {

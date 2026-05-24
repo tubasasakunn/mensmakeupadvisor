@@ -26,3 +26,41 @@
 5. **SwiftData のみ** — CoreData は使わない
 6. **コメントは "なぜ" だけ** — 何をするかは書かない。自明なコードにコメント不要
 7. **Preview は必ずインメモリ ModelContainer を使う**
+
+## アーキテクチャの設計判断
+
+### 画面遷移は NavigationStack ではなく AppScreen + NavigationContext
+
+swiftui-patterns.md は NavigationStack を推奨しているが、本プロジェクトは
+**意図的に NavigationStack を採用していない**。
+
+- 全画面が編集者風のクロスフェード遷移で繋がる UX を保つため (`.transition(.opacity)`)
+- 同じ画面 (capture / studio / diagnosis) を複数の入口から開けるよう、
+  画面遷移と並行して `captureOrigin` / `studioOrigin` / `diagnosisOrigin` の
+  origin breadcrumb を更新するため。NavigationStack の `path` だけでは
+  「Home から来た studio は Home に戻り、Diagnosis から来た studio は Diagnosis に戻る」
+  という挙動を素直に表現しにくい
+- 一部画面 (Tutorial / Onboarding) は内側で独自のスワイプ UI を持つため、
+  iOS 標準の back gesture と衝突しやすい
+
+新規画面を追加する場合:
+- `AppScreen` に case を足し、`RootView` の switch に対応する View を追加
+- 遷移は `appState.navigation.navigate(to:)` か router ヘルパー
+  (`openCapture(from:)` / `openDiagnosis(from:)` / `openStudio(back:)` /
+  `openTutorial(studioBack:)` / `openHome(tab:)`) を使う
+- origin の付け忘れを防ぐため、生 `navigate(to:)` ではなくヘルパーを優先
+
+### 状態は AppState ファサード経由でサブ状態にアクセス
+
+AppState は composition root として 3 つの `@Observable` サブ状態を保持する:
+
+| サブ状態 | 責務 |
+|---|---|
+| `NavigationContext` | 画面遷移、origin breadcrumbs、router ヘルパー |
+| `MakeupSession` | 撮影画像 / 解析結果 / composition / MakeupEngine |
+| `AppFlowState` | フローフラグ (tutorialStep, skipDiagnosisOnNextFlow 等) |
+
+3 つとも個別に Environment 注入されているので、
+新規 View は `@Environment(NavigationContext.self) private var navigation` のように
+焦点を絞った依存を持つこと。`@Environment(AppState.self)` の全体依存は
+既存コードの後方互換用に残しているフォワードプロパティ。

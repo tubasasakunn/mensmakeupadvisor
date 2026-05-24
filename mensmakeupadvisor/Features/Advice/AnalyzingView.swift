@@ -225,16 +225,15 @@ struct AnalyzingView: View {
             // 2. Create フロー (Home → 撮影): 診断を飛ばして Tutorial で全化粧工程を歩く。
             //    戻り先は Home。フラグは使ったら必ずクリアする。
             // 3. 通常フロー (Onboarding 直後 / Home Report の再評価): Diagnosis に進む。
-            if appState.tryingSavedLook {
-                appState.navigate(to: .studio)
-            } else if appState.skipDiagnosisOnNextFlow {
-                appState.skipDiagnosisOnNextFlow = false
-                appState.studioOrigin = .home
-                appState.navigate(to: .tutorial)
+            if appState.session.tryingSavedLook {
+                // Try フローでは origin は tryLook 側で組んであるのでそのまま遷移
+                appState.navigation.navigate(to: .studio)
+            } else if appState.flow.skipDiagnosisOnNextFlow {
+                appState.flow.skipDiagnosisOnNextFlow = false
+                appState.navigation.openTutorial(studioBack: .home)
             } else {
-                appState.studioOrigin = .diagnosis
-                appState.diagnosisOrigin = .capture
-                appState.navigate(to: .diagnosis)
+                appState.navigation.studioOrigin = .diagnosis
+                appState.navigation.openDiagnosis(from: .capture)
             }
         } catch {
             showError(

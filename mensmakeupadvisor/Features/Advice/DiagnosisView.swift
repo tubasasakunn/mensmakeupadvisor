@@ -190,8 +190,7 @@ struct DiagnosisView: View {
                     accessibilityID: "diagnosis_review_try_button"
                 ) {
                     Haptics.medium()
-                    appState.studioOrigin = .home
-                    appState.navigate(to: .studio)
+                    appState.navigation.openStudio(back: .home)
                 }
             } else {
                 // 新規フロー (Onboarding 直後 / Home Report 再評価): 太い primary。
@@ -204,8 +203,7 @@ struct DiagnosisView: View {
                     accessibilityID: "diagnosis_begin_button"
                 ) {
                     Haptics.medium()
-                    appState.studioOrigin = .diagnosis
-                    appState.navigate(to: .tutorial)
+                    appState.navigation.openTutorial(studioBack: .diagnosis)
                 }
             }
         }

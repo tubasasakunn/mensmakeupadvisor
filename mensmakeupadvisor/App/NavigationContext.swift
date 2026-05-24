@@ -32,4 +32,38 @@ final class NavigationContext {
         diagnosisOrigin = .capture
         homeTab = .create
     }
+
+    // MARK: - Router helpers
+    //
+    // 「origin breadcrumb をセットしてから navigate」を 1 ヶ所にまとめる。
+    // 呼び出し側で順序ミスや origin の付け忘れが起こらないようにするため。
+    // 引数 `from` / `back` は「ここを抜けたら戻る先」を表す。
+
+    func openCapture(from origin: AppScreen) {
+        captureOrigin = origin
+        navigate(to: .capture)
+    }
+
+    func openDiagnosis(from origin: AppScreen) {
+        diagnosisOrigin = origin
+        navigate(to: .diagnosis)
+    }
+
+    func openStudio(back: AppScreen) {
+        studioOrigin = back
+        navigate(to: .studio)
+    }
+
+    func openTutorial(studioBack: AppScreen) {
+        // Tutorial を通った後に Studio で「戻る」を押した時の戻り先を仕込んでおく。
+        // Tutorial 自体は背景が studio と地続きなので、tutorial 自身の戻りは
+        // RootView.edgeSwipeBackTarget で除外している。
+        studioOrigin = studioBack
+        navigate(to: .tutorial)
+    }
+
+    func openHome(tab: HomeTab) {
+        homeTab = tab
+        navigate(to: .home)
+    }
 }
