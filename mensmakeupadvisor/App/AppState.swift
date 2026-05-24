@@ -39,9 +39,10 @@ final class AppState {
     var activePresetID: String?
     var isRenderingMakeup: Bool = false
 
-    // Home → Create フローでは Tutorial をスキップして直接 Studio に行く。
+    // Home → Create フローでは Diagnosis を飛ばして直接 Tutorial（各化粧工程の
+    // ガイド）に入る。撮って即「試す」体験を最短化するため。
     // AnalyzingView 完了時の navigate 分岐で参照する。
-    var skipTutorialOnNextFlow: Bool = false
+    var skipDiagnosisOnNextFlow: Bool = false
 
     // Archive 「試す」フロー: 保存ルックを別の顔で当てて見る一回限りの体験。
     // capture → analyze 完了時に Studio へ直行し、保存もしない (Studio CTA は「完了」)。
@@ -80,7 +81,7 @@ final class AppState {
         capturedImage = nil; renderedImage = nil; analysisResult = nil
         tutorialStep = 0; tutorialDone = false
         composition = MakeupComposition(); activePresetID = nil
-        skipTutorialOnNextFlow = false
+        skipDiagnosisOnNextFlow = false
         tryingSavedLook = false
         captureOrigin = .home
         studioOrigin = .diagnosis

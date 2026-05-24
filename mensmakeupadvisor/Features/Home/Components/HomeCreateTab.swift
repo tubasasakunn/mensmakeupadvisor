@@ -29,7 +29,9 @@ struct HomeCreateTab: View {
                     accessibilityID: "home_create_camera_button"
                 ) {
                     Haptics.medium()
-                    appState.skipTutorialOnNextFlow = true
+                    // Create フローは「撮ってすぐ各化粧工程を試す」体験。
+                    // 撮影後 Diagnosis を飛ばし、Tutorial に直行する。
+                    appState.skipDiagnosisOnNextFlow = true
                     appState.captureOrigin = .home
                     appState.navigate(to: .capture)
                 }

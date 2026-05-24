@@ -178,7 +178,6 @@ struct DiagnosisView: View {
 
     private var bottomButtons: some View {
         let isHomeReview = appState.diagnosisOrigin == .home
-        let isSkipFlow = appState.skipTutorialOnNextFlow
 
         return VStack(spacing: Theme.Spacing.md) {
             if isHomeReview {
@@ -192,26 +191,21 @@ struct DiagnosisView: View {
                 ) {
                     Haptics.medium()
                     appState.studioOrigin = .home
-                    appState.skipTutorialOnNextFlow = false
                     appState.navigate(to: .studio)
                 }
             } else {
-                // 新規フロー: 太い primary。
+                // 新規フロー (Onboarding 直後 / Home Report 再評価): 太い primary。
+                // Tutorial に進んで全化粧工程を歩く。
                 ctaWithSubtitle(
-                    title: isSkipFlow ? "スタジオを開く" : "メイクを試してみる",
-                    subtitle: isSkipFlow ? "プリセットや細かい調整ができます" : "5ステップのガイドに沿って進めます",
-                    icon: isSkipFlow ? "paintbrush.pointed.fill" : "wand.and.stars",
+                    title: "メイクを試してみる",
+                    subtitle: "5ステップのガイドに沿って進めます",
+                    icon: "wand.and.stars",
                     isProminent: true,
                     accessibilityID: "diagnosis_begin_button"
                 ) {
                     Haptics.medium()
                     appState.studioOrigin = .diagnosis
-                    if isSkipFlow {
-                        appState.skipTutorialOnNextFlow = false
-                        appState.navigate(to: .studio)
-                    } else {
-                        appState.navigate(to: .tutorial)
-                    }
+                    appState.navigate(to: .tutorial)
                 }
             }
         }

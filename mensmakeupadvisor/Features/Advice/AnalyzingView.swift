@@ -219,14 +219,19 @@ struct AnalyzingView: View {
             }
             appState.analysisResult = result
             Haptics.success()
-            // Try フロー (Archive → 試す): 診断/チュートリアルを挟まず直接 Studio へ。
-            // composition は ArchiveViewModel.tryLook で既に保存ルックから組まれている。
+            // 3 分岐:
+            // 1. Try フロー (Archive → 試す): 診断/チュートリアルを挟まず Studio 直行。
+            //    composition は ArchiveViewModel.tryLook で既に保存ルックから組まれている。
+            // 2. Create フロー (Home → 撮影): 診断を飛ばして Tutorial で全化粧工程を歩く。
+            //    戻り先は Home。フラグは使ったら必ずクリアする。
+            // 3. 通常フロー (Onboarding 直後 / Home Report の再評価): Diagnosis に進む。
             if appState.tryingSavedLook {
-                // studioOrigin は tryLook 側で .home を入れている。
                 appState.navigate(to: .studio)
+            } else if appState.skipDiagnosisOnNextFlow {
+                appState.skipDiagnosisOnNextFlow = false
+                appState.studioOrigin = .home
+                appState.navigate(to: .tutorial)
             } else {
-                // 通常の新規撮影フロー: Studio の戻る先は診断結果、
-                // 診断の戻る先は撮影画面。
                 appState.studioOrigin = .diagnosis
                 appState.diagnosisOrigin = .capture
                 appState.navigate(to: .diagnosis)

@@ -146,7 +146,7 @@ struct HomeReportTab: View {
                 accessibilityID: "home_report_open_button"
             ) {
                 // Home 経由の閲覧フロー。戻り先と CTA の出し分けに使う。
-                appState.skipTutorialOnNextFlow = false
+                appState.skipDiagnosisOnNextFlow = false
                 appState.diagnosisOrigin = .home
                 appState.navigate(to: .diagnosis)
             }
