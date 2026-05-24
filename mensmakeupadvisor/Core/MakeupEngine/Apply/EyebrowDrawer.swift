@@ -6,7 +6,6 @@ import Foundation
 nonisolated enum EyebrowDrawer {
     nonisolated static func draw(image: CGImage, faceMesh: FaceMesh,
                                  options: EyebrowApplier.Options) -> CGImage? {
-        loadShapes()
         guard let shape = shapesCache[options.type.rawValue] else { return image }
 
         let w = image.width
@@ -178,14 +177,14 @@ nonisolated enum EyebrowDrawer {
 
     // MARK: - Shape
 
-    nonisolated(unsafe) private static var shapesCache: [String: (upper: [(Double, Double)], lower: [(Double, Double)])] = [:]
-
-    private nonisolated static func loadShapes() {
-        guard shapesCache.isEmpty else { return }
+    // static let は Swift ランタイムが 1 回限りスレッドセーフに初期化するので
+    // 別途ロックも nonisolated(unsafe) も不要。JSON が無い／壊れている場合は空辞書。
+    private static let shapesCache: [String: (upper: [(Double, Double)], lower: [(Double, Double)])] = {
         guard let url = Bundle.main.url(forResource: "eyebrow_shapes", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: [[Double]]]]
-        else { return }
+        else { return [:] }
+        var result: [String: (upper: [(Double, Double)], lower: [(Double, Double)])] = [:]
         for (k, v) in json {
             let upper = (v["upper"] ?? []).compactMap { p -> (Double, Double)? in
                 p.count == 2 ? (p[0], p[1]) : nil
@@ -193,9 +192,10 @@ nonisolated enum EyebrowDrawer {
             let lower = (v["lower"] ?? []).compactMap { p -> (Double, Double)? in
                 p.count == 2 ? (p[0], p[1]) : nil
             }
-            shapesCache[k] = (upper, lower)
+            result[k] = (upper, lower)
         }
-    }
+        return result
+    }()
 
     private nonisolated static func polygonFromShape(anchors: Anchors,
                                                      shape: (upper: [(Double, Double)], lower: [(Double, Double)]),

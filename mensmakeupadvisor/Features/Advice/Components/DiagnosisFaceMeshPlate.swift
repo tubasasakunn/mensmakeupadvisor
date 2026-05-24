@@ -107,7 +107,9 @@ struct DiagnosisFaceMeshPlate: View {
         }
     }
 
-    nonisolated(unsafe) private static var cachedEdges: [(Int, Int)] = FaceMeshResources.tesselationConnections()
+    // static let は Swift ランタイムが 1 回限りスレッドセーフに初期化するので
+    // 別途ロックも nonisolated(unsafe) も不要。
+    private static let cachedEdges: [(Int, Int)] = FaceMeshResources.tesselationConnections()
 }
 
 #Preview {

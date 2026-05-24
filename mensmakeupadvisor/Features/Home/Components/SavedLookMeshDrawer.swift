@@ -219,9 +219,9 @@ private struct MeshLayout {
 // ごとに JSON を読み直さないよう、一度解決した結果をキャッシュする。
 private enum SavedLookMeshLibrary {
     nonisolated(unsafe) private static var idCache: [String: [Int]] = [:]
-    // 二重 Optional: 外側 nil = 未解決、内側 nil = 解決済みだが eyeliner データなし。
-    nonisolated(unsafe) private static var eyelinerCache: EyeApplier.EyelinerData?? = nil
     private static let lock = NSLock()
+    // eyeliner は単一値の lazy。static let は dispatch_once 相当でスレッドセーフ。
+    private static let eyelinerData: EyeApplier.EyelinerData? = EyeApplier.loadFromTargetJSON().eyeliner
 
     static func highlightIDs(_ names: Set<String>) -> [Int] {
         cached("h", names) { MakeupCompositionBuilder.meshIDs(.highlight, names: names) }
@@ -245,14 +245,7 @@ private enum SavedLookMeshLibrary {
         }
     }
 
-    static func eyeliner() -> EyeApplier.EyelinerData? {
-        lock.lock()
-        defer { lock.unlock() }
-        if let cached = eyelinerCache { return cached }
-        let value = EyeApplier.loadFromTargetJSON().eyeliner
-        eyelinerCache = .some(value)
-        return value
-    }
+    static func eyeliner() -> EyeApplier.EyelinerData? { eyelinerData }
 
     private static func cached(_ prefix: String, _ names: Set<String>,
                                _ build: () -> [Int]) -> [Int] {

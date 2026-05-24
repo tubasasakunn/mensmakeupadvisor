@@ -10,28 +10,28 @@ nonisolated enum FaceMeshResources {
         case modelMissing
     }
 
-    nonisolated(unsafe) private static var cachedTesselation: [(Int, Int)] = []
-    private static let tesselationLock = NSLock()
-
-    nonisolated static func tesselationConnections() -> [(Int, Int)] {
-        (try? loadTesselationConnections()) ?? []
-    }
-
-    nonisolated static func loadTesselationConnections() throws -> [(Int, Int)] {
-        tesselationLock.lock()
-        defer { tesselationLock.unlock() }
-        if !cachedTesselation.isEmpty { return cachedTesselation }
-
+    // static let は Swift ランタイムが 1 回だけスレッドセーフに初期化する。
+    // ファイル無し / 壊れている場合は空配列が入る。throws 版の API はこの空判定で
+    // missing を判定するため、`face_mesh_tesselation.json` を空 `[]` で
+    // バンドルしないこと。
+    private static let cachedTesselation: [(Int, Int)] = {
         guard let url = Bundle.main.url(forResource: "face_mesh_tesselation", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let arr = try? JSONSerialization.jsonObject(with: data) as? [[Int]]
-        else {
-            throw ResourceError.tesselationMissing
-        }
-        cachedTesselation = arr.compactMap { pair in
+        else { return [] }
+        return arr.compactMap { pair in
             pair.count == 2 ? (pair[0], pair[1]) : nil
         }
-        return cachedTesselation
+    }()
+
+    nonisolated static func tesselationConnections() -> [(Int, Int)] {
+        cachedTesselation
+    }
+
+    nonisolated static func loadTesselationConnections() throws -> [(Int, Int)] {
+        let cached = cachedTesselation
+        if cached.isEmpty { throw ResourceError.tesselationMissing }
+        return cached
     }
 
     nonisolated static func cachedModelPath() -> String? {
