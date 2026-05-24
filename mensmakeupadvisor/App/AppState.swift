@@ -2,141 +2,58 @@ import OSLog
 import SwiftUI
 import UIKit
 
-private let renderLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "Render")
-
 enum AppScreen: Equatable {
     case splash, onboarding, home, capture, analyzing, diagnosis, tutorial, studio, completion
 }
 
 // HomeView 内のタブ。Archive 経由で Studio に行って戻ってきた時に
-// 「保存」タブを開き直したいので、選択状態を AppState 側に上げる。
+// 「保存」タブを開き直したいので、選択状態を NavigationContext に上げる。
 enum HomeTab: Hashable {
     case report, create, archive, settings
 }
 
+// アプリ全体の composition root。3 つの責務 (NavigationContext / MakeupSession /
+// AppFlowState) を保持し、Environment にも個別に注入される。
+//
+// 新規実装は `appState.navigation.foo` / `appState.session.foo` / `appState.flow.foo`
+// または `@Environment(NavigationContext.self)` 等で直接サブ状態にアクセスすること。
+// 旧式の `appState.captureOrigin` などの平坦アクセスは後方互換用フォワードプロパティ。
 @Observable @MainActor
 final class AppState {
-    var currentScreen: AppScreen = .splash
-    var capturedImage: UIImage?
-    var renderedImage: UIImage?
-    var analysisResult: AnalysisResult? {
-        didSet {
-            applyPresetDefaultsFromAnalysisIfNeeded()
-            // アーカイブのサムネイルが下地に使う「最新メッシュ」を永続化する。
-            if let landmarks = analysisResult?.landmarksNormalized, !landmarks.isEmpty {
-                let w = analysisResult?.imageWidthPx ?? 0
-                let h = analysisResult?.imageHeightPx ?? 0
-                let aspect = (w > 0 && h > 0) ? CGFloat(w) / CGFloat(h) : 4.0 / 5.0
-                LatestFaceMeshStore.save(landmarksNormalized: landmarks, imageAspect: aspect)
-            }
-        }
+    let navigation: NavigationContext
+    let session: MakeupSession
+    let flow: AppFlowState
+
+    init() {
+        // 既定値は @MainActor 隔離下で生成する必要があるためデフォルト引数では渡せず、
+        // 本体で初期化する。テストで差し替えたい場合は別の init を足す。
+        self.navigation = NavigationContext()
+        self.session = MakeupSession()
+        self.flow = AppFlowState()
     }
-    var tutorialStep: Int = 0
-    var tutorialDone: Bool = false
-    // Studio の化粧状態。化粧単位 (MakeupUnit) ごとに meshID→色 を持つ唯一の真実。
-    // 顔判定結果で初期値が決まり、ユーザーが一度でも触ったら以降は上書きしない。
-    var composition: MakeupComposition = MakeupComposition()
-    var activePresetID: String?
-    var isRenderingMakeup: Bool = false
 
-    // Home → Create フローでは Diagnosis を飛ばして直接 Tutorial（各化粧工程の
-    // ガイド）に入る。撮って即「試す」体験を最短化するため。
-    // AnalyzingView 完了時の navigate 分岐で参照する。
-    var skipDiagnosisOnNextFlow: Bool = false
-
-    // Archive 「試す」フロー: 保存ルックを別の顔で当てて見る一回限りの体験。
-    // capture → analyze 完了時に Studio へ直行し、保存もしない (Studio CTA は「完了」)。
-    var tryingSavedLook: Bool = false
-
-    // 「戻る」の文脈を保持するブレッドクラム。
-    // capture / studio / diagnosis はそれぞれ複数の入口から開かれるため
-    // 「戻る」を文脈ごとに正しい場所へ返すために遷移元を覚えておく。
-    // 例: Archive → applyLook → studio。このとき studio の戻るは Home へ。
-    // 例: Home Report → diagnosis（再閲覧）。diagnosis の戻るは Home へ。
-    // 例: AnalyzingView → diagnosis（新規解析）。diagnosis の戻るは capture へ。
-    // 初期値は .home — 「初回オンボーディングからの遷移」だけが例外として
-    // OnboardingView 側で明示的に .onboarding を立てる。
-    var captureOrigin: AppScreen = .home
-    var studioOrigin: AppScreen = .diagnosis
-    var diagnosisOrigin: AppScreen = .capture
-
-    // HomeView がどのタブを開いているか。Archive からの編集フローで
-    // Studio から戻った際に Archive タブへ復帰させるための共有状態。
-    var homeTab: HomeTab = .create
-
-    private var presetsInitializedFromAnalysis = false
-
-    // makeup_claude のアルゴリズムを移植したエンジン。
-    // アプリ全体で 1 つを使い回し、AnalyzingView で初期化 + 顔検出 →
-    // Studio でレイヤー強度を変更するたびに `render` を再呼び出しする。
-    let makeupEngine: MakeupEngineService = MakeupEngineService()
-
-    private var renderTask: Task<Void, Never>?
-
-    func navigate(to screen: AppScreen) {
-        withAnimation(.easeInOut(duration: 0.35)) { currentScreen = screen }
+    init(navigation: NavigationContext,
+         session: MakeupSession,
+         flow: AppFlowState) {
+        self.navigation = navigation
+        self.session = session
+        self.flow = flow
     }
 
     func reset() {
-        capturedImage = nil; renderedImage = nil; analysisResult = nil
-        tutorialStep = 0; tutorialDone = false
-        composition = MakeupComposition(); activePresetID = nil
-        skipDiagnosisOnNextFlow = false
-        tryingSavedLook = false
-        captureOrigin = .home
-        studioOrigin = .diagnosis
-        diagnosisOrigin = .capture
-        homeTab = .create
-        presetsInitializedFromAnalysis = false
-        renderTask?.cancel(); renderTask = nil
-        Task { await makeupEngine.reset() }
-    }
-
-    // 顔診断完了時、ユーザーがまだ化粧を触っていなければ顔型に応じた
-    // 既定 composition を入れる。一度でも触ったら以降は上書きしない。
-    // Try フロー (Archive 経由) は保存ルックの composition を保ちたいので既定を当てない。
-    private func applyPresetDefaultsFromAnalysisIfNeeded() {
-        guard !presetsInitializedFromAnalysis else { return }
-        guard !tryingSavedLook else {
-            presetsInitializedFromAnalysis = analysisResult != nil
-            return
-        }
-        composition = MakeupCompositionBuilder.makeDefault(for: analysisResult?.faceShape)
-        presetsInitializedFromAnalysis = analysisResult != nil
-    }
-
-    // 化粧反映を非同期で要求する。短時間に複数回呼ばれても直近の 1 回だけ実行する。
-    func requestMakeupRender() {
-        renderTask?.cancel()
-        let snapshot = composition
-        renderTask = Task { [weak self] in
-            guard let self else { return }
-            // 連続スライド時に過剰な再計算を抑える
-            try? await Task.sleep(for: .milliseconds(80))
-            if Task.isCancelled { return }
-            self.isRenderingMakeup = true
-            defer { self.isRenderingMakeup = false }
-            let started = Date()
-            do {
-                let img = try await self.makeupEngine.render(composition: snapshot)
-                if Task.isCancelled { return }
-                self.renderedImage = img
-                let ms = Int(Date().timeIntervalSince(started) * 1000)
-                renderLog.notice("render: ok in \(ms, privacy: .public)ms")
-            } catch {
-                renderLog.error("render: failed — \(String(describing: error), privacy: .public)")
-            }
-        }
+        navigation.reset()
+        session.reset()
+        flow.reset()
     }
 
     // スクリーンショットモード: 全画面を3秒ずつ自動遷移
     func runScreenshotFlow() async {
-        capturedImage = makePlaceholderImage()
-        analysisResult = .mock
+        session.capturedImage = makePlaceholderImage()
+        session.analysisResult = .mock
 
         let screens: [AppScreen] = [.splash, .onboarding, .home, .capture, .analyzing, .diagnosis, .tutorial, .studio, .completion]
         for screen in screens {
-            navigate(to: screen)
+            navigation.navigate(to: screen)
             try? await Task.sleep(for: .seconds(3))
         }
     }
@@ -161,5 +78,81 @@ final class AppState {
                 line.stroke()
             }
         }
+    }
+}
+
+// MARK: - Backward-compatible forwarding
+//
+// 旧 API (appState.foo) を維持するためのフォワードプロパティ。
+// 段階的にサブ状態へ移行するため残しているが、新規実装では使わないこと。
+
+extension AppState {
+    // ── NavigationContext
+    var currentScreen: AppScreen {
+        get { navigation.currentScreen }
+        set { navigation.currentScreen = newValue }
+    }
+    var captureOrigin: AppScreen {
+        get { navigation.captureOrigin }
+        set { navigation.captureOrigin = newValue }
+    }
+    var studioOrigin: AppScreen {
+        get { navigation.studioOrigin }
+        set { navigation.studioOrigin = newValue }
+    }
+    var diagnosisOrigin: AppScreen {
+        get { navigation.diagnosisOrigin }
+        set { navigation.diagnosisOrigin = newValue }
+    }
+    var homeTab: HomeTab {
+        get { navigation.homeTab }
+        set { navigation.homeTab = newValue }
+    }
+    func navigate(to screen: AppScreen) { navigation.navigate(to: screen) }
+
+    // ── MakeupSession
+    var capturedImage: UIImage? {
+        get { session.capturedImage }
+        set { session.capturedImage = newValue }
+    }
+    var renderedImage: UIImage? {
+        get { session.renderedImage }
+        set { session.renderedImage = newValue }
+    }
+    var analysisResult: AnalysisResult? {
+        get { session.analysisResult }
+        set { session.analysisResult = newValue }
+    }
+    var composition: MakeupComposition {
+        get { session.composition }
+        set { session.composition = newValue }
+    }
+    var activePresetID: String? {
+        get { session.activePresetID }
+        set { session.activePresetID = newValue }
+    }
+    var isRenderingMakeup: Bool {
+        get { session.isRenderingMakeup }
+        set { session.isRenderingMakeup = newValue }
+    }
+    var tryingSavedLook: Bool {
+        get { session.tryingSavedLook }
+        set { session.tryingSavedLook = newValue }
+    }
+    var makeupEngine: MakeupEngineService { session.makeupEngine }
+    func requestMakeupRender() { session.requestMakeupRender() }
+
+    // ── AppFlowState
+    var tutorialStep: Int {
+        get { flow.tutorialStep }
+        set { flow.tutorialStep = newValue }
+    }
+    var tutorialDone: Bool {
+        get { flow.tutorialDone }
+        set { flow.tutorialDone = newValue }
+    }
+    var skipDiagnosisOnNextFlow: Bool {
+        get { flow.skipDiagnosisOnNextFlow }
+        set { flow.skipDiagnosisOnNextFlow = newValue }
     }
 }
