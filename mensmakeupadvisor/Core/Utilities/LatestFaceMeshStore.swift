@@ -34,4 +34,9 @@ enum LatestFaceMeshStore {
         let aspect = stored.map { CGFloat($0) } ?? (4.0 / 5.0)
         return Stored(landmarks: landmarks, imageAspect: aspect > 0 ? aspect : 4.0 / 5.0)
     }
+
+    static func clear() {
+        UserDefaults.standard.removeObject(forKey: landmarksKey)
+        UserDefaults.standard.removeObject(forKey: aspectKey)
+    }
 }

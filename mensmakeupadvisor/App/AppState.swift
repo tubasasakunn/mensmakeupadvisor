@@ -11,7 +11,7 @@ enum AppScreen: Equatable {
 // HomeView 内のタブ。Archive 経由で Studio に行って戻ってきた時に
 // 「保存」タブを開き直したいので、選択状態を AppState 側に上げる。
 enum HomeTab: Hashable {
-    case report, create, archive
+    case report, create, archive, settings
 }
 
 @Observable @MainActor

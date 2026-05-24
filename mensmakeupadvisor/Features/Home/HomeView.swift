@@ -32,6 +32,13 @@ struct HomeView: View {
                 }
                 .tag(HomeTab.archive)
                 .aid("home_tab_archive")
+
+            HomeSettingsTab()
+                .tabItem {
+                    Label("アトリエ", systemImage: "circle.dotted")
+                }
+                .tag(HomeTab.settings)
+                .aid("home_tab_settings")
         }
         .tint(Color.ivory)
         // iOS 26: Tab bar も Liquid Glass の上に乗るようにする
