@@ -119,7 +119,7 @@ struct FaceDiagramView: View {
                 if !caption.isEmpty {
                     let figText = Text(caption)
                         .font(.system(size: 8, design: .monospaced))
-                        .foregroundColor(Color.inkSecondary)
+                        .foregroundStyle(Color.inkSecondary)
                     ctx.draw(figText, at: CGPoint(x: w - 4, y: h - 4), anchor: .bottomTrailing)
                 }
             }

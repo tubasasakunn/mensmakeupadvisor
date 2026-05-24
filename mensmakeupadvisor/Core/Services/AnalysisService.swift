@@ -20,16 +20,10 @@ extension AnalysisServiceProtocol {
 }
 
 // MARK: - EnvironmentKey
-
-private struct AnalysisServiceKey: EnvironmentKey {
-    static let defaultValue: any AnalysisServiceProtocol = AnalysisService()
-}
+// Swift 5.10+ の @Entry マクロで EnvironmentKey + computed property を一行で。
 
 extension EnvironmentValues {
-    var analysisService: any AnalysisServiceProtocol {
-        get { self[AnalysisServiceKey.self] }
-        set { self[AnalysisServiceKey.self] = newValue }
-    }
+    @Entry var analysisService: any AnalysisServiceProtocol = AnalysisService()
 }
 
 // MARK: - Real Implementation

@@ -110,14 +110,8 @@ actor MakeupEngineService {
 }
 
 // MARK: - Environment
-
-private struct MakeupEngineServiceKey: EnvironmentKey {
-    static let defaultValue = MakeupEngineService()
-}
+// @Entry マクロで boilerplate を排除。
 
 extension EnvironmentValues {
-    var makeupEngineService: MakeupEngineService {
-        get { self[MakeupEngineServiceKey.self] }
-        set { self[MakeupEngineServiceKey.self] = newValue }
-    }
+    @Entry var makeupEngineService: MakeupEngineService = MakeupEngineService()
 }
