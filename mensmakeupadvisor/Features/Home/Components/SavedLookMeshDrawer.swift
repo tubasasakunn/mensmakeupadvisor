@@ -29,14 +29,14 @@ struct SavedLookMeshDrawer {
     // MARK: - Background / Placeholder
 
     private func drawBackground() {
-        var ctx = context
+        let ctx = context
         ctx.fill(Path(CGRect(origin: .zero, size: size)),
                  with: .color(Theme.Mesh.backdrop))
     }
 
     // メッシュ未取得 (診断前に保存されたルック等) のフォールバック。
     private func drawPlaceholder() {
-        var ctx = context
+        let ctx = context
         let cols = 8, rows = 10
         for c in 0...cols {
             var p = Path()
@@ -57,7 +57,7 @@ struct SavedLookMeshDrawer {
     // MARK: - Mesh wireframe
 
     private func drawWireframe(_ layout: MeshLayout) {
-        var ctx = context
+        let ctx = context
         let edges = FaceMeshResources.tesselationConnections()
         guard !edges.isEmpty else { return }
         var path = Path()
@@ -71,34 +71,34 @@ struct SavedLookMeshDrawer {
     // MARK: - Makeup
 
     private func drawMakeup(_ layout: MeshLayout, triangles: [(Int, Int, Int)]) {
-        var ctx = context
+        let ctx = context
 
-        fillTriangles(&ctx, layout, triangles,
+        fillTriangles(ctx, layout, triangles,
                       ids: SavedLookMeshLibrary.shadowIDs(look.shadowAreaSet),
                       kind: .shadow, intensity: look.shadow)
 
-        fillTriangles(&ctx, layout, triangles,
+        fillTriangles(ctx, layout, triangles,
                       ids: SavedLookMeshLibrary.highlightIDs(look.highlightAreaSet),
                       kind: .highlight, intensity: look.highlight)
 
-        fillTriangles(&ctx, layout, triangles,
+        fillTriangles(ctx, layout, triangles,
                       ids: SavedLookMeshLibrary.eyeshadowIDs(look.eyeAreaSet),
                       kind: .eyeshadow, intensity: look.eye)
 
-        fillTriangles(&ctx, layout, triangles,
+        fillTriangles(ctx, layout, triangles,
                       ids: SavedLookMeshLibrary.tearbagIDs(look.eyeAreaSet),
                       kind: .tearbag, intensity: look.eye)
 
-        drawEyeliner(&ctx, layout)
+        drawEyeliner(ctx, layout)
 
         if let raw = look.eyebrowTypeRaw, !raw.isEmpty {
-            fillTriangles(&ctx, layout, triangles,
+            fillTriangles(ctx, layout, triangles,
                           ids: SavedLookMeshLibrary.eyebrowFullIDs(),
                           kind: .eyebrow, intensity: look.eyebrow)
         }
     }
 
-    private func fillTriangles(_ ctx: inout GraphicsContext, _ layout: MeshLayout,
+    private func fillTriangles(_ ctx: GraphicsContext, _ layout: MeshLayout,
                                _ triangles: [(Int, Int, Int)], ids: [Int],
                                kind: MakeupKind, intensity: Double) {
         let alpha = makeupAlpha(intensity)
@@ -123,7 +123,7 @@ struct SavedLookMeshDrawer {
     }
 
     // アイラインは mesh 領域ではなく目際のランドマークを結ぶポリライン。
-    private func drawEyeliner(_ ctx: inout GraphicsContext, _ layout: MeshLayout) {
+    private func drawEyeliner(_ ctx: GraphicsContext, _ layout: MeshLayout) {
         guard look.eyeAreaSet.contains("eyeliner"),
               let data = SavedLookMeshLibrary.eyeliner() else { return }
         // 細い不透明ラインなので、暗背景でも視認できるよう下限を設ける。
