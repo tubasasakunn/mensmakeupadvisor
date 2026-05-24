@@ -26,8 +26,6 @@ struct HomeArchiveTab: View {
         .sheet(item: $selected) { look in
             SavedLookDetailSheet(
                 look: look,
-                onApply: { handleApply(look) },
-                onTry: { handleTry(look) },
                 onDelete: { handleDelete(look) }
             )
             .presentationBackground(Theme.Ambient.backdrop)
@@ -148,17 +146,6 @@ struct HomeArchiveTab: View {
     }
 
     // MARK: - Actions
-
-    private func handleApply(_ look: SavedLook) {
-        viewModel.applyLook(look, appState: appState)
-        appState.skipTutorialOnNextFlow = false
-        selected = nil
-    }
-
-    private func handleTry(_ look: SavedLook) {
-        viewModel.tryLook(look, appState: appState)
-        selected = nil
-    }
 
     private func handleDelete(_ look: SavedLook) {
         viewModel.deleteLook(look, modelContext: modelContext)

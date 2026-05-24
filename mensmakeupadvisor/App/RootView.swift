@@ -45,7 +45,7 @@ struct RootView: View {
     private var edgeSwipeBackTarget: AppScreen? {
         switch appState.currentScreen {
         case .capture:   return appState.captureOrigin
-        case .diagnosis: return .capture
+        case .diagnosis: return appState.diagnosisOrigin
         case .studio:    return appState.studioOrigin
         // Splash/Home はトップ階層、Analyzing は処理中、
         // Tutorial/Onboarding は内側スワイプと衝突するため除外。

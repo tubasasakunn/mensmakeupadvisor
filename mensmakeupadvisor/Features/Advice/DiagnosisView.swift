@@ -58,10 +58,16 @@ struct DiagnosisView: View {
                             .padding(.top, Theme.Spacing.xs)
                             .padding(.horizontal, Theme.Spacing.xl)
 
-                        bottomButtons
-                            .padding(.top, Theme.Spacing.xxxl)
-                            .padding(.horizontal, Theme.Spacing.xl)
-                            .padding(.bottom, Theme.Spacing.huge)
+                        // Home 経由の閲覧フロー（再訪）は静かに眺める画面なので、
+                        // 強い CTA を置かない。新規解析フローからのみ次工程へ送り出す。
+                        if appState.diagnosisOrigin != .home {
+                            bottomButtons
+                                .padding(.top, Theme.Spacing.xxxl)
+                                .padding(.horizontal, Theme.Spacing.xl)
+                                .padding(.bottom, Theme.Spacing.huge)
+                        } else {
+                            Color.clear.frame(height: Theme.Spacing.huge)
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -78,11 +84,23 @@ struct DiagnosisView: View {
 
     // MARK: - Navigation
 
+    // 戻り先は diagnosisOrigin に従う。
+    // - 新規解析（Analyzing 経由）: .capture へ
+    // - Home Report 経由の再閲覧: .home へ
+    private var backDestination: AppScreen { appState.diagnosisOrigin }
+    private var backAccessibilityLabel: String {
+        switch backDestination {
+        case .home: "ホームに戻る"
+        case .capture: "撮影画面に戻る"
+        default: "戻る"
+        }
+    }
+
     private var navigationBar: some View {
         HStack {
             Button {
                 Haptics.soft()
-                appState.navigate(to: .capture)
+                appState.navigate(to: backDestination)
             } label: {
                 HStack(spacing: 5) {
                     Image(systemName: "chevron.left")
@@ -95,7 +113,7 @@ struct DiagnosisView: View {
                 .padding(.vertical, 7)
                 .glassEffect(.clear, in: .capsule)
             }
-            .accessibilityLabel("撮影画面に戻る")
+            .accessibilityLabel(backAccessibilityLabel)
             .aid("diagnosis_back_button")
 
             Spacer()
@@ -198,20 +216,6 @@ struct DiagnosisView: View {
                     appState.navigate(to: .studio)
                 } else {
                     appState.navigate(to: .tutorial)
-                }
-            }
-
-            if !isSkipFlow {
-                ctaWithSubtitle(
-                    title: "ガイドを飛ばしてスタジオへ",
-                    subtitle: "メイクの経験がある方向け",
-                    icon: nil,
-                    isProminent: false,
-                    accessibilityID: "diagnosis_skip_button"
-                ) {
-                    Haptics.soft()
-                    appState.studioOrigin = .diagnosis
-                    appState.navigate(to: .studio)
                 }
             }
         }

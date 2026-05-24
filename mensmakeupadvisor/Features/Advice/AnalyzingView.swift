@@ -225,8 +225,10 @@ struct AnalyzingView: View {
                 // studioOrigin は tryLook 側で .home を入れている。
                 appState.navigate(to: .studio)
             } else {
-                // 通常の新規撮影フロー: Studio の戻る先は診断結果。
+                // 通常の新規撮影フロー: Studio の戻る先は診断結果、
+                // 診断の戻る先は撮影画面。
                 appState.studioOrigin = .diagnosis
+                appState.diagnosisOrigin = .capture
                 appState.navigate(to: .diagnosis)
             }
         } catch {

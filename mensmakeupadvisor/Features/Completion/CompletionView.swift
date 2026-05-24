@@ -65,7 +65,9 @@ struct CompletionView: View {
                 .italic()
                 .foregroundStyle(Theme.Text.primaryFaded)
 
-            Text("さぁ、\nはじめましょう。")
+            // 仕上げが終わったタイミングなので「これから始める」ではなく
+            // 一日に送り出す表現に。"はじめましょう" は最初の頃を匂わせて違和感が出る。
+            Text("さぁ、\n出かけましょう。")
                 .font(.system(size: 44, weight: .bold, design: .serif))
                 .italic()
                 .foregroundStyle(Color.ivory)

@@ -4,8 +4,6 @@ import SwiftUI
 // メッシュ図 + 適用ゾーン一覧 + 強度表示 + 共有 / 編集 / 削除アクション。
 struct SavedLookDetailSheet: View {
     let look: SavedLook
-    let onApply: () -> Void
-    let onTry: () -> Void
     let onDelete: () -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -94,8 +92,11 @@ struct SavedLookDetailSheet: View {
     private func shareLook() async {
         isPreparingShare = true
         defer { isPreparingShare = false }
+        // Archive には顔写真がないため、シェアカードのビジュアル領域 (320×220)
+        // にメッシュサムネを焼き込んで「写真欠落」の空っぽカードを避ける。
+        let meshImage = renderMeshHero()
         let card = MakeupShareCardView(
-            renderedImage: nil,
+            renderedImage: meshImage,
             capturedImage: nil,
             composition: composition(from: look),
             result: archivedResult(from: look),
@@ -105,6 +106,19 @@ struct SavedLookDetailSheet: View {
         if let image = ShareHelper.render(card) {
             ShareHelper.present([image])
         }
+    }
+
+    private func renderMeshHero() -> UIImage? {
+        let hero = ZStack {
+            // 透けると上のシェアカードオーバーレイで真っ黒に潰れるので、
+            // ここで明示的に背景を敷く。
+            Theme.Surface.raised
+            SavedLookMeshThumbnail(look: look, geometry: SavedLookMeshGeometry.makeLatest())
+                .aspectRatio(1, contentMode: .fit)
+                .padding(.vertical, 8)
+        }
+        .frame(width: 320, height: 220)
+        return ShareHelper.render(hero)
     }
 
     // 保存済みのスライダー値・ゾーン集合から MakeupComposition を復元する。
@@ -209,39 +223,17 @@ struct SavedLookDetailSheet: View {
         }
     }
 
+    // アーカイブ詳細はあくまで「保存ルックを眺める」ための画面。
+    // 「試す」「編集」のような診断/チュートリアルに飛ばす導線は撤廃して
+    // 削除だけを残す。
     private var actionRow: some View {
-        VStack(spacing: Theme.Spacing.sm) {
-            // メインは「試す = いま撮った顔で見てみる」。
-            // 過去の自分の顔ではなく今日の顔に当てたい欲求が一番強いはずなので
-            // プロミネントに置く。
-            GlassPrimaryButton(
-                title: "今の自分で試す",
-                icon: "camera.fill",
-                accessibilityID: "home_archive_detail_try"
-            ) {
-                Haptics.medium()
-                onTry()
-            }
-
-            HStack(spacing: Theme.Spacing.md) {
-                GlassSecondaryButton(
-                    title: "削除",
-                    icon: "trash",
-                    accessibilityID: "home_archive_detail_delete"
-                ) {
-                    Haptics.warning()
-                    showDeleteConfirmation = true
-                }
-
-                GlassSecondaryButton(
-                    title: "編集",
-                    icon: "slider.horizontal.3",
-                    accessibilityID: "home_archive_detail_apply"
-                ) {
-                    Haptics.medium()
-                    onApply()
-                }
-            }
+        GlassSecondaryButton(
+            title: "削除",
+            icon: "trash",
+            accessibilityID: "home_archive_detail_delete"
+        ) {
+            Haptics.warning()
+            showDeleteConfirmation = true
         }
     }
 }
@@ -254,7 +246,7 @@ struct SavedLookDetailSheet: View {
             eyeAreas: ["eyeshadow_base", "tear_bag", "eyeliner"],
             eyebrowTypeRaw: "natural"
         ),
-        onApply: {}, onTry: {}, onDelete: {}
+        onDelete: {}
     )
     .background(Color.appBackground)
 }
