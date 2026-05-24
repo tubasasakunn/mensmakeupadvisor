@@ -41,11 +41,7 @@ struct DiagnosisSharePrompt: View {
                 }
             }
             .padding(Theme.Spacing.md)
-            .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.lg))
-            .overlay(
-                RoundedRectangle(cornerRadius: Theme.Radius.lg)
-                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.8)
-            )
+            .contentShape(Rectangle())
         }
         .aid("diagnosis_share_button")
         .disabled(isRendering)

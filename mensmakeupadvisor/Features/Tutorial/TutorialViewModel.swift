@@ -58,7 +58,8 @@ final class TutorialViewModel {
 
     func prevStep(appState: AppState) {
         guard appState.tutorialStep > 0 else {
-            appState.navigate(to: .diagnosis)
+            // step 0 から戻る先は遷移元 (Diagnosis / Archive=Home)。
+            appState.navigate(to: appState.studioOrigin)
             return
         }
         withAnimation(.easeInOut(duration: 0.25)) {

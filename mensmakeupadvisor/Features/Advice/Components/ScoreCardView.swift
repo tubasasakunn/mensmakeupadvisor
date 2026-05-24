@@ -18,20 +18,27 @@ struct ScoreCardView: View {
             adviceText
 
             if isExpanded {
-                // 親 VStack の高さ変化で下方向に展開させ、内容は fade のみ。
+                // 高さ変化と中身の出現を 1 つの transition にまとめる。
+                // `.opacity` 単独だと閉じる際にビュー枠は残ったまま fade するため
+                // 顔図だけ取り残されて見える。`.move(edge: .top) + .opacity` で
+                // 上に畳まれながら消える挙動にする。
                 expandedAnnotation
                     .padding(.top, Theme.Spacing.xs)
-                    .transition(.opacity)
+                    .transition(
+                        .move(edge: .top)
+                            .combined(with: .opacity)
+                    )
             }
         }
         .padding(.vertical, Theme.Spacing.lg)
         .padding(.leading, score.score >= 75 ? Theme.Spacing.md : 0)
         .frame(maxWidth: .infinity, alignment: .leading)
         .clipped()
-        .animation(Theme.Motion.smooth, value: isExpanded)
         .contentShape(Rectangle())
         .onTapGesture {
-            isExpanded.toggle()
+            withAnimation(Theme.Motion.smooth) {
+                isExpanded.toggle()
+            }
         }
         .overlay(alignment: .leading) {
             if score.score >= 75 {

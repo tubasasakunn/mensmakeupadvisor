@@ -27,6 +27,7 @@ struct HomeArchiveTab: View {
             SavedLookDetailSheet(
                 look: look,
                 onApply: { handleApply(look) },
+                onTry: { handleTry(look) },
                 onDelete: { handleDelete(look) }
             )
             .presentationBackground(Theme.Ambient.backdrop)
@@ -150,7 +151,12 @@ struct HomeArchiveTab: View {
 
     private func handleApply(_ look: SavedLook) {
         viewModel.applyLook(look, appState: appState)
-        appState.skipTutorialOnNextFlow = true
+        appState.skipTutorialOnNextFlow = false
+        selected = nil
+    }
+
+    private func handleTry(_ look: SavedLook) {
+        viewModel.tryLook(look, appState: appState)
         selected = nil
     }
 

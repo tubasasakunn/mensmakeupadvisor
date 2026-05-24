@@ -218,11 +218,17 @@ struct AnalyzingView: View {
                 appState.capturedImage = cropped
             }
             appState.analysisResult = result
-            // 新規撮影フローを経た Studio の戻る先は診断結果。
-            // Archive 経由のときは applyLook 側で .home を入れているので上書きしない。
-            appState.studioOrigin = .diagnosis
             Haptics.success()
-            appState.navigate(to: .diagnosis)
+            // Try フロー (Archive → 試す): 診断/チュートリアルを挟まず直接 Studio へ。
+            // composition は ArchiveViewModel.tryLook で既に保存ルックから組まれている。
+            if appState.tryingSavedLook {
+                // studioOrigin は tryLook 側で .home を入れている。
+                appState.navigate(to: .studio)
+            } else {
+                // 通常の新規撮影フロー: Studio の戻る先は診断結果。
+                appState.studioOrigin = .diagnosis
+                appState.navigate(to: .diagnosis)
+            }
         } catch {
             showError(
                 title: "顔をうまく検出できませんでした",

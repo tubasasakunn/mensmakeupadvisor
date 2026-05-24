@@ -88,38 +88,37 @@ struct HomeCreateTab: View {
         }
     }
 
-    // Liquid Glass の主役カード。3 ステップを上品な hero として見せる。
+    // hero。Glass の白っぽい下敷きを外し、暗色背景を素通しで読ませる。
     private var heroCard: some View {
-        GlassPanel(radius: Theme.Radius.xl, padding: Theme.Spacing.xl) {
-            VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("3 STEPS")
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
-                        .kerning(2.5)
-                        .foregroundStyle(Theme.Text.secondaryFaded)
-                    Spacer()
-                    Text("≈ 90s")
-                        .font(.system(size: 10, weight: .regular, design: .monospaced))
-                        .kerning(1.5)
-                        .foregroundStyle(Theme.Text.secondaryFaded)
-                }
+        VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("3 STEPS")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .kerning(2.5)
+                    .foregroundStyle(Theme.Text.secondaryFaded)
+                Spacer()
+                Text("≈ 90s")
+                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                    .kerning(1.5)
+                    .foregroundStyle(Theme.Text.secondaryFaded)
+            }
 
-                Text("自分の顔を撮って、\nメイクを試してみる。")
-                    .font(.system(size: 22, weight: .bold, design: .serif))
-                    .foregroundStyle(Color.ivory)
-                    .lineSpacing(6)
+            Text("自分の顔を撮って、\nメイクを試してみる。")
+                .font(.system(size: 22, weight: .bold, design: .serif))
+                .foregroundStyle(Color.ivory)
+                .lineSpacing(6)
 
-                GlassDivider()
+            HairlineDivider()
 
-                HStack(spacing: Theme.Spacing.sm) {
-                    heroStep(number: "01", label: "撮影")
-                    heroArrow
-                    heroStep(number: "02", label: "診断")
-                    heroArrow
-                    heroStep(number: "03", label: "メイク")
-                }
+            HStack(spacing: Theme.Spacing.sm) {
+                heroStep(number: "01", label: "撮影")
+                heroArrow
+                heroStep(number: "02", label: "診断")
+                heroArrow
+                heroStep(number: "03", label: "メイク")
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func heroStep(number: String, label: String) -> some View {

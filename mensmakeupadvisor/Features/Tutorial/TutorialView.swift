@@ -29,13 +29,15 @@ struct TutorialView: View {
                     .padding(.top, 12)
                     .padding(.bottom, 12)
 
+                // 顔プレートは撮影画像のアスペクト比だけでサイズが決まるよう固定。
+                // maxHeight: .infinity を載せると Info 本文量で残り空間が変動し、
+                // ステップ間で顔の大きさが揺れていた。
                 TutorialFacePlate(
                     currentStep: currentStep,
                     capturedImage: appState.capturedImage,
                     renderedImage: appState.renderedImage
                 )
                 .padding(.horizontal, 28)
-                .frame(maxHeight: .infinity)
 
                 TutorialStepInfoArea(
                     currentStep: currentStep,
@@ -44,6 +46,8 @@ struct TutorialView: View {
                 )
                 .padding(.top, 16)
                 .padding(.horizontal, 28)
+
+                Spacer(minLength: 0)
 
                 navigationBar
                     .padding(.top, 12)
@@ -103,6 +107,8 @@ struct TutorialView: View {
 
     private var headerBar: some View {
         let isFirst = appState.tutorialStep == 0
+        let backLabel: String = isFirst ? (appState.studioOrigin == .home ? "ホームへ" : "診断結果へ") : "前へ"
+        let backA11y: String = isFirst ? (appState.studioOrigin == .home ? "ホームに戻る" : "診断結果に戻る") : "前のステップに戻る"
         return HStack {
             Button {
                 Haptics.soft()
@@ -111,7 +117,7 @@ struct TutorialView: View {
                 HStack(spacing: 5) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 11, weight: .semibold))
-                    Text(isFirst ? "診断結果へ" : "前へ")
+                    Text(backLabel)
                         .font(.system(size: 12, weight: .medium))
                 }
                 .foregroundStyle(Theme.Text.primarySoft)
@@ -119,7 +125,7 @@ struct TutorialView: View {
                 .padding(.vertical, 7)
                 .glassEffect(.clear, in: .capsule)
             }
-            .accessibilityLabel(isFirst ? "診断結果に戻る" : "前のステップに戻る")
+            .accessibilityLabel(backA11y)
             .aid("tutorial_back_button")
 
             Spacer()
@@ -138,7 +144,7 @@ struct TutorialView: View {
 
             Button {
                 Haptics.soft()
-                appState.studioOrigin = .diagnosis
+                // studioOrigin は遷移元 (Diagnosis / Archive) が設定した値を尊重する。
                 viewModel.skip(appState: appState)
             } label: {
                 Text("あとで")
@@ -188,10 +194,7 @@ struct TutorialView: View {
             accessibilityID: "tutorial_next_button"
         ) {
             Haptics.medium()
-            if isLast {
-                // Tutorial 経由で Studio に入った場合の戻り先は診断結果
-                appState.studioOrigin = .diagnosis
-            }
+            // studioOrigin は遷移元 (Diagnosis / Archive) が設定した値を尊重する。
             viewModel.nextStep(appState: appState)
         }
     }

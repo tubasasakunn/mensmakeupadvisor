@@ -60,83 +60,83 @@ struct HomeReportTab: View {
     }
 
     // 一番上の hero — 顔型・グレード・パーセンタイル
+    // 顔型 (卵型 など) ラベルの背景に白っぽい Glass が乗ると読みにくいので
+    // LuxeBackground の暗色をそのまま見せる。
     private func summaryCard(result: AnalysisResult) -> some View {
-        GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xl) {
-            VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(result.faceShape.label)
-                        .font(.system(size: 30, weight: .bold, design: .serif))
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(result.faceShape.label)
+                    .font(.system(size: 30, weight: .bold, design: .serif))
+                    .italic()
+                    .foregroundStyle(Color.ivory)
+                Spacer()
+                VStack(alignment: .trailing, spacing: 0) {
+                    Text(result.grade)
+                        .font(.system(size: 46, weight: .light, design: .serif))
                         .italic()
-                        .foregroundStyle(Color.ivory)
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 0) {
-                        Text(result.grade)
-                            .font(.system(size: 46, weight: .light, design: .serif))
-                            .italic()
-                            .foregroundStyle(result.gradeColor)
-                        Text("\(result.totalScore) pt")
-                            .font(.system(size: 11, design: .monospaced))
-                            .kerning(1)
-                            .foregroundStyle(Theme.Text.secondary)
-                    }
-                }
-                Text(result.faceShape.note)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.Text.primaryFaded)
-                    .lineSpacing(5)
-                GlassDivider()
-                HStack(spacing: 6) {
-                    Image(systemName: "chart.bar.fill")
-                        .font(.system(size: 10))
+                        .foregroundStyle(result.gradeColor)
+                    Text("\(result.totalScore) pt")
+                        .font(.system(size: 11, design: .monospaced))
+                        .kerning(1)
                         .foregroundStyle(Theme.Text.secondary)
-                    Text(result.rankPercentile)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Theme.Text.primarySoft)
                 }
             }
+            Text(result.faceShape.note)
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.Text.primaryFaded)
+                .lineSpacing(5)
+            HairlineDivider()
+            HStack(spacing: 6) {
+                Image(systemName: "chart.bar.fill")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.Text.secondary)
+                Text(result.rankPercentile)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Theme.Text.primarySoft)
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // 7 評価指標の表
     private func scorePreviewCard(result: AnalysisResult) -> some View {
-        GlassCard(radius: Theme.Radius.lg, padding: Theme.Spacing.xl) {
-            VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
-                HStack {
-                    Text("7 つの評価指標")
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .kerning(1.5)
-                        .foregroundStyle(Theme.Text.primaryFaded)
-                    Spacer()
-                    Text("SEVEN")
-                        .font(.system(size: 10, design: .monospaced))
-                        .kerning(2)
-                        .foregroundStyle(Theme.Text.tertiary)
-                }
-                VStack(spacing: Theme.Spacing.sm) {
-                    ForEach(Array(result.scores.enumerated()), id: \.element.id) { idx, score in
-                        HStack {
-                            Text(String(format: "%02d", idx + 1))
-                                .font(.system(size: 10, design: .monospaced))
-                                .foregroundStyle(Theme.Text.tertiary)
-                            Text(score.name)
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(Color.ivory)
-                            Spacer()
-                            Text(score.grade)
-                                .font(.system(size: 14, weight: .heavy))
-                                .foregroundStyle(score.gradeColor)
-                            Text("\(score.score)pt")
-                                .font(.system(size: 11, design: .monospaced))
-                                .foregroundStyle(Theme.Text.secondary)
-                                .frame(width: 44, alignment: .trailing)
-                        }
-                        .overlay(alignment: .bottom) {
-                            GlassDivider().offset(y: 7)
-                        }
+        VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
+            HStack {
+                Text("7 つの評価指標")
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .kerning(1.5)
+                    .foregroundStyle(Theme.Text.primaryFaded)
+                Spacer()
+                Text("SEVEN")
+                    .font(.system(size: 10, design: .monospaced))
+                    .kerning(2)
+                    .foregroundStyle(Theme.Text.tertiary)
+            }
+            VStack(spacing: Theme.Spacing.sm) {
+                ForEach(Array(result.scores.enumerated()), id: \.element.id) { idx, score in
+                    HStack {
+                        Text(String(format: "%02d", idx + 1))
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundStyle(Theme.Text.tertiary)
+                        Text(score.name)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(Color.ivory)
+                        Spacer()
+                        Text(score.grade)
+                            .font(.system(size: 14, weight: .heavy))
+                            .foregroundStyle(score.gradeColor)
+                        Text("\(score.score)pt")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundStyle(Theme.Text.secondary)
+                            .frame(width: 44, alignment: .trailing)
+                    }
+                    .overlay(alignment: .bottom) {
+                        HairlineDivider().offset(y: 7)
                     }
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var actionButtons: some View {

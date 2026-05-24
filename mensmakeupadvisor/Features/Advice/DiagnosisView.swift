@@ -31,12 +31,11 @@ struct DiagnosisView: View {
                             .padding(.top, Theme.Spacing.xl)
                             .padding(.horizontal, Theme.Spacing.xl)
 
-                        // hero は glass card 化して、上で背景が抜けるようにする
-                        GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xl) {
-                            DiagnosisHeroSection(result: result)
-                        }
-                        .padding(.top, Theme.Spacing.xl)
-                        .padding(.horizontal, Theme.Spacing.xl)
+                        // 背景は LuxeBackground のままで読ませる (Glass の白っぽさが
+                        // 顔型ラベルや本文と干渉していたため、コンテンツのみ配置)。
+                        DiagnosisHeroSection(result: result)
+                            .padding(.top, Theme.Spacing.xl)
+                            .padding(.horizontal, Theme.Spacing.xl)
 
                         // スコアを見た直後の「シェアしたい」瞬間に配置
                         DiagnosisSharePrompt(result: result, capturedImage: appState.capturedImage)
@@ -193,9 +192,9 @@ struct DiagnosisView: View {
                 accessibilityID: "diagnosis_begin_button"
             ) {
                 Haptics.medium()
+                appState.studioOrigin = .diagnosis
                 if isSkipFlow {
                     appState.skipTutorialOnNextFlow = false
-                    appState.studioOrigin = .diagnosis
                     appState.navigate(to: .studio)
                 } else {
                     appState.navigate(to: .tutorial)

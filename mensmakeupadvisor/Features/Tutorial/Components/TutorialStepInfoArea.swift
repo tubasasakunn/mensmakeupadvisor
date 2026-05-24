@@ -8,16 +8,16 @@ struct TutorialStepInfoArea: View {
     @Binding var eyebrowType: EyebrowApplier.BrowType?
 
     var body: some View {
-        GlassPanel(radius: Theme.Radius.lg, padding: Theme.Spacing.lg) {
-            VStack(alignment: .leading, spacing: 0) {
-                headerBlock
-                divider
-                oneLinerText
-                explanationText
-                controlBlock
-                    .padding(.top, Theme.Spacing.xl)
-            }
+        // Glass の白っぽい下敷きを外し、本文を LuxeBackground 上で素読みさせる。
+        VStack(alignment: .leading, spacing: 0) {
+            headerBlock
+            divider
+            oneLinerText
+            explanationText
+            controlBlock
+                .padding(.top, Theme.Spacing.xl)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var headerBlock: some View {
@@ -37,7 +37,7 @@ struct TutorialStepInfoArea: View {
     }
 
     private var divider: some View {
-        GlassDivider()
+        HairlineDivider()
             .padding(.vertical, Theme.Spacing.md)
     }
 

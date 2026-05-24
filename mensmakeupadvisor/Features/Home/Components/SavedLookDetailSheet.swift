@@ -5,6 +5,7 @@ import SwiftUI
 struct SavedLookDetailSheet: View {
     let look: SavedLook
     let onApply: () -> Void
+    let onTry: () -> Void
     let onDelete: () -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -17,12 +18,12 @@ struct SavedLookDetailSheet: View {
                 VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
                     headerRow
                     thumbnail
-                    GlassCard(radius: Theme.Radius.lg, padding: Theme.Spacing.lg) {
-                        appliedZoneList
-                    }
-                    GlassCard(radius: Theme.Radius.lg, padding: Theme.Spacing.lg) {
-                        intensityRows
-                    }
+                    // 詳細セクションは白っぽい Glass を避けて素のレイアウトで読ませる
+                    appliedZoneList
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HairlineDivider()
+                    intensityRows
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     actionRow
                 }
                 .padding(Theme.Spacing.xl)
@@ -138,22 +139,37 @@ struct SavedLookDetailSheet: View {
     }
 
     private var actionRow: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            GlassSecondaryButton(
-                title: "削除",
-                icon: "trash",
-                accessibilityID: "home_archive_detail_delete"
-            ) {
-                Haptics.warning()
-                showDeleteConfirmation = true
-            }
-
+        VStack(spacing: Theme.Spacing.sm) {
+            // メインは「試す = いま撮った顔で見てみる」。
+            // 過去の自分の顔ではなく今日の顔に当てたい欲求が一番強いはずなので
+            // プロミネントに置く。
             GlassPrimaryButton(
-                title: "このルックを編集",
-                accessibilityID: "home_archive_detail_apply"
+                title: "今の自分で試す",
+                icon: "camera.fill",
+                accessibilityID: "home_archive_detail_try"
             ) {
                 Haptics.medium()
-                onApply()
+                onTry()
+            }
+
+            HStack(spacing: Theme.Spacing.md) {
+                GlassSecondaryButton(
+                    title: "削除",
+                    icon: "trash",
+                    accessibilityID: "home_archive_detail_delete"
+                ) {
+                    Haptics.warning()
+                    showDeleteConfirmation = true
+                }
+
+                GlassSecondaryButton(
+                    title: "編集",
+                    icon: "slider.horizontal.3",
+                    accessibilityID: "home_archive_detail_apply"
+                ) {
+                    Haptics.medium()
+                    onApply()
+                }
             }
         }
     }
@@ -167,7 +183,7 @@ struct SavedLookDetailSheet: View {
             eyeAreas: ["eyeshadow_base", "tear_bag", "eyeliner"],
             eyebrowTypeRaw: "natural"
         ),
-        onApply: {}, onDelete: {}
+        onApply: {}, onTry: {}, onDelete: {}
     )
     .background(Color.appBackground)
 }

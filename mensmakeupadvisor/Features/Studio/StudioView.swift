@@ -1,11 +1,14 @@
 import SwiftData
 import SwiftUI
 
+// 仕上がり確認専用のシンプルな画面。
+// プリセット切替や FineTune の調整はもう持たず、Tutorial 工程で組んだ顔を
+// Before/After スライダーだけで眺めて確定する。CTA は底に 1 つだけ。
 struct StudioView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = StudioViewModel()
-    @State private var showResetConfirmation = false
+    @State private var isPreparingShare = false
 
     var body: some View {
         ZStack {
@@ -19,57 +22,18 @@ struct StudioView: View {
                     .padding(.horizontal, Theme.Spacing.xxl)
                     .padding(.top, Theme.Spacing.md)
 
-                modeRow
-                    .padding(.top, Theme.Spacing.lg)
+                Spacer(minLength: 0)
+
+                nextButton
                     .padding(.horizontal, Theme.Spacing.xxl)
-
-                controlPanel
-                    .padding(.top, Theme.Spacing.lg)
-                    .padding(.horizontal, Theme.Spacing.xxl)
-
-                Spacer()
-
-                StudioBottomBar {
-                    viewModel.saveLook(appState: appState, modelContext: modelContext)
-                }
-                .padding(.horizontal, Theme.Spacing.xxl)
-                .padding(.bottom, Theme.Spacing.xxxl)
+                    .padding(.bottom, Theme.Spacing.xxxl)
             }
-
-            if viewModel.showSavedNotification {
-                StudioSavedToast(
-                    onGoHome: {
-                        viewModel.dismissSavedNotification()
-                        appState.navigate(to: .home)
-                    },
-                    onKeepEditing: {
-                        viewModel.dismissSavedNotification()
-                    }
-                )
-            }
-        }
-        .confirmationDialog(
-            "メイクを全部リセットしますか？",
-            isPresented: $showResetConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("リセットする", role: .destructive) {
-                Haptics.medium()
-                viewModel.resetAll(appState: appState)
-            }
-            Button("やめる", role: .cancel) {}
-        } message: {
-            Text("すべての強さを 0 に、眉の選択を解除します。")
         }
         .accessibilityElement(children: .contain)
         .aid("studio_view")
         .task(id: compositionKey) {
             await MainActor.run { appState.requestMakeupRender() }
         }
-    }
-
-    private var hasAnyIntensity: Bool {
-        viewModel.hasAnyIntensity(appState.composition)
     }
 
     // 全化粧単位の強度 + 眉 type を 1 つのキーに集約して task(id:) で監視する。
@@ -83,26 +47,33 @@ struct StudioView: View {
 
     // MARK: - Subviews
 
-    // 戻る先は AppState.studioOrigin に従う。
-    // - Diagnosis 経由（新規撮影フロー or Tutorial 終了）: .diagnosis
-    // - Archive 経由（保存ルックの編集）: .home
+    // 戻り先は AppState.studioOrigin に従う。
+    // - Diagnosis 経由（新規撮影 or Tutorial 完了）: 診断結果へ
+    // - Archive 経由（保存ルックの編集）: ホームへ
     private var backLabel: String {
-        appState.studioOrigin == .home ? "保存" : "診断結果"
-    }
-    private var backAccessibilityLabel: String {
-        appState.studioOrigin == .home ? "保存タブに戻る" : "診断結果に戻る"
+        appState.studioOrigin == .home ? "ホーム" : "診断結果"
     }
 
     private var headerBar: some View {
         HStack {
-            backChip(
-                label: backLabel,
-                aid: "studio_back_button",
-                accessibilityLabel: backAccessibilityLabel
-            ) {
+            Button {
                 Haptics.soft()
+                appState.tryingSavedLook = false
                 appState.navigate(to: appState.studioOrigin)
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 11, weight: .semibold))
+                    Text(backLabel)
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .foregroundStyle(Theme.Text.primarySoft)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, 7)
+                .glassEffect(.clear, in: .capsule)
             }
+            .accessibilityLabel("\(backLabel)に戻る")
+            .aid("studio_back_button")
 
             Spacer()
 
@@ -113,145 +84,69 @@ struct StudioView: View {
 
             Spacer()
 
-            backChip(
-                label: "ホーム",
-                aid: "studio_header_home_button",
-                accessibilityLabel: "ホームに戻る",
-                icon: "house.fill",
-                trailing: true
-            ) {
-                Haptics.soft()
-                appState.navigate(to: .home)
-            }
+            shareIconButton
         }
         .padding(.horizontal, Theme.Spacing.xxl)
     }
 
-    // Header の戻る/ホームチップ。clear glass + ivory outline。
-    private func backChip(
-        label: String,
-        aid: String,
-        accessibilityLabel: String,
-        icon: String = "chevron.left",
-        trailing: Bool = false,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            HStack(spacing: 5) {
-                if !trailing {
-                    Image(systemName: icon)
-                        .font(.system(size: 11, weight: .semibold))
-                }
-                Text(label)
-                    .font(.system(size: 12, weight: .medium))
-                if trailing {
-                    Image(systemName: icon)
-                        .font(.system(size: 11, weight: .semibold))
-                }
-            }
-            .foregroundStyle(Theme.Text.primarySoft)
-            .padding(.horizontal, Theme.Spacing.md)
-            .padding(.vertical, 7)
-            .glassEffect(.clear, in: .capsule)
-        }
-        .accessibilityLabel(accessibilityLabel)
-        .aid(aid)
-    }
-
-    private var modeRow: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            modeSegment
-            resetButton
-        }
-    }
-
-    private var modeSegment: some View {
-        HStack(spacing: 0) {
-            modeButton(
-                title: "比べる",
-                subtitle: "Before / After",
-                mode: .compare,
-                aid: "studio_compare_button"
-            )
-            modeButton(
-                title: "細かく調整",
-                subtitle: "色味と強さ",
-                mode: .fineTune,
-                aid: "studio_finetune_button"
-            )
-        }
-        .glassEffect(.regular, in: .capsule)
-    }
-
-    private var resetButton: some View {
+    // 右上の小さな共有アイコン。共有内容は MakeupShareCardView。
+    // 試すフローと通常フローで mode を出し分け、ラベルだけ違いを残す。
+    private var shareIconButton: some View {
         Button {
-            Haptics.warning()
-            showResetConfirmation = true
+            Haptics.soft()
+            Task { await shareCurrentLook() }
         } label: {
-            VStack(spacing: 2) {
-                Image(systemName: "arrow.counterclockwise")
-                    .font(.system(size: 14, weight: .regular))
-                Text("リセット")
-                    .font(.system(size: 11, weight: .regular))
-            }
-            .foregroundStyle(hasAnyIntensity ? Color.ivory : Theme.Text.tertiary)
-            .frame(width: 56, height: 56)
-        }
-        .glassEffect(.regular, in: .circle)
-        .disabled(!hasAnyIntensity)
-        .accessibilityLabel("メイクをリセット")
-        .aid("studio_reset_button")
-    }
-
-    private func modeButton(title: String, subtitle: String, mode: StudioViewModel.DisplayMode, aid: String) -> some View {
-        let isActive = viewModel.displayMode == mode
-        return Button {
-            guard !isActive else { return }
-            Haptics.selection()
-            withAnimation(Theme.Motion.spring) { viewModel.displayMode = mode }
-        } label: {
-            VStack(spacing: 2) {
-                Text(title)
-                    .font(.system(size: 14, weight: .semibold))
-                Text(subtitle)
-                    .font(.system(size: 10, weight: .regular, design: .monospaced))
-                    .kerning(1)
-                    .opacity(0.7)
-            }
-            .foregroundStyle(isActive ? Color.appBackground : Color.ivory)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(
-                Capsule()
-                    .fill(isActive ? Color.ivory : Color.clear)
-                    .padding(4)
-            )
-        }
-        .accessibilityLabel("\(title)モード。\(subtitle)")
-        .aid(aid)
-    }
-
-    @ViewBuilder
-    private var controlPanel: some View {
-        Group {
-            switch viewModel.displayMode {
-            case .compare:
-                PresetPanelView(viewModel: viewModel)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-            case .fineTune:
-                // FINE TUNE は要素が多い (4 slider + 2 preset 群 + brow picker) ので
-                // 高さに収まらないことがある。ScrollView でラップして上下にスワイプ
-                // できるようにする。画像プレートが潰れるのを防ぐ。
-                ScrollView(.vertical, showsIndicators: false) {
-                    FineTunePanelView()
-                        .padding(.bottom, Theme.Spacing.sm)
+            Group {
+                if isPreparingShare {
+                    ProgressView()
+                        .tint(Theme.Text.primarySoft)
+                        .scaleEffect(0.6)
+                } else {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.Text.primarySoft)
                 }
-                .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
+            .frame(width: 30, height: 30)
+            .glassEffect(.clear, in: .circle)
         }
-        .animation(Theme.Motion.smooth, value: viewModel.displayMode)
+        .accessibilityLabel(isPreparingShare ? "共有画像を準備中" : "この仕上がりを共有する")
+        .aid("studio_share_button")
+        .disabled(isPreparingShare)
     }
 
+    private func shareCurrentLook() async {
+        isPreparingShare = true
+        defer { isPreparingShare = false }
+        let card = MakeupShareCardView(
+            renderedImage: appState.renderedImage,
+            capturedImage: appState.capturedImage,
+            composition: appState.composition,
+            result: appState.analysisResult,
+            mode: appState.tryingSavedLook ? .tried : .styled
+        )
+        if let image = ShareHelper.render(card) {
+            ShareHelper.present([image])
+        }
+    }
+
+    // 通常フロー: 保存 → ホーム。
+    // Try フロー (Archive 経由): 保存せず「完了」でホーム。
+    // 試すたびに SavedLook が増えるとアーカイブが汚れるので保存しない。
+    private var nextButton: some View {
+        let isTrying = appState.tryingSavedLook
+        return GlassPrimaryButton(
+            title: isTrying ? "完了" : "次へ",
+            accessibilityID: "studio_next_button"
+        ) {
+            Haptics.success()
+            if !isTrying {
+                viewModel.saveLook(appState: appState, modelContext: modelContext)
+            }
+            appState.tryingSavedLook = false
+            appState.navigate(to: .home)
+        }
+    }
 }
 
 // MARK: - Preview

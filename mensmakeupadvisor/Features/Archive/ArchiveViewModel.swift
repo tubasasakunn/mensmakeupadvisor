@@ -9,6 +9,27 @@ final class ArchiveViewModel {
     }
 
     func applyLook(_ look: SavedLook, appState: AppState) {
+        loadComposition(from: look, into: appState)
+        // Archive 経由の編集はオンボーディング末尾の Tutorial 工程を再び歩く。
+        // 戻る先 / Home タブは編集起点が Archive である文脈を保つ。
+        appState.studioOrigin = .home
+        appState.homeTab = .archive
+        appState.tryingSavedLook = false
+        appState.navigate(to: .tutorial)
+    }
+
+    // 保存ルックを別の顔で当てて見る一回限りの体験。
+    // 撮影 → 解析後に Studio へ直行し、CTA は「完了」(保存しない)。
+    func tryLook(_ look: SavedLook, appState: AppState) {
+        loadComposition(from: look, into: appState)
+        appState.studioOrigin = .home
+        appState.homeTab = .archive
+        appState.tryingSavedLook = true
+        appState.captureOrigin = .home
+        appState.navigate(to: .capture)
+    }
+
+    private func loadComposition(from look: SavedLook, into appState: AppState) {
         appState.composition = MakeupCompositionBuilder.make(
             highlightAreas: look.highlightAreaSet,
             shadowAreas: look.shadowAreaSet,
@@ -20,11 +41,5 @@ final class ArchiveViewModel {
             eye: Float(look.eye / 100)
         )
         appState.activePresetID = look.presetID
-        // Archive 経由で Studio を開いた場合、戻る先は Home (Archive タブ) にする。
-        // デフォルトの .diagnosis にすると「診断結果がない/別物」に戻ってしまい混乱する。
-        appState.studioOrigin = .home
-        // Studio の「戻る」で Home に戻った時、Create ではなく Archive タブに着地させる。
-        appState.homeTab = .archive
-        appState.navigate(to: .studio)
     }
 }

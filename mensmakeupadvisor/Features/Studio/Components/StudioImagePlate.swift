@@ -27,11 +27,7 @@ struct StudioImagePlate: View {
             let height = width / max(displayAspect, 0.5)
 
             ZStack {
-                if viewModel.displayMode == .compare {
-                    compareView(width: width, height: height)
-                } else {
-                    afterView(width: width, height: height)
-                }
+                compareView(width: width, height: height)
 
                 // スコア表示（右上 — BEFORE/AFTERラベルと重複しない位置）
                 if let result = appState.analysisResult {
@@ -45,7 +41,7 @@ struct StudioImagePlate: View {
                     }
                 }
 
-                if showCompareHint && viewModel.displayMode == .compare {
+                if showCompareHint {
                     compareHintOverlay
                         .transition(.opacity.combined(with: .move(edge: .top)))
                 }
