@@ -59,7 +59,10 @@ struct AnalyzingView: View {
             }
             .padding(.horizontal, Theme.Spacing.md)
             .padding(.vertical, Theme.Spacing.sm)
-            .glassEffect(.regular, in: .capsule)
+            .background(Theme.Surface.panelRaised, in: .capsule)
+            .overlay(
+                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+            )
 
             Spacer()
 

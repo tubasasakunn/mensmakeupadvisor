@@ -65,7 +65,10 @@ struct SaveTitleSheet: View {
                 .foregroundStyle(Color.ivory)
                 .padding(.horizontal, Theme.Spacing.md)
                 .padding(.vertical, 7)
-                .glassEffect(.regular, in: .capsule)
+                .background(Theme.Surface.panelRaised, in: .capsule)
+                .overlay(
+                    Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                )
         }
         .accessibilityLabel("この仕上がりを保存する")
         .aid("save_title_save")
