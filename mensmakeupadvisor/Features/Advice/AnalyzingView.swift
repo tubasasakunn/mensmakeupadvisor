@@ -78,7 +78,10 @@ struct AnalyzingView: View {
                         .foregroundStyle(Theme.Text.primarySoft)
                         .padding(.horizontal, Theme.Spacing.md)
                         .padding(.vertical, Theme.Spacing.sm)
-                        .glassEffect(.clear, in: .capsule)
+                        .background(Theme.Surface.panelRaised, in: .capsule)
+                        .overlay(
+                            Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                        )
                 }
                 .accessibilityLabel("分析をキャンセルして撮影画面に戻る")
                 .aid("analyzing_cancel_button")

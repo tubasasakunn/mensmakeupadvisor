@@ -62,7 +62,10 @@ struct ScreenHeader<Trailing: View>: View {
             .foregroundStyle(Theme.Text.primarySoft)
             .padding(.horizontal, Theme.Spacing.md)
             .padding(.vertical, 7)
-            .glassEffect(.clear, in: .capsule)
+            .background(Theme.Surface.panelRaised, in: .capsule)
+            .overlay(
+                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+            )
         }
         .accessibilityLabel(backAccessibilityLabel)
         .aid(backAccessibilityID)
@@ -77,7 +80,10 @@ struct ScreenHeader<Trailing: View>: View {
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Theme.Text.primarySoft)
                 .frame(width: 30, height: 30)
-                .glassEffect(.clear, in: .circle)
+                .background(Theme.Surface.panelRaised, in: .circle)
+                .overlay(
+                    Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                )
         }
         .accessibilityLabel(backAccessibilityLabel)
         .aid(backAccessibilityID)
@@ -144,7 +150,10 @@ extension ScreenHeader where Trailing == EmptyView {
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(Theme.Text.primarySoft)
                             .frame(width: 30, height: 30)
-                            .glassEffect(.clear, in: .circle)
+                            .background(Theme.Surface.panelRaised, in: .circle)
+                            .overlay(
+                                Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                            )
                     }
                 }
             )
@@ -169,7 +178,10 @@ extension ScreenHeader where Trailing == EmptyView {
                         .foregroundStyle(Theme.Text.primarySoft)
                         .padding(.horizontal, Theme.Spacing.md)
                         .padding(.vertical, 7)
-                        .glassEffect(.clear, in: .capsule)
+                        .background(Theme.Surface.panelRaised, in: .capsule)
+                        .overlay(
+                            Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                        )
                 }
             )
             Spacer()

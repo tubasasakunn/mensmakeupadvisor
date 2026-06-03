@@ -1,6 +1,7 @@
 import SwiftUI
 
-// 副ボタン。clear glass + ivory の薄い outline で「触れるが目立たせない」表現。
+// 副ボタン。暗い panel 面 + ivory の薄い outline で「触れるが目立たせない」表現。
+// (clear glass はフラットな暗背景の上だと効果が出ず崩れるため面塗りに統一)
 // Primary を引き立てるための引き算デザイン。
 struct GlassSecondaryButton: View {
     let title: String
@@ -23,7 +24,7 @@ struct GlassSecondaryButton: View {
             .padding(.horizontal, Theme.Spacing.xl)
             .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
-            .glassEffect(.clear, in: .capsule)
+            .background(Theme.Surface.panel, in: .capsule)
             .overlay(
                 Capsule()
                     .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
