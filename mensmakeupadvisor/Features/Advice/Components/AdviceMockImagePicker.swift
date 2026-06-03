@@ -21,7 +21,10 @@ struct AdviceMockImagePicker: View {
                     .foregroundStyle(Color.ivory)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .glassEffect(.regular, in: .capsule)
+                    .background(Theme.Surface.panelRaised, in: .capsule)
+                    .overlay(
+                        Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                    )
                     .aid("advice_mock_image_\(index)")
                 }
             }

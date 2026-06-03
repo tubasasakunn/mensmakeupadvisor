@@ -33,6 +33,18 @@ enum Theme {
         // glass の暖色版。Onboarding カード等で ivory ベースの淡い半透明にしたいときに使う。
         nonisolated static let glassWeakIvory   = Palette.ivoryAlpha04
         nonisolated static let glassMedium      = Palette.whiteAlpha08
+
+        // カード/パネル/チップの面 (旧 .glassEffect(.regular) の置き換え)。
+        //
+        // Liquid Glass の .regular は「背後に色味のあるコンテンツがある」前提の
+        // システムマテリアル。LuxeBackground のオーブが届かない低彩度の暗部
+        // (画面中央など) の上では白く曇って「板」に見え、CLAUDE.md の
+        // 「単色/薄い背景の上で glass は崩れる」に該当してしまう。
+        // 暖色 ivory をごく薄く重ねた暗い半透明面なら、オーブの色を透かしつつ
+        // 暗背景になじむ「面」として成立する。
+        nonisolated static let panel            = Palette.ivoryAlpha08
+        // チップ/丸アイコンボタンなど小さな対話要素は少し持ち上げて視認性を確保。
+        nonisolated static let panelRaised      = Palette.ivoryAlpha12
         nonisolated static let scrim            = Palette.blackAlpha50
         nonisolated static let labelBackdrop    = Palette.canvasAlpha60
         nonisolated static let imageDim         = Palette.canvasAlpha55

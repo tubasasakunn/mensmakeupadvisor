@@ -127,7 +127,10 @@ struct HomeArchiveTab: View {
                             .foregroundStyle(Color.ivory)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
-                            .glassEffect(.regular, in: .capsule)
+                            .background(Theme.Surface.panelRaised, in: .capsule)
+                            .overlay(
+                                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                            )
                             .padding(6)
                     }
                 }

@@ -1,12 +1,17 @@
 import SwiftUI
 
-// iOS 26 Liquid Glass の標準的な見た目を提供するラッパー群。
-// 直接 `.glassEffect(...)` を書き散らさず、これらを使うことで
+// カード・パネル・チップ・丸ボタンの面を提供するラッパー群。
 // 角丸スケール・余白・hairline 補強の規約を 1 箇所に集約する。
 //
+// なぜ system glass (.glassEffect(.regular)) を使わないか:
+//   Liquid Glass の .regular は背後に色味のあるコンテンツがある前提のマテリアル。
+//   本アプリの LuxeBackground はオーブの届かない領域が低彩度の暗部になり、
+//   その上に .regular を重ねると白く曇って「板」に見えてしまう
+//   (CLAUDE.md「単色/薄い背景の上で glass は崩れる」)。
+//   そのため面は Theme.Surface.panel (暗い ivory 半透明) + ivory hairline で表現する。
+//
 // 配置のルール:
-//   - Glass の上に Glass を重ねない (CLAUDE.md 違反になる)
-//   - 必ず LuxeBackground のような有彩な背景の上に置く
+//   - 必ず LuxeBackground の上に置く (面が透けて奥行きが出る)
 //   - テキストは .primary / .ivory / Theme.Text.primarySoft を使い、可読性を担保
 
 // MARK: - GlassCard (汎用カード)
@@ -21,14 +26,18 @@ struct GlassCard<Content: View>: View {
         content()
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                // tint を入れて欲しい場合 (active state など) のために
-                // 1 枚薄い色を下敷きにできる。
-                tint.map { $0.opacity(0.22) }
-            )
-            .glassEffect(.regular, in: .rect(cornerRadius: radius))
+            .background {
+                // 暗い面 (panel) を基調に、active state 等では tint を重ねる。
+                ZStack {
+                    Theme.Surface.panel
+                    if let tint {
+                        tint.opacity(0.22)
+                    }
+                }
+                .clipShape(.rect(cornerRadius: radius))
+            }
             .overlay(
-                // ガラスの輪郭を ivory で 1px 強調すると luxury 感が出る。
+                // 面の輪郭を ivory で 1px 強調すると luxury 感が出る。
                 RoundedRectangle(cornerRadius: radius)
                     .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
             )
@@ -46,7 +55,7 @@ struct GlassPanel<Content: View>: View {
         content()
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .glassEffect(.regular, in: .rect(cornerRadius: radius))
+            .background(Theme.Surface.panel, in: .rect(cornerRadius: radius))
             .overlay(
                 RoundedRectangle(cornerRadius: radius)
                     .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
@@ -65,7 +74,10 @@ struct GlassPill<Content: View>: View {
         content()
             .padding(.horizontal, hPadding)
             .padding(.vertical, vPadding)
-            .glassEffect(.regular, in: .capsule)
+            .background(Theme.Surface.panelRaised, in: .capsule)
+            .overlay(
+                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+            )
     }
 }
 
@@ -88,7 +100,10 @@ struct GlassIconButton: View {
                 .foregroundStyle(tint)
                 .frame(width: size, height: size)
         }
-        .glassEffect(.regular, in: .circle)
+        .background(Theme.Surface.panelRaised, in: .circle)
+        .overlay(
+            Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+        )
         .accessibilityLabel(accessibilityLabel ?? systemImage)
         .aid(accessibilityID)
     }
