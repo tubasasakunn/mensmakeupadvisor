@@ -139,6 +139,16 @@ extension AppState {
         get { session.tryingSavedLook }
         set { session.tryingSavedLook = newValue }
     }
+    var triedLooks: [SavedLook] {
+        get { session.triedLooks }
+        set { session.triedLooks = newValue }
+    }
+    var triedLookIndex: Int {
+        get { session.triedLookIndex }
+        set { session.triedLookIndex = newValue }
+    }
+    @discardableResult
+    func showTriedLook(offset: Int) -> Bool { session.showTriedLook(offset: offset) }
     var makeupEngine: MakeupEngineService { session.makeupEngine }
     func requestMakeupRender() { session.requestMakeupRender() }
 

@@ -164,7 +164,7 @@ struct HomeArchiveTab: View {
 
     private func handleTry(_ look: SavedLook) {
         selected = nil
-        viewModel.tryLook(look, appState: appState)
+        viewModel.tryLook(look, in: savedLooks, appState: appState)
     }
 
     private func grade(for score: Int) -> String {
