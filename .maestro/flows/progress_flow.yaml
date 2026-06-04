@@ -1,0 +1,75 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# スコアの推移画面 E2E フロー
+# 前提: 推移を出すには保存ルックが 1 件以上必要なので、まず 1 件保存してから
+# Archive タブ → 「スコアの推移」へ遷移する。
+
+- launchApp:
+    arguments:
+      - "--mock-mode"
+
+- waitForAnimationToEnd:
+    timeout: 3000
+
+- tapOn:
+    id: "onboarding_skip_button"
+    optional: true
+
+# ── サンプル画像で解析 → 診断
+- tapOn:
+    id: "advice_sample_button"
+
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# ── 診断をスキップして Studio へ、ルックを保存
+- tapOn:
+    id: "diagnosis_skip_button"
+
+- assertVisible:
+    id: "studio_view"
+
+- tapOn:
+    id: "studio_next_button"
+
+- assertVisible:
+    id: "save_title_sheet"
+
+- tapOn:
+    id: "save_title_save"
+
+# ── 保存後は送り出し画面 → ホームへ
+- assertVisible:
+    id: "completion_view"
+
+- tapOn:
+    id: "completion_continue_button"
+
+- assertVisible:
+    id: "home_view"
+
+# ── Archive タブから推移画面を開く
+- tapOn:
+    id: "home_tab_archive"
+
+- assertVisible:
+    id: "home_archive_tab"
+
+- tapOn:
+    id: "home_archive_progress_button"
+
+- assertVisible:
+    id: "progress_view"
+
+- assertVisible:
+    id: "progress_stat_row"
+
+- assertVisible:
+    id: "progress_trend_card"
+
+# ── 戻る → Archive タブへ復帰
+- tapOn:
+    id: "progress_back_button"
+
+- assertVisible:
+    id: "home_archive_tab"

@@ -11,6 +11,7 @@ struct StudioView: View {
     @State private var isPreparingShare = false
     // 「次へ」を押したあと、tryingSavedLook == false なら名前付けシートを挟む。
     @State private var showSaveSheet = false
+    @State private var showArrangeSheet = false
 
     var body: some View {
         ZStack {
@@ -26,9 +27,15 @@ struct StudioView: View {
 
                 Spacer(minLength: 0)
 
-                nextButton
-                    .padding(.horizontal, Theme.Spacing.xxl)
-                    .padding(.bottom, Theme.Spacing.xxxl)
+                VStack(spacing: Theme.Spacing.md) {
+                    HStack(spacing: Theme.Spacing.md) {
+                        mirrorButton
+                        arrangeButton
+                    }
+                    nextButton
+                }
+                .padding(.horizontal, Theme.Spacing.xxl)
+                .padding(.bottom, Theme.Spacing.xxxl)
             }
         }
         .accessibilityElement(children: .contain)
@@ -54,6 +61,13 @@ struct StudioView: View {
             .presentationBackground(Theme.Ambient.backdrop)
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showArrangeSheet) {
+            StudioArrangeSheet()
+                .environment(appState)
+                .presentationBackground(Theme.Ambient.backdrop)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
     }
 
@@ -127,6 +141,31 @@ struct StudioView: View {
         )
         if let image = ShareHelper.render(card) {
             ShareHelper.present([image])
+        }
+    }
+
+    // 鏡モード: フロントカメラの鏡像にガイドを重ね、実際に塗りながら確認する。
+    // 戻り先は Studio (この画面)。
+    private var mirrorButton: some View {
+        GlassSecondaryButton(
+            title: "鏡モード",
+            icon: "camera.viewfinder",
+            accessibilityID: "studio_mirror_button"
+        ) {
+            Haptics.soft()
+            appState.navigation.openMirror(back: .studio)
+        }
+    }
+
+    // アレンジ: プリセット比較・カラー調整をまとめた任意の微調整シート。
+    private var arrangeButton: some View {
+        GlassSecondaryButton(
+            title: "アレンジ",
+            icon: "slider.horizontal.3",
+            accessibilityID: "studio_arrange_button"
+        ) {
+            Haptics.soft()
+            showArrangeSheet = true
         }
     }
 

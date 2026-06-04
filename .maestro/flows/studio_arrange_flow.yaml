@@ -1,0 +1,55 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# Studio「アレンジ」シート E2E フロー
+# プリセット比較とカラー調整のタブ切替・表示を確認する。
+# モックではエンジン未準備のため renderedImage/capturedImage にフォールバックする。
+
+- launchApp:
+    arguments:
+      - "--mock-mode"
+
+- waitForAnimationToEnd:
+    timeout: 3000
+
+- tapOn:
+    id: "onboarding_skip_button"
+    optional: true
+
+- tapOn:
+    id: "advice_sample_button"
+
+- waitForAnimationToEnd:
+    timeout: 10000
+
+- tapOn:
+    id: "diagnosis_skip_button"
+
+- assertVisible:
+    id: "studio_view"
+
+# ── アレンジシートを開く（既定: プリセット比較）
+- tapOn:
+    id: "studio_arrange_button"
+
+- assertVisible:
+    id: "studio_arrange_sheet"
+
+- assertVisible:
+    id: "studio_compare_view"
+
+# ── カラータブへ切替
+- tapOn:
+    id: "studio_arrange_tab_color"
+
+- assertVisible:
+    id: "studio_color_view"
+
+- assertVisible:
+    id: "studio_color_kind_picker"
+
+# ── 閉じる
+- tapOn:
+    id: "studio_arrange_close_button"
+
+- assertVisible:
+    id: "studio_view"

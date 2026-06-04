@@ -17,6 +17,7 @@ final class NavigationContext {
     var captureOrigin: AppScreen = .home
     var studioOrigin: AppScreen = .diagnosis
     var diagnosisOrigin: AppScreen = .capture
+    var mirrorOrigin: AppScreen = .studio
 
     // HomeView がどのタブを開いているか。Archive からの編集フローで
     // Studio から戻った際に Archive タブへ復帰させるための共有状態。
@@ -30,6 +31,7 @@ final class NavigationContext {
         captureOrigin = .home
         studioOrigin = .diagnosis
         diagnosisOrigin = .capture
+        mirrorOrigin = .studio
         homeTab = .create
     }
 
@@ -65,5 +67,16 @@ final class NavigationContext {
     func openHome(tab: HomeTab) {
         homeTab = tab
         navigate(to: .home)
+    }
+
+    // Progress は Archive タブからのみ開く。戻り先は常に Home なので
+    // origin breadcrumb は持たず、RootView.edgeSwipeBackTarget で .home を返す。
+    func openProgress() {
+        navigate(to: .progress)
+    }
+
+    func openMirror(back origin: AppScreen) {
+        mirrorOrigin = origin
+        navigate(to: .mirror)
     }
 }

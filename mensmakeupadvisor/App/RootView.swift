@@ -20,6 +20,8 @@ struct RootView: View {
                 case .tutorial:   TutorialView()
                 case .studio:     StudioView()
                 case .completion: CompletionView()
+                case .progress:   ProgressReportView()
+                case .mirror:     MirrorView()
                 }
             }
             .transition(reduceMotion ? .identity : .opacity)
@@ -47,6 +49,10 @@ struct RootView: View {
         case .capture:   return appState.captureOrigin
         case .diagnosis: return appState.diagnosisOrigin
         case .studio:    return appState.studioOrigin
+        // Progress は Home (Archive タブ) からのみ開くので常に Home へ戻る。
+        case .progress:  return .home
+        // Mirror は開いた元 (既定 Studio) へ戻る。
+        case .mirror:    return appState.navigation.mirrorOrigin
         // Splash/Home はトップ階層、Analyzing は処理中、
         // Tutorial/Onboarding は内側スワイプと衝突するため除外。
         // Completion は送り出し画面なので戻る対象外。

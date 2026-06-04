@@ -1,0 +1,48 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# ミラーモード E2E フロー
+# 実カメラはシミュレータで動かないため、--mock-mode では静的プレースホルダ
+# (mirror_mock_label) を表示する。Studio から鏡モードを開いて戻るまでを確認する。
+
+- launchApp:
+    arguments:
+      - "--mock-mode"
+
+- waitForAnimationToEnd:
+    timeout: 3000
+
+- tapOn:
+    id: "onboarding_skip_button"
+    optional: true
+
+- tapOn:
+    id: "advice_sample_button"
+
+- waitForAnimationToEnd:
+    timeout: 10000
+
+- tapOn:
+    id: "diagnosis_skip_button"
+
+- assertVisible:
+    id: "studio_view"
+
+# ── 鏡モードを開く
+- tapOn:
+    id: "studio_mirror_button"
+
+- assertVisible:
+    id: "mirror_view"
+
+- assertVisible:
+    id: "mirror_mock_label"
+
+- assertVisible:
+    id: "mirror_legend"
+
+# ── 戻ると Studio へ復帰
+- tapOn:
+    id: "mirror_back_button"
+
+- assertVisible:
+    id: "studio_view"

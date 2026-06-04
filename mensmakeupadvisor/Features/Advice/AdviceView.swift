@@ -1,9 +1,13 @@
+import PhotosUI
 import SwiftUI
 import UIKit
 
 struct AdviceView: View {
     @Environment(AppState.self) private var appState
     @State private var viewModel = AdviceViewModel()
+    // ライブラリ選択。PhotosPicker はプロセス外で動くため写真ライブラリの
+    // 使用許可 (Info.plist) は不要。選択後に Data → UIImage に変換して流す。
+    @State private var pickedItem: PhotosPickerItem?
 
     var body: some View {
         ZStack {
@@ -55,6 +59,29 @@ struct AdviceView: View {
                 }
             )
             .ignoresSafeArea()
+        }
+        .onChange(of: pickedItem) { _, newItem in
+            guard let newItem else { return }
+            Task {
+                if let data = try? await newItem.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    viewModel.selectImage(image, appState: appState)
+                } else {
+                    viewModel.errorMessage = "画像を読み込めませんでした。別の写真をお試しください。"
+                }
+                pickedItem = nil
+            }
+        }
+        .alert(
+            "読み込みエラー",
+            isPresented: Binding(
+                get: { viewModel.errorMessage != nil },
+                set: { if !$0 { viewModel.errorMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+        } message: {
+            Text(viewModel.errorMessage ?? "")
         }
         .aid("advice_capture_view")
     }
@@ -133,6 +160,7 @@ struct AdviceView: View {
                     Haptics.medium()
                     viewModel.showCamera = true
                 }
+                libraryButton
             }
             GlassSecondaryButton(
                 title: "サンプル画像で試す",
@@ -143,6 +171,29 @@ struct AdviceView: View {
                 viewModel.useSample(appState: appState)
             }
         }
+    }
+
+    // ライブラリから写真を選ぶ。GlassSecondaryButton と同じ見た目に揃える
+    // (PhotosPicker は独自ボタンなので label を手組みする)。
+    private var libraryButton: some View {
+        PhotosPicker(selection: $pickedItem, matching: .images, photoLibrary: .shared()) {
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "photo.on.rectangle")
+                    .font(.system(size: 14, weight: .regular))
+                Text("ライブラリから選ぶ")
+                    .font(.system(size: 14, weight: .medium))
+                    .kerning(0.3)
+            }
+            .foregroundStyle(Theme.Text.primarySoft)
+            .padding(.horizontal, Theme.Spacing.xl)
+            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity)
+            .background(Theme.Surface.panel, in: .capsule)
+            .overlay(
+                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
+            )
+        }
+        .aid("advice_library_button")
     }
 
     // MARK: - Privacy Caption
