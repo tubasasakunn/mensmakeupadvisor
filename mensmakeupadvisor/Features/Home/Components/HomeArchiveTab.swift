@@ -43,6 +43,13 @@ struct HomeArchiveTab: View {
             titleSection
                 .padding(.top, Theme.Spacing.md)
                 .padding(.horizontal, Theme.Spacing.xxl)
+
+            if !savedLooks.isEmpty {
+                progressButton
+                    .padding(.top, Theme.Spacing.lg)
+                    .padding(.horizontal, Theme.Spacing.xxl)
+            }
+
             HairlineDivider()
                 .padding(.top, Theme.Spacing.xxl)
                 .padding(.horizontal, Theme.Spacing.xxl)
@@ -77,6 +84,18 @@ struct HomeArchiveTab: View {
             Text(savedLooks.isEmpty ? "保存ゼロ件" : "保存 \(savedLooks.count) 件")
                 .font(.system(size: 12))
                 .foregroundStyle(Color.inkSecondary)
+        }
+    }
+
+    // 保存ルックがある時だけ出す「スコアの推移」入口。
+    private var progressButton: some View {
+        GlassSecondaryButton(
+            title: "スコアの推移を見る",
+            icon: "chart.line.uptrend.xyaxis",
+            accessibilityID: "home_archive_progress_button"
+        ) {
+            Haptics.soft()
+            appState.navigation.openProgress()
         }
     }
 

@@ -66,4 +66,10 @@ final class NavigationContext {
         homeTab = tab
         navigate(to: .home)
     }
+
+    // Progress は Archive タブからのみ開く。戻り先は常に Home なので
+    // origin breadcrumb は持たず、RootView.edgeSwipeBackTarget で .home を返す。
+    func openProgress() {
+        navigate(to: .progress)
+    }
 }
