@@ -201,7 +201,7 @@ struct ProgressReportView: View {
 
     // points は昇順なので、末尾から最大 6 件を新しい順に並べ替える。
     private var recentEntries: [ProgressMetrics.Point] {
-        metrics.points.suffix(6).reversed()
+        Array(metrics.points.suffix(6).reversed())
     }
 
     private var reEvaluateButton: some View {

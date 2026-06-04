@@ -1,4 +1,5 @@
 import AVFoundation
+import CoreVideo
 import SwiftUI
 
 // ミラーモードのフロントカメラ・セッションを統括する。
@@ -62,6 +63,9 @@ final class CameraSessionController {
         consumeTask?.cancel()
         consumeTask = nil
         if session.isRunning { session.stopRunning() }
+        // ストリームを閉じる。本コントローラは画面遷移ごとに作り直されるため
+        // (MirrorView の @State) 再開での使い回しはなく、ここで終端して問題ない。
+        processor.finish()
         face = nil
         status = .idle
     }

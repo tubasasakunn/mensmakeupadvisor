@@ -1,4 +1,5 @@
 import AVFoundation
+import CoreVideo
 import Vision
 
 // AVCaptureVideoDataOutput のサンプルバッファを受け取り、Vision で顔ランドマークを
