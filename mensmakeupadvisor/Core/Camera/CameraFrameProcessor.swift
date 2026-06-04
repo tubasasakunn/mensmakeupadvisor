@@ -32,12 +32,25 @@ final class CameraFrameProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffer
     ) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
 
-        let request = VNDetectFaceLandmarksRequest()
         // フロントカメラ・ポートレート時の向き。実機での見え方に応じて
         // .leftMirrored / .upMirrored などへ要調整 (シミュレータでは検証不可)。
+        let orientation: CGImagePropertyOrientation = .leftMirrored
+
+        // 向き補正後の画像サイズ。.left*/.right* は 90° 回転なので幅高を入れ替える。
+        let rawW = CGFloat(CVPixelBufferGetWidth(pixelBuffer))
+        let rawH = CGFloat(CVPixelBufferGetHeight(pixelBuffer))
+        let orientedSize: CGSize
+        switch orientation {
+        case .left, .right, .leftMirrored, .rightMirrored:
+            orientedSize = CGSize(width: rawH, height: rawW)
+        default:
+            orientedSize = CGSize(width: rawW, height: rawH)
+        }
+
+        let request = VNDetectFaceLandmarksRequest()
         let handler = VNImageRequestHandler(
             cvPixelBuffer: pixelBuffer,
-            orientation: .leftMirrored,
+            orientation: orientation,
             options: [:]
         )
 
@@ -49,7 +62,7 @@ final class CameraFrameProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffer
         }
 
         if let face = request.results?.first {
-            continuation.yield(FaceObservation(visionFace: face))
+            continuation.yield(FaceObservation(visionFace: face, orientedImageSize: orientedSize))
         } else {
             continuation.yield(nil)
         }

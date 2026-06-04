@@ -21,10 +21,11 @@ struct MirrorGuideOverlay: View {
     var body: some View {
         Canvas { context, size in
             guard let face, face.hasFace else { return }
-            let box = viewBox(face.boundingBox, in: size)
-            let eyeL = face.leftEyeCenter.map { viewPoint($0, in: size) }
-            let eyeR = face.rightEyeCenter.map { viewPoint($0, in: size) }
-            let nose = face.noseCenter.map { viewPoint($0, in: size) }
+            let img = face.imageSize
+            let box = viewBox(face.boundingBox, image: img, view: size)
+            let eyeL = face.leftEyeCenter.map { viewPoint($0, image: img, view: size) }
+            let eyeR = face.rightEyeCenter.map { viewPoint($0, image: img, view: size) }
+            let nose = face.noseCenter.map { viewPoint($0, image: img, view: size) }
 
             for zone in shadowZones(box: box) {
                 let path = Path(ellipseIn: zone)
@@ -83,15 +84,41 @@ struct MirrorGuideOverlay: View {
 
     // MARK: - Coordinate helpers
 
-    private func viewPoint(_ p: CGPoint, in size: CGSize) -> CGPoint {
-        let vx = (mirrorX ? (1 - p.x) : p.x) * size.width
-        let vy = (1 - p.y) * size.height   // Vision 左下原点 → View 左上原点
-        return CGPoint(x: vx, y: vy)
+    // Vision 正規化座標 (原点 左下, 向き補正後画像基準) → View 座標。
+    // プレビューは .resizeAspectFill で画像が View を覆うようにクロップされるため、
+    // 画像と View のアスペクト差に応じた可視範囲 (オフセット/スケール) を補正する。
+    // image == .zero (モック) のときはクロップ補正せず素朴に全画面へマップする。
+    private func viewPoint(_ p: CGPoint, image: CGSize, view: CGSize) -> CGPoint {
+        let nx = mirrorX ? (1 - p.x) : p.x
+        let ny = 1 - p.y   // 左下原点 → 左上原点
+
+        guard image.width > 0, image.height > 0, view.width > 0, view.height > 0 else {
+            return CGPoint(x: nx * view.width, y: ny * view.height)
+        }
+
+        let imgAspect = image.width / image.height
+        let viewAspect = view.width / view.height
+
+        // aspect-fill で実際に見えている画像範囲 (正規化) を求める。
+        var scaleX: CGFloat = 1, scaleY: CGFloat = 1
+        var offsetX: CGFloat = 0, offsetY: CGFloat = 0
+        if imgAspect > viewAspect {
+            // 画像が相対的に横長 → 高さを合わせ、横をクロップ。
+            scaleX = viewAspect / imgAspect
+            offsetX = (1 - scaleX) / 2
+        } else {
+            scaleY = imgAspect / viewAspect
+            offsetY = (1 - scaleY) / 2
+        }
+
+        let vx = (nx - offsetX) / scaleX
+        let vy = (ny - offsetY) / scaleY
+        return CGPoint(x: vx * view.width, y: vy * view.height)
     }
 
-    private func viewBox(_ bb: CGRect, in size: CGSize) -> CGRect {
-        let a = viewPoint(CGPoint(x: bb.minX, y: bb.maxY), in: size)   // 左上
-        let b = viewPoint(CGPoint(x: bb.maxX, y: bb.minY), in: size)   // 右下
+    private func viewBox(_ bb: CGRect, image: CGSize, view: CGSize) -> CGRect {
+        let a = viewPoint(CGPoint(x: bb.minX, y: bb.maxY), image: image, view: view)   // 左上
+        let b = viewPoint(CGPoint(x: bb.maxX, y: bb.minY), image: image, view: view)   // 右下
         return CGRect(
             x: min(a.x, b.x),
             y: min(a.y, b.y),

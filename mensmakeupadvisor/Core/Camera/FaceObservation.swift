@@ -12,6 +12,10 @@ struct FaceObservation: Sendable, Equatable {
     var leftEye: [CGPoint]
     var rightEye: [CGPoint]
     var nose: [CGPoint]
+    // 検出に用いた「向き補正後」の画像サイズ (pt 比率のみ意味を持つ)。
+    // プレビューの .resizeAspectFill クロップを正しく再現するために使う。
+    // .zero の場合 (モック等) はクロップ補正をせず素朴に全画面へマップする。
+    var imageSize: CGSize
 
     var hasFace: Bool { boundingBox != .zero }
 
@@ -23,15 +27,17 @@ struct FaceObservation: Sendable, Equatable {
         boundingBox: CGRect = .zero,
         leftEye: [CGPoint] = [],
         rightEye: [CGPoint] = [],
-        nose: [CGPoint] = []
+        nose: [CGPoint] = [],
+        imageSize: CGSize = .zero
     ) {
         self.boundingBox = boundingBox
         self.leftEye = leftEye
         self.rightEye = rightEye
         self.nose = nose
+        self.imageSize = imageSize
     }
 
-    init(visionFace face: VNFaceObservation) {
+    init(visionFace face: VNFaceObservation, orientedImageSize: CGSize) {
         let box = face.boundingBox
         // VNFaceLandmarkRegion2D.normalizedPoints は boundingBox 相対なので
         // 画像全体の正規化座標へ展開する。
@@ -49,7 +55,8 @@ struct FaceObservation: Sendable, Equatable {
             boundingBox: box,
             leftEye: region(lm?.leftEye),
             rightEye: region(lm?.rightEye),
-            nose: region(lm?.nose)
+            nose: region(lm?.nose),
+            imageSize: orientedImageSize
         )
     }
 
