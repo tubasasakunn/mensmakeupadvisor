@@ -26,9 +26,12 @@ struct StudioView: View {
 
                 Spacer(minLength: 0)
 
-                nextButton
-                    .padding(.horizontal, Theme.Spacing.xxl)
-                    .padding(.bottom, Theme.Spacing.xxxl)
+                VStack(spacing: Theme.Spacing.md) {
+                    mirrorButton
+                    nextButton
+                }
+                .padding(.horizontal, Theme.Spacing.xxl)
+                .padding(.bottom, Theme.Spacing.xxxl)
             }
         }
         .accessibilityElement(children: .contain)
@@ -127,6 +130,19 @@ struct StudioView: View {
         )
         if let image = ShareHelper.render(card) {
             ShareHelper.present([image])
+        }
+    }
+
+    // 鏡モード: フロントカメラの鏡像にガイドを重ね、実際に塗りながら確認する。
+    // 戻り先は Studio (この画面)。
+    private var mirrorButton: some View {
+        GlassSecondaryButton(
+            title: "鏡モードで実践する",
+            icon: "camera.viewfinder",
+            accessibilityID: "studio_mirror_button"
+        ) {
+            Haptics.soft()
+            appState.navigation.openMirror(back: .studio)
         }
     }
 

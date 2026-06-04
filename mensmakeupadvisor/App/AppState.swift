@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 enum AppScreen: Equatable {
-    case splash, onboarding, home, capture, analyzing, diagnosis, tutorial, studio, completion, progress
+    case splash, onboarding, home, capture, analyzing, diagnosis, tutorial, studio, completion, progress, mirror
 }
 
 // HomeView 内のタブ。Archive 経由で Studio に行って戻ってきた時に
