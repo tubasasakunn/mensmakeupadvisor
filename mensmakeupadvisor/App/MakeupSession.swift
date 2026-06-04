@@ -41,11 +41,6 @@ final class MakeupSession {
     // Diagnosis 完了時のプリセット既定を当てないために MakeupSession でも持つ。
     var tryingSavedLook: Bool = false
 
-    // 試着中に Studio で縦スワイプして前後ルックへ切り替えるための対象一覧と現在位置。
-    // 試着開始時に Archive のグリッド順をそのまま受け取る。試着以外は空。
-    var triedLooks: [SavedLook] = []
-    var triedLookIndex: Int = 0
-
     func reset() {
         capturedImage = nil
         renderedImage = nil
@@ -54,41 +49,10 @@ final class MakeupSession {
         activePresetID = nil
         isRenderingMakeup = false
         tryingSavedLook = false
-        triedLooks = []
-        triedLookIndex = 0
         presetsInitializedFromAnalysis = false
         renderTask?.cancel()
         renderTask = nil
         Task { await makeupEngine.reset() }
-    }
-
-    // 保存ルックの強度・ゾーン・眉を composition に焼き込む。
-    // Archive の「設定で開く」「試す」両方と、試着中の縦スワイプ切替で共有する。
-    func loadComposition(from look: SavedLook) {
-        composition = MakeupCompositionBuilder.make(
-            highlightAreas: look.highlightAreaSet,
-            shadowAreas: look.shadowAreaSet,
-            eyeAreas: look.eyeAreaSet,
-            browType: EyebrowApplier.BrowType(rawValue: look.eyebrowTypeRaw ?? ""),
-            base: Float(look.base / 100),
-            highlight: Float(look.highlight / 100),
-            shadow: Float(look.shadow / 100),
-            eye: Float(look.eye / 100)
-        )
-        activePresetID = look.presetID
-    }
-
-    // Studio 縦スワイプ用: 試着中ルックを前後に切り替える。
-    // offset = -1 で前、+1 で次。端ではループせず false を返す。
-    // 切り替え後の再レンダリングは Studio の task(id:) が composition 変化を検知して行う。
-    @discardableResult
-    func showTriedLook(offset: Int) -> Bool {
-        guard tryingSavedLook, triedLooks.count > 1 else { return false }
-        let next = triedLookIndex + offset
-        guard triedLooks.indices.contains(next) else { return false }
-        triedLookIndex = next
-        loadComposition(from: triedLooks[next])
-        return true
     }
 
     // 顔診断完了時、ユーザーがまだ化粧を触っていなければ顔型に応じた
