@@ -30,13 +30,20 @@ appId: com.tubasasakun.mensmakeupadvisor
     id: "studio_view"
 
 - tapOn:
-    id: "studio_save_button"
+    id: "studio_next_button"
 
 - assertVisible:
-    id: "studio_saved_notification"
+    id: "save_title_sheet"
 
 - tapOn:
-    id: "studio_saved_go_home"
+    id: "save_title_save"
+
+# ── 保存後は送り出し画面 → ホームへ
+- assertVisible:
+    id: "completion_view"
+
+- tapOn:
+    id: "completion_continue_button"
 
 - assertVisible:
     id: "home_view"
