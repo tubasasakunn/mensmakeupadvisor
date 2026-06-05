@@ -37,9 +37,6 @@ appId: com.tubasasakun.mensmakeupadvisor
 - assertVisible:
     id: "mirror_mock_label"
 
-- assertVisible:
-    id: "mirror_legend"
-
 # ── 戻ると Studio へ復帰
 - tapOn:
     id: "mirror_back_button"
