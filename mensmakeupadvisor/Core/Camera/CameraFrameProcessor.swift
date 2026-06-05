@@ -1,22 +1,23 @@
 import AVFoundation
+import CoreImage
 import CoreVideo
-import Vision
+import UIKit
 
-// AVCaptureVideoDataOutput のサンプルバッファを受け取り、Vision で顔ランドマークを
-// 検出して FaceObservation を AsyncStream に流すデリゲート。
+// AVCaptureVideoDataOutput のサンプルバッファを向き補正済みの UIImage に変換し、
+// AsyncStream で流すデリゲート。化粧合成 (detect + render) は重いので、ここでは
+// 変換のみ行い、合成は CameraSessionController 側でスロットリングして実行する。
 //
-// captureOutput は AVFoundation が管理するバックグラウンドキューで呼ばれる。
-// 共有する可変状態を持たず (継続のみ保持)、検出結果は Sendable な FaceObservation に
-// 落としてから yield するため、@unchecked Sendable を使わずに Swift 6 strict
-// concurrency と両立する。継続経由でのみ MainActor 側 (CameraSessionController) と
-// 通信する。
+// captureOutput は AVFoundation のバックグラウンドキューで呼ばれる。共有可変状態を
+// 持たず (継続と再利用する CIContext のみ)、Sendable な UIImage を yield して
+// MainActor 側と通信するため、@unchecked Sendable を使わずに Swift 6 と両立する。
 final class CameraFrameProcessor: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
-    let stream: AsyncStream<FaceObservation?>
-    private let continuation: AsyncStream<FaceObservation?>.Continuation
+    let stream: AsyncStream<UIImage>
+    private let continuation: AsyncStream<UIImage>.Continuation
+    private let ciContext = CIContext(options: nil)
 
     override init() {
-        var captured: AsyncStream<FaceObservation?>.Continuation!
-        // 最新フレームだけ保持。描画が追いつかなくても遅延が溜まらないようにする。
+        var captured: AsyncStream<UIImage>.Continuation!
+        // 最新フレームだけ保持。合成が追いつかなくても遅延を溜めない。
         stream = AsyncStream(bufferingPolicy: .bufferingNewest(1)) { captured = $0 }
         continuation = captured
         super.init()
@@ -33,39 +34,15 @@ final class CameraFrameProcessor: NSObject, AVCaptureVideoDataOutputSampleBuffer
     ) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
 
-        // フロントカメラ・ポートレート時の向き。実機での見え方に応じて
-        // .leftMirrored / .upMirrored などへ要調整 (シミュレータでは検証不可)。
-        let orientation: CGImagePropertyOrientation = .leftMirrored
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        // pixelBuffer は AVFoundation に再利用されるので、ここで CGImage に焼いて切り離す。
+        guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return }
 
-        // 向き補正後の画像サイズ。.left*/.right* は 90° 回転なので幅高を入れ替える。
-        let rawW = CGFloat(CVPixelBufferGetWidth(pixelBuffer))
-        let rawH = CGFloat(CVPixelBufferGetHeight(pixelBuffer))
-        let orientedSize: CGSize
-        switch orientation {
-        case .left, .right, .leftMirrored, .rightMirrored:
-            orientedSize = CGSize(width: rawH, height: rawW)
-        default:
-            orientedSize = CGSize(width: rawW, height: rawH)
-        }
-
-        let request = VNDetectFaceLandmarksRequest()
-        let handler = VNImageRequestHandler(
-            cvPixelBuffer: pixelBuffer,
-            orientation: orientation,
-            options: [:]
-        )
-
-        do {
-            try handler.perform([request])
-        } catch {
-            continuation.yield(nil)
-            return
-        }
-
-        if let face = request.results?.first {
-            continuation.yield(FaceObservation(visionFace: face, orientedImageSize: orientedSize))
-        } else {
-            continuation.yield(nil)
-        }
+        // フロントカメラ・ポートレートの向き。.leftMirrored を焼き込んで以降の
+        // detect / render が一貫して扱えるようにする。実機で上下左右がずれる場合は
+        // この orientation が調整点 (シミュレータでは検証不可)。
+        let oriented = UIImage(cgImage: cgImage, scale: 1, orientation: .leftMirrored)
+            .uprightOriented()
+        continuation.yield(oriented)
     }
 }

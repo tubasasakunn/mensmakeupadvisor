@@ -1,20 +1,16 @@
-import AVFoundation
 import SwiftUI
 import UIKit
 
-// ライブ "ミラーモード"。フロントカメラの鏡像映像に、塗る位置のガイドを重ねる。
-// Studio から「鏡モードで実践」で開き、戻ると元の画面へ復帰する。
+// ライブ "ミラーモード"。フロントカメラの映像に、いま組んでいる化粧 (composition) を
+// 毎フレーム合成して表示する。Studio から「鏡モードで実践」で開き、戻ると元の画面へ。
 //
-// 注意: カメラはシミュレータで動作しないため、--mock-mode では静的プレースホルダを
-// 出す (Maestro / スクリーンショット用)。実機での向き・座標の微調整が前提。
+// 注意: カメラ・MediaPipe・合成はシミュレータで動かないため、--mock-mode では
+// Studio の合成済み画像 (renderedImage) を静的に出すプレースホルダにする。
+// 実機ではフレームレート (合成負荷) と向き (CameraFrameProcessor の orientation) が
+// 調整点になる。
 struct MirrorView: View {
     @Environment(AppState.self) private var appState
     @State private var camera = CameraSessionController()
-
-    // 鏡像プレビュー上に固定で出すモック顔 (中央)。実機が無い環境での確認用。
-    private let mockFace = FaceObservation(
-        boundingBox: CGRect(x: 0.28, y: 0.24, width: 0.44, height: 0.5)
-    )
 
     var body: some View {
         ZStack {
@@ -25,7 +21,7 @@ struct MirrorView: View {
                 header
                     .padding(.top, Theme.Spacing.sm)
                 Spacer(minLength: 0)
-                legend
+                caption
                     .padding(.horizontal, Theme.Spacing.xxl)
                     .padding(.bottom, Theme.Spacing.xxxl)
             }
@@ -44,65 +40,51 @@ struct MirrorView: View {
         } else {
             switch camera.status {
             case .running:
-                ZStack {
-                    CameraPreviewView(session: camera.session)
+                if let frame = camera.renderedFrame {
+                    Image(uiImage: frame)
+                        .resizable()
+                        .scaledToFill()
                         .ignoresSafeArea()
-                    MirrorGuideOverlay(face: camera.face)
-                        .ignoresSafeArea()
-                    if camera.face == nil { faceHint }
+                        .aid("mirror_live_frame")
+                } else {
+                    loadingLayer(message: "顔を画面に映してください")
                 }
             case .denied:
                 deniedLayer
             case .failed(let message):
                 messageLayer(icon: "exclamationmark.triangle", title: "カメラを起動できません", body: message)
             case .idle, .configuring:
-                loadingLayer
+                loadingLayer(message: "カメラを準備中…")
             }
         }
     }
 
+    // モック: Studio で合成済みの化粧画像をそのまま「鏡像」に見立てて表示する。
     private var mockLayer: some View {
         ZStack {
-            RadialGradient(
-                colors: [Theme.Surface.raised, .black],
-                center: .center, startRadius: 40, endRadius: 420
-            )
-            .ignoresSafeArea()
-
-            Ellipse()
-                .stroke(Theme.Plate.dashedEllipse, style: StrokeStyle(lineWidth: 1, dash: [4, 6]))
-                .frame(width: 220, height: 300)
-
-            MirrorGuideOverlay(face: mockFace)
-                .ignoresSafeArea()
-
+            Color.black.ignoresSafeArea()
+            if let display = appState.renderedImage ?? appState.capturedImage {
+                Image(uiImage: display)
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+            }
             Text("[MOCK] ミラーモード")
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
                 .foregroundStyle(Theme.Status.warning)
-                .padding(.top, 180)
+                .padding(.vertical, 6)
+                .padding(.horizontal, Theme.Spacing.md)
+                .background(Theme.Surface.labelBackdrop, in: .capsule)
+                .padding(.top, 100)
                 .aid("mirror_mock_label")
         }
     }
 
-    private var faceHint: some View {
-        VStack {
-            Spacer()
-            Text("顔を画面の中央に合わせてください")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Color.ivory)
-                .padding(.horizontal, Theme.Spacing.lg)
-                .padding(.vertical, Theme.Spacing.sm)
-                .background(Theme.Surface.labelBackdrop, in: .capsule)
-            Spacer().frame(height: 160)
-        }
-        .aid("mirror_face_hint")
-    }
-
-    private var loadingLayer: some View {
+    private func loadingLayer(message: String) -> some View {
         VStack(spacing: Theme.Spacing.md) {
             ProgressView()
                 .tint(Color.ivory)
-            Text("カメラを準備中…")
+            Text(message)
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.Text.primaryFaded)
         }
@@ -166,35 +148,22 @@ struct MirrorView: View {
         )
     }
 
-    // 色 → 意味の凡例。
-    private var legend: some View {
-        HStack(spacing: Theme.Spacing.xl) {
-            legendChip(color: .sulphur, label: "ハイライト")
-            legendChip(color: Theme.Accent.primary, label: "シェーディング")
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, Theme.Spacing.md)
-        .background(Theme.Surface.labelBackdrop, in: .capsule)
-        .aid("mirror_legend")
-    }
-
-    private func legendChip(color: Color, label: String) -> some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(color.opacity(0.5))
-                .overlay(Circle().stroke(color, lineWidth: 1))
-                .frame(width: 12, height: 12)
-            Text(label)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.ivory)
-        }
+    private var caption: some View {
+        Text("鏡を見ながら、いまの仕上がりを確認できます")
+            .font(.system(size: 12, weight: .medium))
+            .foregroundStyle(Color.ivory)
+            .padding(.vertical, Theme.Spacing.sm)
+            .padding(.horizontal, Theme.Spacing.lg)
+            .frame(maxWidth: .infinity)
+            .background(Theme.Surface.labelBackdrop, in: .capsule)
+            .aid("mirror_caption")
     }
 
     // MARK: - Actions
 
     private func startIfPossible() async {
         guard !AppEnvironment.useMockCamera else { return }
-        await camera.start()
+        await camera.start(composition: appState.composition)
     }
 
     private func openSettings() {
