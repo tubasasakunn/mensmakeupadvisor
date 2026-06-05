@@ -93,8 +93,12 @@ nonisolated final class FaceMesh {
 
         let mpImage = try MPImage(uiImage: image)
         let result = try landmarker.detect(image: mpImage)
-        guard let face = result.faceLandmarks.first else {
-            faceMeshLog.warning("detect: no face detected (size=\(Int(image.size.width), privacy: .public)x\(Int(image.size.height), privacy: .public))")
+        // 顔が見つからない場合 faceLandmarks は空だが、稀に空/部分的なランドマーク
+        // 配列が返ることがある。下流の Judge 群は landmarksPx[0...477] を境界チェック
+        // なしで参照するため、478 点そろっていなければ未検出として扱い、ここで弾く。
+        guard let face = result.faceLandmarks.first, face.count >= 478 else {
+            let count = result.faceLandmarks.first?.count ?? 0
+            faceMeshLog.warning("detect: no usable face (landmarks=\(count, privacy: .public), size=\(Int(image.size.width), privacy: .public)x\(Int(image.size.height), privacy: .public))")
             throw FaceMeshError.faceNotDetected
         }
         faceMeshLog.notice("detect: face landmarks=\(face.count, privacy: .public) (image=\(Int(image.size.width), privacy: .public)x\(Int(image.size.height), privacy: .public))")
