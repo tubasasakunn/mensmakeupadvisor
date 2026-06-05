@@ -17,16 +17,24 @@ enum ShareHelper {
             let rootVC = windowScene.keyWindow?.rootViewController
         else { return }
 
+        // Archive 詳細などシート内から共有する場合、root は既にシートを
+        // モーダル表示済みなので root.present は無言で失敗する。
+        // 最前面の presentedViewController まで辿ってから present する。
+        var presenter = rootVC
+        while let presented = presenter.presentedViewController {
+            presenter = presented
+        }
+
         let vc = UIActivityViewController(activityItems: items, applicationActivities: nil)
         if let pop = vc.popoverPresentationController {
-            pop.sourceView = rootVC.view
+            pop.sourceView = presenter.view
             pop.sourceRect = CGRect(
-                x: rootVC.view.bounds.midX,
-                y: rootVC.view.bounds.midY,
+                x: presenter.view.bounds.midX,
+                y: presenter.view.bounds.midY,
                 width: 0, height: 0
             )
             pop.permittedArrowDirections = []
         }
-        rootVC.present(vc, animated: true)
+        presenter.present(vc, animated: true)
     }
 }
