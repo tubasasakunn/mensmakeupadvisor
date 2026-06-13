@@ -1,0 +1,2 @@
+# ストア画像の出力先。python3 scripts/make_store_images.py で生成される。
+# iPhone 6.9": 2868x1320 / iPad 13": 2752x2064。各シェルフ 3〜10 枚。

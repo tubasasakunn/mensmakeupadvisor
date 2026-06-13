@@ -1,269 +1,76 @@
-# Swift 6 記法・命名規則
+---
+paths:
+  - "**/*.swift"
+---
 
-## 言語バージョン・設定
+# Swift コーディング規約
 
-```swift
-// Package.swift or プロジェクト設定
-swiftLanguageVersions: [.v6]
-// Swift Strict Concurrency: Complete
-```
+新しい Swift / SwiftUI アプリで一貫した品質を保つための骨子。
+コードを書く・直すときはこの規約に揃える。新しいパターンを導入したくなったら、
+まず既存コードに前例がないか探すこと。違反の全走査は `/audit-conventions`。
 
-## 命名規則
+> このテンプレートは「集約レイヤを必ず通す」設計を前提にしている。新規プロジェクトでは
+> 早い段階で以下の集約ファイルを作っておく（無ければ作ってから使う）。
 
-### 型・プロトコル
-```swift
-// PascalCase
-struct MakeupProduct {}
-final class AdviceViewModel {}
-protocol ImagePickerServiceProtocol {}
-enum AnalysisState {}
-```
+## 集約レイヤを必ず通す
 
-### 変数・関数・プロパティ
-```swift
-// lowerCamelCase
-var isLoading: Bool
-var makeupProducts: [MakeupProduct]
-func fetchRecommendations() async throws -> [Recommendation]
-```
+| 何を書くとき | 通す場所（推奨ファイル） | 直書きの例（禁止） |
+|---|---|---|
+| 色・余白・角丸・サイズ・フォント | `Tokens.*`（`Design/DesignTokens.swift`） | `.padding(16)` / `.frame(width: 44)` / `Font.custom(...)` |
+| ユーザー向け文字列 | `Strings.*`（`Resources/Strings.swift`） | `Text("完了")` |
+| 日付の表示フォーマット | `DisplayDate.*`（`Resources/DateFormatters.swift`） | ビュー内で `DateFormatter()` を生成 |
+| `@AppStorage` / UserDefaults キー | `AppStorageKeys.*` | `@AppStorage("someKey")` |
+| ハプティクス | `Haptics.*`（`Design/Haptics.swift`） | `UIImpactFeedbackGenerator` 直叩き |
+| ディープリンク構成要素 | `DeepLink`（`AppNavigator.swift`） | `url.scheme == "..."` の直比較 |
 
-### 定数
-```swift
-// lowerCamelCase（グローバル定数も同じ）
-let maxImageSize: CGFloat = 1024
-let defaultAnimationDuration: Double = 0.3
-// enum namespace で管理する
-enum Constants {
-    enum Layout {
-        static let cornerRadius: CGFloat = 16
-        static let cardPadding: CGFloat = 20
-    }
-    enum API {
-        static let baseURL = "https://api.example.com/v1"
-        static let timeoutInterval: TimeInterval = 30
-    }
-}
-```
+- 集約先に欲しい定数が無ければ**先に定数を足してから**使う。意味の違う既存定数の
+  流用（別画面用の文言を借りる等）はしない。
+- 例外：別ターゲット（ウィジェット拡張等）からは本体の `Tokens` / `Strings` が
+  見えないため、拡張内のリテラルは許容（コメントで対応元を示す）。
 
-### ファイル名
-```swift
-// 型名と 1:1 対応
-HomeView.swift          // struct HomeView
-AdviceViewModel.swift   // final class AdviceViewModel
-MakeupProduct.swift     // struct MakeupProduct
-```
+## 安全性
 
-## 型宣言
+- **強制アンラップ `!` 禁止**。`guard let` / `if let` で逃がす。
+  例外は `layerClass` オーバーライド済みビューの `layer as!`（型が構造的に保証される）等、
+  構造で保証できる箇所のみ（理由コメント必須）。
+- **`fatalError` は最後の砦**。永続化スタックの起動時フォールバック最終段のような
+  「ここまで来たら継続不能」な箇所だけ。それ以外は `Logger` でログ + early return。
+- **エラーを握りつぶさない**。`try?` を使ってよいのは「失敗しても続行が正しい」と
+  コメントで説明できる箇所だけ。保存・生成系の失敗は必ず `Logger` に残す
+  （`privacy:` 指定を忘れない）。`print()` は使わない。
+- SwiftData + CloudKit ミラーリングを使うなら：モデルに `@Attribute(.unique)` を
+  使わない（CloudKit 非互換。一意性は upsert で担保）。新フィールドは optional か
+  デフォルト値付き。長い `await` を跨いだモデル書き込みの前は主キーで refetch する
+  （ゾンビ書き込みクラッシュ防止）。判断したら ADR に残す。
 
-### struct vs class
-```swift
-// データモデル・値型 → struct（デフォルト）
-struct MakeupProduct: Identifiable, Hashable, Sendable {
-    let id: UUID
-    var name: String
-    var brand: String
-}
+## 構造
 
-// ViewModel・サービス → final class + @Observable
-@Observable
-final class HomeViewModel {
-    var products: [MakeupProduct] = []
-}
+- 新規の参照型は `@Observable`。`ObservableObject` / `@Published` / `@StateObject` は使わない。
+  所有は `@State`、共有は `@Environment`、受け取りは素の `let`。
+- ファイルは **500 行を超えたら分割を検討**。
+- ビューの分割は「computed property で body を返す」より「サブビュー struct の抽出」を優先
+  （Instruments の SwiftUI 計測で原因追跡できる単位になる）。
+- 触ったファイルに `// MARK: -` 区分けが無ければ追加する。
+- Xcode の `PBXFileSystemSynchronizedRootGroup` を採用しているプロジェクトでは
+  `.swift` を増やすだけでターゲットに入る（`pbxproj` 編集不要・してはならない）。
+  ファイルを**削除**したら `git status` の `deleted:` を必ず確認する
+  （「ファイルだけ消えてビルドが直る」静かな事故が起きやすい）。
 
-// SwiftData モデル → final class + @Model
-@Model
-final class AdviceHistory {
-    var createdAt: Date
-    var imageData: Data?
-}
-```
+## スタイル
 
-### プロトコル準拠の順序
-```swift
-// 1. 継承 2. プロトコル（アルファベット順）
-struct Product: Identifiable, Codable, Hashable, Sendable {
-    // ...
-}
-```
+- `!(x?.isEmpty ?? true)` のような二重否定は `x?.isEmpty == false` と書く。
+- `.onChange(of:)` で新旧値を使わないときは引数なしクロージャ形式（iOS 17+）を使う。
+- `DispatchQueue.main.async` を書かない。`@MainActor` 文脈の 1 ターン遅延は `Task { }` で足りる。
 
-## Swift 6 並行処理
+## コメント
 
-### @Observable ViewModel（必須パターン）
-```swift
-// ObservableObject / @Published は使わない
-@Observable
-final class AdviceViewModel {
-    // @Published 不要 — @Observable が自動追跡
-    var analysisState: AnalysisState = .idle
-    var recommendations: [Recommendation] = []
-    var errorMessage: String?
+- 「なぜそうなっているか」を書く。何をしているかは命名で表す。
+- 仕様の根拠は仕様書のセクション番号、設計判断の経緯は `docs/adr/NNNN` を引用する。
+- 一見「統一できそうで統一してはいけない」コードには、その旨のコメントを必ず残す。
 
-    func analyze(image: UIImage) async {
-        analysisState = .loading
-        do {
-            recommendations = try await analysisService.analyze(image: image)
-            analysisState = .success
-        } catch {
-            errorMessage = error.localizedDescription
-            analysisState = .failure(error)
-        }
-    }
-}
-```
+## 変更を確定する前に
 
-### Actor isolation
-```swift
-// UI 更新は @MainActor
-@MainActor
-final class AppState {
-    var isTabBarVisible: Bool = true
-}
-
-// バックグラウンド処理は actor
-actor ImageCache {
-    private var cache: [String: UIImage] = [:]
-
-    func store(_ image: UIImage, forKey key: String) {
-        cache[key] = image
-    }
-
-    func image(forKey key: String) -> UIImage? {
-        cache[key]
-    }
-}
-```
-
-### async/await パターン
-```swift
-// ❌ 避ける: DispatchQueue.main.async
-// ✅ 使う: await MainActor.run / @MainActor
-
-// Task の起動
-func loadData() {
-    Task {
-        await viewModel.fetchProducts()
-    }
-}
-
-// .task modifier（推奨）
-.task {
-    await viewModel.fetchProducts()
-}
-
-// 並列実行
-async let products = fetchProducts()
-async let user = fetchUser()
-let (p, u) = try await (products, user)
-```
-
-### Sendable
-```swift
-// 値型は原則 Sendable 準拠
-struct Recommendation: Sendable {
-    let id: UUID
-    let productName: String
-    let reason: String
-}
-
-// @unchecked Sendable は禁止
-// ❌ final class Service: @unchecked Sendable {}
-```
-
-## エラーハンドリング
-
-```swift
-// typed throws（Swift 6）
-enum APIError: Error, LocalizedError {
-    case networkUnavailable
-    case unauthorized
-    case notFound(resource: String)
-    case serverError(statusCode: Int)
-
-    var errorDescription: String? {
-        switch self {
-        case .networkUnavailable: "ネットワークに接続できません"
-        case .unauthorized: "認証が必要です"
-        case .notFound(let resource): "\(resource) が見つかりません"
-        case .serverError(let code): "サーバーエラー (\(code))"
-        }
-    }
-}
-
-// throws(APIError) — typed throws
-func fetchProduct(id: UUID) async throws(APIError) -> MakeupProduct {
-    // ...
-}
-```
-
-## Extensions
-
-```swift
-// 機能ごとにファイルを分ける
-// Extensions/View+Glass.swift
-// Extensions/Color+Brand.swift
-// Extensions/Date+Formatted.swift
-
-extension View {
-    func cardStyle() -> some View {
-        self
-            .padding(Constants.Layout.cardPadding)
-            .glassEffect(.regular, in: .rect(cornerRadius: Constants.Layout.cornerRadius))
-    }
-}
-
-extension Color {
-    static let brandPrimary = Color("BrandPrimary")
-    static let brandSecondary = Color("BrandSecondary")
-}
-```
-
-## Access Control
-
-```swift
-// デフォルトは internal（明示不要）
-// View から直接アクセスしない ViewModel の実装は private
-@Observable
-final class HomeViewModel {
-    var products: [MakeupProduct] = []        // internal: View が読む
-    private var cancellables: Set<AnyCancellable> = []  // private: 外に見せない
-
-    func loadProducts() async { /* ... */ }   // internal: View が呼ぶ
-    private func buildRequest() -> URLRequest { /* ... */ }  // private
-}
-```
-
-## if/switch 式（Swift 5.9+）
-
-```swift
-// if 式
-let color: Color = if isSelected { .brandPrimary } else { .gray }
-
-// switch 式
-let message: String = switch state {
-case .idle: "準備完了"
-case .loading: "分析中..."
-case .success: "完了"
-case .failure: "エラーが発生しました"
-}
-```
-
-## 禁止パターン
-
-```swift
-// ❌ ObservableObject
-class ViewModel: ObservableObject { @Published var x = 0 }
-
-// ❌ DispatchQueue.main
-DispatchQueue.main.async { self.isLoading = false }
-
-// ❌ NavigationView
-NavigationView { ... }
-
-// ❌ UIHostingController を乱用
-// ❌ @objc / NSObject 継承（SwiftUI 不要なら）
-// ❌ force unwrap（!）— guard let / if let を使う
-let value = optionalValue!  // 禁止
-
-// ❌ as! キャスト — guard let / if let as? を使う
-let vc = viewController as! MyViewController  // 禁止
-```
+1. macOS 環境なら `/verify-build` でビルド検証（`.swift` 由来 warning/error = 0 を維持）。
+   ビルドできない環境では diff 全体のコンパイル整合性レビューで代替し、その旨を明記する。
+2. `/audit-conventions` で規約違反の混入をチェック。
+3. アーキテクチャ・データモデル・依存・並行性の判断をしたら `/adr` で記録する。

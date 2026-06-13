@@ -1,0 +1,59 @@
+{
+  "_comment": "ストア画像（App Store スクリーンショット）の各スライド定義。make_store_images.py が読む。アプリに合わせて文言・素材・並びを書き換える。並びは ASO 定石で『コンセプト→コア操作→低コストの記録→振り返り→プライバシー』。先頭 1〜3 枚が検索結果に露出する。",
+  "slides": [
+    {
+      "out": "01_hero.png",
+      "shot": "screen-hero.png",
+      "scene": "sunset",
+      "footage": "hero",
+      "accent": "evening",
+      "headline": "1 行目の\nキャッチコピー。",
+      "sub": "アプリのいちばんの価値を\n2 行で言い切る。",
+      "phone_right": true,
+      "show_wordmark": true,
+      "show_dots": true
+    },
+    {
+      "out": "02_core.png",
+      "shot": "screen-core.png",
+      "scene": "morning",
+      "footage": "core",
+      "accent": "forenoon",
+      "headline": "コア操作を\nひとことで。",
+      "sub": "むずかしくない。\nそれだけ、を伝える。",
+      "phone_right": false,
+      "icon_h": 250
+    },
+    {
+      "out": "03_detail.png",
+      "shot": "screen-detail.png",
+      "scene": "coffee",
+      "footage": "detail",
+      "accent": "afternoon",
+      "headline": "ふたつめの\n特徴。",
+      "sub": "任意の入力・低コストの\n記録などを訴求。",
+      "phone_right": true
+    },
+    {
+      "out": "04_review.png",
+      "shot": "screen-review.png",
+      "scene": "park",
+      "footage": "review",
+      "accent": "morning",
+      "headline": "振り返りの\n体験。",
+      "sub": "たまっていく・見返せる\n価値を伝える。",
+      "phone_right": false,
+      "icon_h": 250
+    },
+    {
+      "out": "05_privacy.png",
+      "shot": "screen-privacy.png",
+      "scene": null,
+      "footage": null,
+      "accent": "midnight",
+      "headline": "安心の\n約束。",
+      "sub": "プライバシー・ローカル完結\nなどの信頼軸で締める。",
+      "phone_right": true
+    }
+  ]
+}

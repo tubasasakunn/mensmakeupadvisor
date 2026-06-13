@@ -1,0 +1,72 @@
+# release/<version>/ の文言・スクショを App Store Connect へ反映するレーン。
+# 起動は .github/workflows/appstore-metadata.yml（main push の release/** 変更時）。
+# バイナリ（ipa）のアップロードはここでは扱わない。
+#
+# アプリ固有値（bundle id・連絡先メール）は ../appstore.config.json から読む。
+
+require "json"
+
+CONFIG = JSON.parse(File.read(File.expand_path("../appstore.config.json", __dir__)))
+APP_IDENTIFIER = CONFIG.dig("app", "bundle_id")
+DEFAULT_EMAIL = CONFIG.dig("appstore", "contact_email")
+
+default_platform(:ios)
+
+platform :ios do
+  desc "release/<version>/ のメタデータとスクリーンショットを App Store Connect へ"
+  lane :push_metadata do
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_content: ENV.fetch("ASC_KEY_CONTENT"),
+      is_key_content_base64: true
+    )
+
+    # App Review 情報（審査の連絡先）。一度も保存されていないアプリでは
+    # deliver が内部の fetch_app_store_review_detail で "No data" クラッシュする
+    # （fastlane#21272）。app_review_information を渡すと無ければ新規作成される
+    # ため、その回避を兼ねて**必ず非空で**渡す。値は Secrets で上書き可能。
+    # 注意：未設定の GitHub Secrets は env 上「空文字列」になり、Ruby では
+    # 空文字列も truthy。`ENV[...] || デフォルト` では拾えないので presence で弾く。
+    presence = ->(value) { value.to_s.strip.empty? ? nil : value }
+
+    # ASC は電話番号を E.164（+国番号）でしか受け付けない。
+    # 国内表記（090-xxxx-xxxx 等）は +81 へ正規化し、それでも '+' 始まりに
+    # ならない値は外して続行する（電話は審査提出までに入っていればよい）。
+    phone = presence.call(ENV["ASC_CONTACT_PHONE"])
+    if phone
+      digits = phone.gsub(/[^\d+]/, "")
+      digits = "+81#{digits[1..]}" if digits.start_with?("0")
+      phone = digits.start_with?("+") ? digits : nil
+      UI.important("ASC_CONTACT_PHONE を E.164 に正規化できないため除外") if phone.nil?
+    end
+
+    review_info = {
+      first_name: presence.call(ENV["ASC_CONTACT_FIRST_NAME"]),
+      last_name: presence.call(ENV["ASC_CONTACT_LAST_NAME"]),
+      phone_number: phone,
+      email_address: presence.call(ENV["ASC_CONTACT_EMAIL"]) || DEFAULT_EMAIL
+    }.compact
+
+    # 年齢制限指定。release/<version>/rating.json から反映する。
+    version = ENV.fetch("APP_VERSION")
+    rating_path = File.expand_path("../release/#{version}/rating.json", __dir__)
+
+    deliver(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      # 対象バージョン。ASC に無ければ新規作成される（sync スクリプトが
+      # pbxproj の MARKETING_VERSION から導出して環境変数で渡す）
+      app_version: version,
+      metadata_path: "fastlane/metadata",
+      screenshots_path: "fastlane/screenshots",
+      app_rating_config_path: (File.exist?(rating_path) ? rating_path : nil),
+      app_review_information: review_info,
+      overwrite_screenshots: true,
+      skip_binary_upload: true,
+      run_precheck_before_submit: false,
+      submit_for_review: false,
+      force: true  # HTML プレビューの対話確認を CI でスキップ
+    )
+  end
+end

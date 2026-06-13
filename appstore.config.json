@@ -1,0 +1,48 @@
+{
+  "_comment": "swift-base 共通設定。新しいアプリにコピーしたら、まずこのファイルの値を全部置き換える。scripts/*.py・fastlane/Fastfile・post/_brand.py がここを読む。",
+
+  "app": {
+    "name": "MyApp",
+    "reading": "マイアップ",
+    "bundle_id": "com.example.myapp",
+    "scheme": "MyApp",
+    "xcodeproj": "MyApp.xcodeproj",
+    "url_scheme": "myapp",
+    "deployment_target": "26.0"
+  },
+
+  "appstore": {
+    "primary_locale": "ja",
+    "contact_email": "you@example.com",
+    "github_repo": "owner/repo",
+    "primary_category": "PHOTO_AND_VIDEO",
+    "secondary_category": "LIFESTYLE",
+    "marketing_domain": "https://myapp.example.com"
+  },
+
+  "brand": {
+    "_comment": "ストア画像・SNS 画像の共通カラートークン。アプリの DesignTokens と揃える。RGB 0-255。",
+    "bg": [247, 244, 240],
+    "ink": [42, 37, 32],
+    "sub_ink": [111, 103, 96],
+    "card": [255, 255, 255],
+    "wordmark": "MyApp",
+    "accents": {
+      "morning": [232, 168, 124],
+      "forenoon": [242, 201, 76],
+      "afternoon": [168, 197, 160],
+      "evening": [224, 123, 84],
+      "night": [155, 114, 207],
+      "midnight": [91, 127, 166]
+    },
+    "icon_color": [197, 111, 82]
+  },
+
+  "fonts": {
+    "_comment": "見出し用日本語フォントは OFL の Noto を実行時に /tmp へ取得する。英字ロゴ用フォントはアプリ同梱の ttf 相対パス（無ければ Noto Sans にフォールバック）。",
+    "jp_sans_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP%5Bwght%5D.ttf",
+    "jp_serif_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/notoserifjp/NotoSerifJP%5Bwght%5D.ttf",
+    "latin_sans_ttf": "",
+    "latin_mono_ttf": ""
+  }
+}
