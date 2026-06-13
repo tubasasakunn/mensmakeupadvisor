@@ -65,7 +65,7 @@ struct OnboardingChapterSheet: View {
                 .font(Theme.Typography.Display.title3Light)
                 .italic()
                 .foregroundStyle(isCurrent ? Color.brandPrimary : Color.inkSecondary)
-                .frame(width: 28, alignment: .leading)
+                .frame(width: Theme.Size.Column.chapter, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(ch.title)

@@ -51,7 +51,7 @@ struct AnalyzingView: View {
             HStack(spacing: 6) {
                 Circle()
                     .fill(errorMessage == nil ? Theme.Plate.renderingTint : Color.brandPrimary)
-                    .frame(width: 6, height: 6)
+                    .frame(width: Theme.Size.Dot.medium, height: Theme.Size.Dot.medium)
                 Text(errorMessage == nil ? "ANALYZING" : "FAILED")
                     .font(Theme.Typography.Data.smallMedium)
                     .kerning(2)
@@ -181,7 +181,7 @@ struct AnalyzingView: View {
                         .animation(.easeInOut(duration: 0.4), value: progress)
                 }
             }
-            .frame(height: 2)
+            .frame(height: Theme.Size.Stroke.regular)
             .padding(.horizontal, 24)
             .aid("analyzing_progress_bar")
         }

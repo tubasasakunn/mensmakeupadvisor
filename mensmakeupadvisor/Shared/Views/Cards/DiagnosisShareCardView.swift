@@ -45,7 +45,7 @@ struct DiagnosisShareCardView: View {
                 .padding(.horizontal, 28)
             }
         }
-        .frame(width: 320, height: 568)
+        .frame(width: Theme.Size.ShareCard.width, height: Theme.Size.ShareCard.height)
     }
 
     // MARK: - Background
@@ -95,13 +95,13 @@ struct DiagnosisShareCardView: View {
             Text(result.grade)
                 .font(Theme.Typography.Data.heroBlack)
                 .foregroundStyle(Color.appBackground)
-                .frame(width: 52, height: 52)
+                .frame(width: Theme.Size.ShareCard.avatar, height: Theme.Size.ShareCard.avatar)
                 .background(result.gradeColor)
                 .clipShape(RoundedRectangle(cornerRadius: 2))
                 .padding(.trailing, 28)
                 .padding(.bottom, 10)
         }
-        .frame(width: 320, height: 200)
+        .frame(width: Theme.Size.ShareCard.width, height: Theme.Size.ShareCard.diagnosisBodyHeight)
         .clipped()
         .overlay(
             LinearGradient(

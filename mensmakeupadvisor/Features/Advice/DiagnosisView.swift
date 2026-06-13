@@ -151,7 +151,7 @@ struct DiagnosisView: View {
                     Image(systemName: icon)
                         .font(Theme.Typography.UI.title3Semibold)
                         .foregroundStyle(Color.ivory)
-                        .frame(width: 24)
+                        .frame(width: Theme.Size.Column.iconWide)
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)

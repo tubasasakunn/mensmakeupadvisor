@@ -67,6 +67,6 @@ struct HowtoShadowAnimation: View {
 
 #Preview {
     HowtoShadowAnimation()
-        .frame(width: 260, height: 260)
+        .frame(width: Theme.Size.Canvas.howto, height: Theme.Size.Canvas.howto)
         .background(Theme.Howto.canvas)
 }

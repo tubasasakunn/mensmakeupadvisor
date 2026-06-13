@@ -141,25 +141,25 @@ struct SplashView: View {
             ZStack {
                 // 左上
                 CrossMark()
-                    .frame(width: 10, height: 10)
+                    .frame(width: Theme.Size.Dot.large, height: Theme.Size.Dot.large)
                     .foregroundStyle(Theme.Splash.cornerMark)
                     .position(x: offset, y: offset)
 
                 // 右上
                 CrossMark()
-                    .frame(width: 10, height: 10)
+                    .frame(width: Theme.Size.Dot.large, height: Theme.Size.Dot.large)
                     .foregroundStyle(Theme.Splash.cornerMark)
                     .position(x: size.width - offset, y: offset)
 
                 // 左下
                 CrossMark()
-                    .frame(width: 10, height: 10)
+                    .frame(width: Theme.Size.Dot.large, height: Theme.Size.Dot.large)
                     .foregroundStyle(Theme.Splash.cornerMark)
                     .position(x: offset, y: size.height - offset)
 
                 // 右下
                 CrossMark()
-                    .frame(width: 10, height: 10)
+                    .frame(width: Theme.Size.Dot.large, height: Theme.Size.Dot.large)
                     .foregroundStyle(Theme.Splash.cornerMark)
                     .position(x: size.width - offset, y: size.height - offset)
             }

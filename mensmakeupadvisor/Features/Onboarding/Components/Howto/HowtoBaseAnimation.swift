@@ -1,5 +1,10 @@
 import SwiftUI
 
+private enum Layout {
+    nonisolated static let arrowTipWidth: CGFloat = 12
+    nonisolated static let arrowTipHeight: CGFloat = 10
+}
+
 struct HowtoBaseAnimation: View {
     private struct Dot {
         let x: CGFloat, y: CGFloat, r: CGFloat
@@ -92,7 +97,7 @@ struct HowtoBaseAnimation: View {
 
             ArrowTipShape()
                 .fill(color)
-                .frame(width: 12, height: 10)
+                .frame(width: Layout.arrowTipWidth, height: Layout.arrowTipHeight)
                 .rotationEffect(angle)
                 .position(x: arrow.to.x, y: arrow.to.y)
                 .opacity(headReveal)
@@ -115,6 +120,6 @@ private struct ArrowTipShape: Shape {
 
 #Preview {
     HowtoBaseAnimation()
-        .frame(width: 260, height: 260)
+        .frame(width: Theme.Size.Canvas.howto, height: Theme.Size.Canvas.howto)
         .background(Theme.Howto.canvas)
 }

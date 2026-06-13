@@ -21,7 +21,7 @@ struct GoalPageView: View {
                 HStack(alignment: .top, spacing: 14) {
                     Rectangle()
                         .fill(Color.brandPrimary)
-                        .frame(width: 3)
+                        .frame(width: Theme.Size.Stroke.bold)
 
                     Text(quote)
                         .font(Theme.Typography.Display.calloutMedium)
@@ -70,7 +70,7 @@ struct GoalPageView: View {
             Image(systemName: symbol)
                 .font(Theme.Typography.UI.titleLarge)
                 .foregroundStyle(Theme.Accent.primaryFaded)
-                .frame(width: 56, height: 56)
+                .frame(width: Theme.Size.Control.circleXLarge, height: Theme.Size.Control.circleXLarge)
                 .background(Theme.Surface.glassWeak)
                 .clipShape(Circle())
 

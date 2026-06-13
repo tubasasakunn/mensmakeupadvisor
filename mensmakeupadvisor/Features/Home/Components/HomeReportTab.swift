@@ -128,7 +128,7 @@ struct HomeReportTab: View {
                         Text("\(score.score)pt")
                             .font(Theme.Typography.Data.base)
                             .foregroundStyle(Theme.Text.secondary)
-                            .frame(width: 44, alignment: .trailing)
+                            .frame(width: Theme.Size.Column.score, alignment: .trailing)
                     }
                     .overlay(alignment: .bottom) {
                         HairlineDivider().offset(y: 7)

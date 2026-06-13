@@ -4,6 +4,12 @@ import UIKit
 // 化粧 (Studio) / 試す (Try) 結果の共有カード。
 // 縦長 9:16 (320×568) で診断カードとビジュアルを揃え、主役は renderedImage。
 // 下半分にどの化粧単位がどれくらい乗っているかを 4 軸の棒で要約する。
+private enum Layout {
+    nonisolated static let barWidth: CGFloat = 6
+    nonisolated static let barMaxHeight: CGFloat = 56
+    nonisolated static let barMinHeight: CGFloat = 2
+}
+
 struct MakeupShareCardView: View {
     enum Mode {
         case styled   // Studio: 仕上げた状態
@@ -68,7 +74,7 @@ struct MakeupShareCardView: View {
                 .padding(.horizontal, 28)
             }
         }
-        .frame(width: 320, height: 568)
+        .frame(width: Theme.Size.ShareCard.width, height: Theme.Size.ShareCard.height)
     }
 
     // MARK: - Background
@@ -142,7 +148,7 @@ struct MakeupShareCardView: View {
                         .fill(Theme.Surface.glassWeak)
                 }
             }
-            .frame(width: 320, height: 220)
+            .frame(width: Theme.Size.ShareCard.width, height: Theme.Size.ShareCard.bodyHeight)
             .clipped()
             .overlay(Theme.Surface.shareCardOverlay)
             .overlay(
@@ -156,7 +162,7 @@ struct MakeupShareCardView: View {
             HStack(spacing: 6) {
                 Circle()
                     .fill(Color.brandPrimary)
-                    .frame(width: 5, height: 5)
+                    .frame(width: Theme.Size.Dot.small, height: Theme.Size.Dot.small)
                 Text(mode == .styled ? "RENDERED" : "TRY-ON")
                     .font(Theme.Typography.Data.tinyMedium)
                     .foregroundStyle(Color.ivory)
@@ -168,7 +174,7 @@ struct MakeupShareCardView: View {
             .padding(.leading, 18)
             .padding(.bottom, 18)
         }
-        .frame(width: 320, height: 220)
+        .frame(width: Theme.Size.ShareCard.width, height: Theme.Size.ShareCard.bodyHeight)
     }
 
     // MARK: - Statement
@@ -218,10 +224,10 @@ struct MakeupShareCardView: View {
                     ZStack(alignment: .bottom) {
                         Capsule()
                             .fill(Color.ivory.opacity(0.12))
-                            .frame(width: 6, height: 56)
+                            .frame(width: Layout.barWidth, height: Layout.barMaxHeight)
                         Capsule()
                             .fill(Color.ivory.opacity(0.85))
-                            .frame(width: 6, height: max(2, CGFloat(axis.value) * 56))
+                            .frame(width: Layout.barWidth, height: max(Layout.barMinHeight, CGFloat(axis.value) * Layout.barMaxHeight))
                     }
                     Text(axis.label)
                         .font(Theme.Typography.UI.caption2Medium)

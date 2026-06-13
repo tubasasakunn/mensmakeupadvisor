@@ -90,7 +90,7 @@ struct PrincipleItemRow: View {
         .overlay(
             Rectangle()
                 .fill(Theme.Plate.scanLineGlow)
-                .frame(width: 2),
+                .frame(width: Theme.Size.Stroke.regular),
             alignment: .leading
         )
     }

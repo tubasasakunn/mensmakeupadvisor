@@ -37,7 +37,7 @@ struct ScreenHeader<Trailing: View>: View {
             trailing()
         }
         .padding(.horizontal, Theme.Spacing.xxl)
-        .frame(height: 44)
+        .frame(height: Theme.Size.Control.hitTarget)
     }
 
     @ViewBuilder
@@ -79,7 +79,7 @@ struct ScreenHeader<Trailing: View>: View {
             Image(systemName: "xmark")
                 .font(Theme.Typography.UI.footnoteSemibold)
                 .foregroundStyle(Theme.Text.primarySoft)
-                .frame(width: 30, height: 30)
+                .frame(width: Theme.Size.Control.circleSmall, height: Theme.Size.Control.circleSmall)
                 .background(Theme.Surface.panelRaised, in: .circle)
                 .overlay(
                     Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
@@ -149,7 +149,7 @@ extension ScreenHeader where Trailing == EmptyView {
                         Image(systemName: "square.and.arrow.up")
                             .font(Theme.Typography.UI.calloutSemibold)
                             .foregroundStyle(Theme.Text.primarySoft)
-                            .frame(width: 30, height: 30)
+                            .frame(width: Theme.Size.Control.circleSmall, height: Theme.Size.Control.circleSmall)
                             .background(Theme.Surface.panelRaised, in: .circle)
                             .overlay(
                                 Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)

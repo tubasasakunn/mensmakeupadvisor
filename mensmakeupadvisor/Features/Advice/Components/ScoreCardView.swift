@@ -44,7 +44,7 @@ struct ScoreCardView: View {
             if score.score >= 75 {
                 Rectangle()
                     .fill(score.gradeColor)
-                    .frame(width: 2)
+                    .frame(width: Theme.Size.Stroke.regular)
                     .offset(x: -10)
             }
         }
@@ -74,7 +74,7 @@ struct ScoreCardView: View {
             Text(score.grade)
                 .font(Theme.Typography.UI.title3Heavy)
                 .foregroundStyle(score.gradeColor)
-                .frame(minWidth: 24, alignment: .trailing)
+                .frame(minWidth: Theme.Size.Column.iconWide, alignment: .trailing)
 
             Text("\(score.score) 点")
                 .font(Theme.Typography.UI.subheadlineMedium)
@@ -93,7 +93,7 @@ struct ScoreCardView: View {
             ZStack(alignment: .leading) {
                 Capsule()
                     .fill(Color.lineColor)
-                    .frame(height: 3)
+                    .frame(height: Theme.Size.Stroke.bold)
 
                 Capsule()
                     .fill(score.gradeColor.opacity(0.8))
@@ -104,7 +104,7 @@ struct ScoreCardView: View {
                     )
             }
         }
-        .frame(height: 3)
+        .frame(height: Theme.Size.Stroke.bold)
     }
 
     private var adviceText: some View {

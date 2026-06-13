@@ -1,5 +1,9 @@
 import SwiftUI
 
+private enum Layout {
+    nonisolated static let animationMaxWidth: CGFloat = 260
+}
+
 struct HowtoPageView: View {
     let page: OnboardingPage
 
@@ -36,7 +40,7 @@ struct HowtoPageView: View {
             if let step = animatedStep {
                 HowtoAnimationView(step: step)
                     .aspectRatio(1, contentMode: .fit)
-                    .frame(maxWidth: 260)
+                    .frame(maxWidth: Layout.animationMaxWidth)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.bottom, 16)
             }

@@ -15,7 +15,7 @@ struct DiagnosisHeroSection: View {
                 Text(result.grade)
                     .font(Theme.Typography.UI.title3Heavy)
                     .foregroundStyle(Color.appBackground)
-                    .frame(width: 44, height: 44)
+                    .frame(width: Theme.Size.Control.hitTarget, height: Theme.Size.Control.hitTarget)
                     .background(result.gradeColor)
                     .clipShape(RoundedRectangle(cornerRadius: 3))
                     .shadow(color: result.gradeColor.opacity(0.5), radius: 8, x: 0, y: 2)

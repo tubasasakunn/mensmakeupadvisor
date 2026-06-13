@@ -117,6 +117,6 @@ struct GlassDivider: View {
     var body: some View {
         Rectangle()
             .fill(Theme.Line.outlineIvorySoft)
-            .frame(height: 1)
+            .frame(height: Theme.Size.Stroke.hairline)
     }
 }

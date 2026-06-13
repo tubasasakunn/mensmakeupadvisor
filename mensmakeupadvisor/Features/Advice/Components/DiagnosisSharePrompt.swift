@@ -1,6 +1,11 @@
 import SwiftUI
 import UIKit
 
+private enum Layout {
+    nonisolated static let miniCardW: CGFloat = 68
+    nonisolated static let miniCardH: CGFloat = 88
+}
+
 struct DiagnosisSharePrompt: View {
     let result: AnalysisResult
     @State private var isRendering = false
@@ -11,7 +16,7 @@ struct DiagnosisSharePrompt: View {
         } label: {
             HStack(spacing: Theme.Spacing.lg) {
                 miniCardPreview
-                    .frame(width: 68, height: 88)
+                    .frame(width: Layout.miniCardW, height: Layout.miniCardH)
 
                 VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                     Text("結果をシェアする")
@@ -27,7 +32,7 @@ struct DiagnosisSharePrompt: View {
 
                 if isRendering {
                     ProgressView().tint(Color.ivory).scaleEffect(0.7)
-                        .frame(width: 40, height: 40)
+                        .frame(width: Theme.Size.Control.circleMedium, height: Theme.Size.Control.circleMedium)
                 } else {
                     // 親が glassEffect を持つので、ここでは glass を重ねず
                     // 塗りつぶしの円のみ。grade 色ではなく bordeaux 固定で
@@ -35,7 +40,7 @@ struct DiagnosisSharePrompt: View {
                     Image(systemName: "arrow.up.forward")
                         .font(Theme.Typography.UI.bodyLargeSemibold)
                         .foregroundStyle(Color.ivory)
-                        .frame(width: 40, height: 40)
+                        .frame(width: Theme.Size.Control.circleMedium, height: Theme.Size.Control.circleMedium)
                         .background(Circle().fill(Theme.Accent.primary))
                 }
             }

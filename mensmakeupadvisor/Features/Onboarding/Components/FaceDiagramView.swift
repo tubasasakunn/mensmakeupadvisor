@@ -1,6 +1,11 @@
 import SwiftUI
 
 // 顔の線画ダイアグラム。region 引数で強調部分を色分けする。
+private enum Layout {
+    nonisolated static let diagramWidth: CGFloat = 160
+    nonisolated static let diagramHeight: CGFloat = 190
+}
+
 struct FaceDiagramView: View {
     let region: String  // "base", "highlight", "shadow", "eyes", "brows"
     var caption: String = ""
@@ -123,7 +128,7 @@ struct FaceDiagramView: View {
                     ctx.draw(figText, at: CGPoint(x: w - 4, y: h - 4), anchor: .bottomTrailing)
                 }
             }
-            .frame(width: 160, height: 190)
+            .frame(width: Layout.diagramWidth, height: Layout.diagramHeight)
         }
     }
 }

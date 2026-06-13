@@ -1,5 +1,9 @@
 import SwiftUI
 
+private enum Layout {
+    nonisolated static let sparkle: CGFloat = 24
+}
+
 struct HowtoHighlightAnimation: View {
     private struct Spot {
         let cx: CGFloat, cy: CGFloat
@@ -110,7 +114,7 @@ struct HowtoHighlightAnimation: View {
         ])
         return SparkleShape()
             .fill(Theme.Howto.highlightCore)
-            .frame(width: 24, height: 24)
+            .frame(width: Layout.sparkle, height: Layout.sparkle)
             .rotationEffect(.degrees(rotation))
             .scaleEffect(scale)
             .opacity(opacity)
@@ -135,6 +139,6 @@ private struct SparkleShape: Shape {
 
 #Preview {
     HowtoHighlightAnimation()
-        .frame(width: 260, height: 260)
+        .frame(width: Theme.Size.Canvas.howto, height: Theme.Size.Canvas.howto)
         .background(Theme.Howto.canvas)
 }

@@ -1,5 +1,9 @@
 import SwiftUI
 
+private enum Layout {
+    nonisolated static let barTrack: CGFloat = 60
+}
+
 extension DiagnosisShareCardView {
     var scoreWithGrade: some View {
         HStack(alignment: .bottom, spacing: 0) {
@@ -62,16 +66,16 @@ extension DiagnosisShareCardView {
                         Capsule().fill(Color.lineColor)
                         Capsule()
                             .fill(score.gradeColor.opacity(0.8))
-                            .frame(width: 60 * CGFloat(score.score) / 100.0)
+                            .frame(width: Layout.barTrack * CGFloat(score.score) / 100.0)
                     }
-                    .frame(width: 60, height: 2)
+                    .frame(width: Layout.barTrack, height: Theme.Size.Stroke.regular)
                     .padding(.horizontal, 8)
 
                     Text(score.grade)
                         .font(Theme.Typography.Display.calloutLight)
                         .italic()
                         .foregroundStyle(score.gradeColor)
-                        .frame(minWidth: 18, alignment: .trailing)
+                        .frame(minWidth: Theme.Size.Column.narrow, alignment: .trailing)
                 }
             }
         }

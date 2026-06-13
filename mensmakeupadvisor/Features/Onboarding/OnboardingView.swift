@@ -1,5 +1,9 @@
 import SwiftUI
 
+private enum Layout {
+    nonisolated static let hintBarHeight: CGFloat = 60
+}
+
 struct OnboardingView: View {
     @Environment(AppState.self) private var appState
     @State private var currentPage = 0
@@ -96,7 +100,7 @@ struct OnboardingView: View {
                     .animation(.easeInOut(duration: 0.25), value: currentPage)
             }
         }
-        .frame(height: 1.5)
+        .frame(height: Theme.Size.Stroke.thin)
         .padding(.horizontal, 28)
         .padding(.bottom, 6)
         .aid("onboarding_progress_bar")
@@ -169,7 +173,7 @@ struct OnboardingView: View {
                 }
             }
         }
-        .frame(height: 60)
+        .frame(height: Layout.hintBarHeight)
         .padding(.horizontal, Theme.Spacing.xxl)
         .padding(.bottom, Theme.Spacing.xxxl)
     }

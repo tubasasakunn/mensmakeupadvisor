@@ -8,7 +8,7 @@ struct AnalyzingScanArea: View {
     var body: some View {
         ZStack(alignment: .top) {
             capturedImageView
-                .frame(height: 240)
+                .frame(height: Theme.Size.Canvas.scan)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .overlay(
                     RoundedRectangle(cornerRadius: 4)
@@ -24,15 +24,15 @@ struct AnalyzingScanArea: View {
                         endPoint: .trailing
                     )
                 )
-                .frame(height: 2)
+                .frame(height: Theme.Size.Stroke.regular)
                 .offset(y: scanY)
                 .clipped()
 
             meshOverlay
-                .frame(height: 240)
+                .frame(height: Theme.Size.Canvas.scan)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
         }
-        .frame(height: 240)
+        .frame(height: Theme.Size.Canvas.scan)
         .clipped()
     }
 

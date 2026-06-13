@@ -121,7 +121,7 @@ struct StudioView: View {
                         .foregroundStyle(Theme.Text.primarySoft)
                 }
             }
-            .frame(width: 30, height: 30)
+            .frame(width: Theme.Size.Control.circleSmall, height: Theme.Size.Control.circleSmall)
             .glassEffect(.clear, in: .circle)
         }
         .accessibilityLabel(isPreparingShare ? "共有画像を準備中" : "この仕上がりを共有する")

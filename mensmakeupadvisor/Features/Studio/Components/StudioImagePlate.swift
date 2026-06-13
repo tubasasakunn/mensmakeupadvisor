@@ -119,7 +119,7 @@ struct StudioImagePlate: View {
 
                 Rectangle()
                     .fill(Theme.Plate.beforeAfterDivider)
-                    .frame(width: 1, height: height)
+                    .frame(width: Theme.Size.Stroke.hairline, height: height)
                     .offset(x: viewModel.comparePosition * width - 0.5)
             } else {
                 placeholderHalf(width: width * viewModel.comparePosition, height: height)

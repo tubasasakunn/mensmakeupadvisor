@@ -184,7 +184,7 @@ struct HomeSettingsTab: View {
                 Image(systemName: systemImage)
                     .font(Theme.Typography.UI.bodyLargeRegular)
                     .foregroundStyle(isDestructive ? Theme.Accent.primaryFaded : Theme.Text.primarySoft)
-                    .frame(width: 22, alignment: .leading)
+                    .frame(width: Theme.Size.Column.icon, alignment: .leading)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(Theme.Typography.UI.bodyMedium)

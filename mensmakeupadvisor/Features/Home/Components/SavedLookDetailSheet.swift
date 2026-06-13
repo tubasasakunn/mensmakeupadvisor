@@ -5,6 +5,10 @@ import SwiftUI
 //   左: ×（閉じる）
 //   右: 共有アイコン + 「編集」テキストボタン
 // body 末尾の primary CTA は「今の自分で試す」、secondary は「削除」。
+private enum Layout {
+    nonisolated static let thumbnailMaxWidth: CGFloat = 320
+}
+
 struct SavedLookDetailSheet: View {
     let look: SavedLook
     let onApply: () -> Void
@@ -90,7 +94,7 @@ struct SavedLookDetailSheet: View {
                         .foregroundStyle(Theme.Text.primarySoft)
                 }
             }
-            .frame(width: 30, height: 30)
+            .frame(width: Theme.Size.Control.circleSmall, height: Theme.Size.Control.circleSmall)
             .glassEffect(.clear, in: .circle)
         }
         .accessibilityLabel(isPreparingShare ? "共有画像を準備中" : "このルックを共有する")
@@ -154,7 +158,7 @@ struct SavedLookDetailSheet: View {
 
     private var thumbnail: some View {
         SavedLookMeshThumbnail(look: look, geometry: SavedLookMeshGeometry.makeLatest())
-            .frame(maxWidth: 320)
+            .frame(maxWidth: Layout.thumbnailMaxWidth)
             .frame(maxWidth: .infinity)
             .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             .overlay(
@@ -265,7 +269,7 @@ struct SavedLookDetailSheet: View {
                 .aspectRatio(1, contentMode: .fit)
                 .padding(.vertical, 8)
         }
-        .frame(width: 320, height: 220)
+        .frame(width: Theme.Size.ShareCard.width, height: Theme.Size.ShareCard.bodyHeight)
         return ShareHelper.render(hero)
     }
 

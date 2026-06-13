@@ -93,7 +93,7 @@ struct BeforeAfterSlider: View {
         ZStack {
             Rectangle()
                 .fill(Theme.Plate.labelText)
-                .frame(width: 2)
+                .frame(width: Theme.Size.Stroke.regular)
             Circle()
                 .fill(Color.ivory)
                 .frame(width: style.handleSize, height: style.handleSize)

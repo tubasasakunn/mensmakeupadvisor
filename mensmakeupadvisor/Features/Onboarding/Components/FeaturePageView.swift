@@ -1,6 +1,10 @@
 import SwiftUI
 import UIKit
 
+private enum Layout {
+    nonisolated static let sliderHeight: CGFloat = 200
+}
+
 struct FeaturePageView: View {
     let page: OnboardingPage
     @State private var sliderX: CGFloat = 0.5
@@ -72,7 +76,7 @@ struct FeaturePageView: View {
                     afterImage: afterImage,
                     style: .step
                 )
-                .frame(height: 200)
+                .frame(height: Layout.sliderHeight)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .padding(.bottom, 14)
             }

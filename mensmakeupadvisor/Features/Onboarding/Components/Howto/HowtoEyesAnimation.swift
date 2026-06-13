@@ -78,6 +78,6 @@ struct HowtoEyesAnimation: View {
 
 #Preview {
     HowtoEyesAnimation()
-        .frame(width: 260, height: 260)
+        .frame(width: Theme.Size.Canvas.howto, height: Theme.Size.Canvas.howto)
         .background(Theme.Howto.canvas)
 }

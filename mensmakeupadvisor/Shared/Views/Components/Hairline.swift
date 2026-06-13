@@ -1,6 +1,6 @@
 import SwiftUI
 
-// 1pt のミニマル罫線。アプリ全体で `Rectangle().fill(Color.lineColor).frame(height: 1)`
+// 1pt のミニマル罫線。アプリ全体で `Rectangle().fill(Color.lineColor).frame(height: Theme.Size.Stroke.hairline)`
 // を書き散らしていたのを集約する。色とアクティブな塗りも切り出せるので進捗バーにも使える。
 struct HairlineDivider: View {
     var color: Color = Color.lineColor
