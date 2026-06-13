@@ -18,7 +18,7 @@ struct TutorialEyebrowPicker: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("眉のかたち")
-                .font(.system(size: 13, weight: .medium))
+                .font(Theme.Typography.UI.calloutMedium)
                 .foregroundStyle(Color.ivory)
 
             VStack(spacing: 6) {
@@ -43,10 +43,10 @@ struct TutorialEyebrowPicker: View {
         } label: {
             VStack(spacing: 2) {
                 Text(entry.label)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(Theme.Typography.UI.subheadlineMedium)
                 if isRecommended {
                     Text("★ おすすめ")
-                        .font(.system(size: 10, weight: .medium))
+                        .font(Theme.Typography.UI.captionMedium)
                 }
             }
             .foregroundStyle(isActive ? Color.appBackground : Color.ivory)

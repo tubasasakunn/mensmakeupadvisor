@@ -7,7 +7,7 @@ struct ConceptPageView: View {
         VStack(alignment: .leading, spacing: 0) {
             if let ct = page.conceptTitle {
                 Text(ct)
-                    .font(.system(size: 60, weight: .light, design: .serif))
+                    .font(Theme.Typography.Display.jumboXLLight)
                     .italic()
                     .foregroundStyle(Color.ivory)
                     .padding(.bottom, 4)
@@ -15,7 +15,7 @@ struct ConceptPageView: View {
 
             if let jp = page.titleJP {
                 Text(jp)
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .font(Theme.Typography.Data.largeMedium)
                     .foregroundStyle(Color.brandPrimary)
                     .kerning(2)
                     .padding(.bottom, 20)
@@ -26,7 +26,7 @@ struct ConceptPageView: View {
 
             if let body = page.body {
                 Text(body)
-                    .font(.system(size: 15, weight: .regular))
+                    .font(Theme.Typography.UI.bodyLargeRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(8)
                     .padding(.bottom, 12)
@@ -34,7 +34,7 @@ struct ConceptPageView: View {
 
             if let source = page.source {
                 Text(source)
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(Theme.Typography.Data.base)
                     .foregroundStyle(Theme.Text.secondaryDim)
             }
 

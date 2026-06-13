@@ -232,7 +232,7 @@ struct ScoreAnnotationDrawer {
     private func drawLabel(ctx: inout GraphicsContext, text: String,
                            at p: CGPoint, align: LabelAlign, color: Color) {
         let t = Text(text)
-            .font(.system(size: 9, weight: .semibold, design: .monospaced))
+            .font(Theme.Typography.Data.miniSemibold)
             .foregroundStyle(color)
         let resolved = ctx.resolve(t)
         let bounds = resolved.measure(in: CGSize(width: 200, height: 40))

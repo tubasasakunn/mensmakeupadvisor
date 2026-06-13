@@ -7,7 +7,7 @@ struct ListPageView: View {
         VStack(alignment: .leading, spacing: 0) {
             if let title = page.title {
                 Text(title)
-                    .font(.system(size: 24, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.titleLBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
                     .padding(.bottom, 20)
@@ -37,17 +37,17 @@ struct NumberedListItem: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Text(number)
-                .font(.system(size: 11, design: .monospaced))
+                .font(Theme.Typography.Data.base)
                 .foregroundStyle(Color.brandPrimary)
                 .padding(.top, 2)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(Theme.Typography.UI.calloutSemibold)
                     .foregroundStyle(Color.ivory)
 
                 Text(desc)
-                    .font(.system(size: 12))
+                    .font(Theme.Typography.UI.subheadline)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(4)
             }

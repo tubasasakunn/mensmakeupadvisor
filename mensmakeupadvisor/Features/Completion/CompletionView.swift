@@ -47,12 +47,12 @@ struct CompletionView: View {
     private var topMeta: some View {
         HStack {
             Text("CHAPTER 08 · BEGIN")
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
+                .font(Theme.Typography.Data.smallRegular)
                 .foregroundStyle(Theme.Text.secondaryFaded)
                 .kerning(2.8)
             Spacer()
             Text("FIN.")
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .font(Theme.Typography.Data.smallMedium)
                 .foregroundStyle(Theme.Text.primaryFaded)
                 .kerning(2.5)
         }
@@ -61,14 +61,14 @@ struct CompletionView: View {
     private var centerBlock: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
             Text("ready.")
-                .font(.system(size: 42, weight: .light, design: .serif))
+                .font(Theme.Typography.Display.numeralLLight)
                 .italic()
                 .foregroundStyle(Theme.Text.primaryFaded)
 
             // 仕上げが終わったタイミングなので「これから始める」ではなく
             // 一日に送り出す表現に。"はじめましょう" は最初の頃を匂わせて違和感が出る。
             Text("さぁ、\n出かけましょう。")
-                .font(.system(size: 44, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.numeralXLBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
                 .lineSpacing(4)
@@ -77,7 +77,7 @@ struct CompletionView: View {
                 .padding(.top, Theme.Spacing.md)
 
             Text("今日のあなたのスタイルが整いました。\n鏡を一度だけ。あとは、外へ。")
-                .font(.system(size: 13, weight: .regular))
+                .font(Theme.Typography.UI.calloutRegular)
                 .foregroundStyle(Theme.Text.primaryFaded)
                 .lineSpacing(6)
                 .padding(.top, Theme.Spacing.lg)

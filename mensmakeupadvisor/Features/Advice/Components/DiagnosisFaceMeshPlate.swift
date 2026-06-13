@@ -99,10 +99,10 @@ struct DiagnosisFaceMeshPlate: View {
     private var captionLabel: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("図 1")
-                .font(.system(size: 11, weight: .semibold))
+                .font(Theme.Typography.UI.footnoteSemibold)
                 .foregroundStyle(Color.inkSecondary)
             Text("顔メッシュ · 478 点")
-                .font(.system(size: 11, weight: .regular))
+                .font(Theme.Typography.UI.footnoteRegular)
                 .foregroundStyle(Color.inkTertiary)
         }
     }

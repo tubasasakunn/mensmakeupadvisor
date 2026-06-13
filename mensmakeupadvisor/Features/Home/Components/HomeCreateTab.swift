@@ -46,7 +46,7 @@ struct HomeCreateTab: View {
 
     private var kickerLabel: some View {
         Text("CREATE")
-            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .font(Theme.Typography.Data.baseMedium)
             .kerning(3)
             .foregroundStyle(Theme.Text.secondaryFaded)
     }
@@ -54,11 +54,11 @@ struct HomeCreateTab: View {
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("メイクを試す")
-                .font(.system(size: 36, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.heroXLBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
             Text("撮って、診て、塗ってみる。")
-                .font(.system(size: 13))
+                .font(Theme.Typography.UI.callout)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(0.5)
         }
@@ -69,18 +69,18 @@ struct HomeCreateTab: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
             HStack(alignment: .firstTextBaseline) {
                 Text("3 STEPS")
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(Theme.Typography.Data.smallMedium)
                     .kerning(2.5)
                     .foregroundStyle(Theme.Text.secondaryFaded)
                 Spacer()
                 Text("≈ 90s")
-                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.smallRegular)
                     .kerning(1.5)
                     .foregroundStyle(Theme.Text.secondaryFaded)
             }
 
             Text("自分の顔を撮って、\nメイクを試してみる。")
-                .font(.system(size: 22, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.titleBold)
                 .foregroundStyle(Color.ivory)
                 .lineSpacing(6)
 
@@ -100,33 +100,33 @@ struct HomeCreateTab: View {
     private func heroStep(number: String, label: String) -> some View {
         HStack(spacing: 6) {
             Text(number)
-                .font(.system(size: 16, weight: .light, design: .serif))
+                .font(Theme.Typography.Display.subheadLight)
                 .italic()
                 .foregroundStyle(Theme.Text.secondary)
             Text(label)
-                .font(.system(size: 12, weight: .medium))
+                .font(Theme.Typography.UI.subheadlineMedium)
                 .foregroundStyle(Color.ivory)
         }
     }
 
     private var heroArrow: some View {
         Image(systemName: "chevron.right")
-            .font(.system(size: 10, weight: .medium))
+            .font(Theme.Typography.UI.captionMedium)
             .foregroundStyle(Theme.Text.secondaryDim)
     }
 
     private var lastPresetHint: some View {
         HStack {
             Image(systemName: "clock")
-                .font(.system(size: 10))
+                .font(Theme.Typography.UI.caption)
                 .foregroundStyle(Theme.Text.tertiary)
             if let result = appState.analysisResult {
                 Text("前回の診断: \(result.faceShape.label) · \(result.grade)")
-                    .font(.system(size: 11))
+                    .font(Theme.Typography.UI.footnote)
                     .foregroundStyle(Theme.Text.tertiary)
             } else {
                 Text("初回の撮影です")
-                    .font(.system(size: 11))
+                    .font(Theme.Typography.UI.footnote)
                     .foregroundStyle(Theme.Text.tertiary)
             }
             Spacer()

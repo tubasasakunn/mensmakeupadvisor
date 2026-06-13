@@ -37,18 +37,18 @@ struct FeaturePageView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     if let no = page.featureNo {
                         Text(no)
-                            .font(.system(size: 52, weight: .bold, design: .serif))
+                            .font(Theme.Typography.Display.jumboBold)
                             .italic()
                             .foregroundStyle(Color.brandPrimary)
                     }
                     if let label = page.featureLabel {
                         Text(label)
-                            .font(.system(size: 16, weight: .bold))
+                            .font(Theme.Typography.UI.headlineBold)
                             .foregroundStyle(Color.ivory)
                     }
                     if let jp = page.featureLabelJP {
                         Text(jp)
-                            .font(.system(size: 11, design: .monospaced))
+                            .font(Theme.Typography.Data.base)
                             .foregroundStyle(Color.inkSecondary)
                             .kerning(1.5)
                     }
@@ -82,7 +82,7 @@ struct FeaturePageView: View {
 
             if let title = page.title {
                 Text(title)
-                    .font(.system(size: 20, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.title2Bold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
                     .padding(.bottom, 10)
@@ -90,7 +90,7 @@ struct FeaturePageView: View {
 
             if let body = page.body {
                 Text(body)
-                    .font(.system(size: 13))
+                    .font(Theme.Typography.UI.callout)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(6)
                     .fixedSize(horizontal: false, vertical: true)

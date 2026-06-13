@@ -55,9 +55,9 @@ struct ScreenHeader<Trailing: View>: View {
         } label: {
             HStack(spacing: 5) {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(Theme.Typography.UI.footnoteSemibold)
                 Text("戻る")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(Theme.Typography.UI.subheadlineMedium)
             }
             .foregroundStyle(Theme.Text.primarySoft)
             .padding(.horizontal, Theme.Spacing.md)
@@ -77,7 +77,7 @@ struct ScreenHeader<Trailing: View>: View {
             onBack()
         } label: {
             Image(systemName: "xmark")
-                .font(.system(size: 11, weight: .semibold))
+                .font(Theme.Typography.UI.footnoteSemibold)
                 .foregroundStyle(Theme.Text.primarySoft)
                 .frame(width: 30, height: 30)
                 .background(Theme.Surface.panelRaised, in: .circle)
@@ -91,7 +91,7 @@ struct ScreenHeader<Trailing: View>: View {
 
     private func kickerLabel(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .font(Theme.Typography.Data.baseMedium)
             .kerning(2.5)
             .foregroundStyle(Theme.Text.primaryFaded)
             .accessibilityHidden(true)
@@ -147,7 +147,7 @@ extension ScreenHeader where Trailing == EmptyView {
                 trailing: {
                     Button {} label: {
                         Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(Theme.Typography.UI.calloutSemibold)
                             .foregroundStyle(Theme.Text.primarySoft)
                             .frame(width: 30, height: 30)
                             .background(Theme.Surface.panelRaised, in: .circle)
@@ -174,7 +174,7 @@ extension ScreenHeader where Trailing == EmptyView {
                 onBack: {},
                 trailing: {
                     Button("編集") {}
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(Theme.Typography.UI.calloutSemibold)
                         .foregroundStyle(Theme.Text.primarySoft)
                         .padding(.horizontal, Theme.Spacing.md)
                         .padding(.vertical, 7)

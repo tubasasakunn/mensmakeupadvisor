@@ -7,7 +7,7 @@ struct CoverPageView: View {
         VStack(alignment: .leading, spacing: 0) {
             if let no = page.chapterNo {
                 Text(no)
-                    .font(.system(size: 88, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.colossalXLBold)
                     .italic()
                     .foregroundStyle(Color.brandPrimary)
                     .padding(.bottom, 4)
@@ -15,7 +15,7 @@ struct CoverPageView: View {
 
             if let title = page.title {
                 Text(title)
-                    .font(.system(size: 30, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.heroBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
                     .padding(.bottom, 16)
@@ -34,7 +34,7 @@ struct CoverPageView: View {
 
             if let body = page.body {
                 Text(body)
-                    .font(.system(size: 15, weight: .regular))
+                    .font(Theme.Typography.UI.bodyLargeRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(6)
             }

@@ -62,26 +62,26 @@ struct ScoreCardView: View {
     private var headerRow: some View {
         HStack(alignment: .firstTextBaseline) {
             Text("\(index + 1).")
-                .font(.system(size: 13, weight: .regular))
+                .font(Theme.Typography.UI.calloutRegular)
                 .foregroundStyle(Color.inkTertiary)
 
             Text(score.name)
-                .font(.system(size: 15, weight: .semibold))
+                .font(Theme.Typography.UI.bodyLargeSemibold)
                 .foregroundStyle(Color.ivory)
 
             Spacer()
 
             Text(score.grade)
-                .font(.system(size: 18, weight: .heavy))
+                .font(Theme.Typography.UI.title3Heavy)
                 .foregroundStyle(score.gradeColor)
                 .frame(minWidth: 24, alignment: .trailing)
 
             Text("\(score.score) 点")
-                .font(.system(size: 12, weight: .medium))
+                .font(Theme.Typography.UI.subheadlineMedium)
                 .foregroundStyle(Color.inkSecondary)
 
             Image(systemName: "chevron.down")
-                .font(.system(size: 12, weight: .medium))
+                .font(Theme.Typography.UI.subheadlineMedium)
                 .foregroundStyle(Color.inkSecondary)
                 .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 .animation(.easeInOut(duration: 0.25), value: isExpanded)
@@ -109,7 +109,7 @@ struct ScoreCardView: View {
 
     private var adviceText: some View {
         Text(score.advice)
-            .font(.system(size: 12, weight: .regular))
+            .font(Theme.Typography.UI.subheadlineRegular)
             .foregroundStyle(Color.inkSecondary)
             .lineSpacing(5)
             .fixedSize(horizontal: false, vertical: true)
@@ -125,12 +125,12 @@ struct ScoreCardView: View {
                     landmarks: landmarks
                 )
                 Text(annotationCaption)
-                    .font(.system(size: 11, weight: .regular))
+                    .font(Theme.Typography.UI.footnoteRegular)
                     .foregroundStyle(Color.inkTertiary)
             }
         } else {
             Text("画像が読み込まれていないため、評価線を表示できません。")
-                .font(.system(size: 11))
+                .font(Theme.Typography.UI.footnote)
                 .foregroundStyle(Color.inkTertiary)
         }
     }

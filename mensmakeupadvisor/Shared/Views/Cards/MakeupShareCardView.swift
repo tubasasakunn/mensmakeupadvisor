@@ -47,11 +47,11 @@ struct MakeupShareCardView: View {
                     if let brow = browLabel {
                         HStack(spacing: 6) {
                             Text("BROW")
-                                .font(.system(size: 8, weight: .regular, design: .monospaced))
+                                .font(Theme.Typography.Data.tinyRegular)
                                 .foregroundStyle(Color.inkTertiary)
                                 .kerning(1.5)
                             Text(brow)
-                                .font(.system(size: 11, weight: .semibold))
+                                .font(Theme.Typography.UI.footnoteSemibold)
                                 .foregroundStyle(Color.ivory)
                             Spacer()
                         }
@@ -97,17 +97,17 @@ struct MakeupShareCardView: View {
     private var topBar: some View {
         HStack {
             Text("M · M · A")
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .font(Theme.Typography.Data.smallMedium)
                 .foregroundStyle(Color.brandPrimary)
                 .kerning(2)
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
                 Text(modeKicker)
-                    .font(.system(size: 7, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.microRegular)
                     .foregroundStyle(Color.inkTertiary)
                     .kerning(1.5)
                 Text(modeTitle)
-                    .font(.system(size: 9, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.miniRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(2)
             }
@@ -158,7 +158,7 @@ struct MakeupShareCardView: View {
                     .fill(Color.brandPrimary)
                     .frame(width: 5, height: 5)
                 Text(mode == .styled ? "RENDERED" : "TRY-ON")
-                    .font(.system(size: 8, weight: .medium, design: .monospaced))
+                    .font(Theme.Typography.Data.tinyMedium)
                     .foregroundStyle(Color.ivory)
                     .kerning(1.5)
             }
@@ -180,17 +180,17 @@ struct MakeupShareCardView: View {
             VStack(alignment: .leading, spacing: 4) {
                 if let result {
                     Text(result.faceShape.label.uppercased())
-                        .font(.system(size: 9, weight: .regular, design: .monospaced))
+                        .font(Theme.Typography.Data.miniRegular)
                         .foregroundStyle(Color.inkSecondary)
                         .kerning(2)
                 } else {
                     Text("MAKEUP COMPOSITION")
-                        .font(.system(size: 9, weight: .regular, design: .monospaced))
+                        .font(Theme.Typography.Data.miniRegular)
                         .foregroundStyle(Color.inkSecondary)
                         .kerning(2)
                 }
                 Text(statementLine)
-                    .font(.system(size: 22, weight: .light, design: .serif))
+                    .font(Theme.Typography.Display.titleLight)
                     .italic()
                     .foregroundStyle(Color.ivory)
                     .lineLimit(2)
@@ -224,7 +224,7 @@ struct MakeupShareCardView: View {
                             .frame(width: 6, height: max(2, CGFloat(axis.value) * 56))
                     }
                     Text(axis.label)
-                        .font(.system(size: 9, weight: .medium))
+                        .font(Theme.Typography.UI.caption2Medium)
                         .foregroundStyle(Color.inkSecondary)
                 }
             }
@@ -263,18 +263,18 @@ struct MakeupShareCardView: View {
         HStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("MensMakeupAdvisor")
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .font(Theme.Typography.Data.smallSemibold)
                     .foregroundStyle(Theme.Text.primaryFaded)
                     .kerning(1)
                 Text(date, format: .dateTime.year().month().day())
-                    .font(.system(size: 9, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.miniRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(0.5)
             }
             Spacer()
             if let result {
                 Text(result.grade)
-                    .font(.system(size: 11, weight: .black, design: .monospaced))
+                    .font(Theme.Typography.Data.baseBlack)
                     .foregroundStyle(result.gradeColor)
             }
         }

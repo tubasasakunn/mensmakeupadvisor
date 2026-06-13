@@ -14,7 +14,7 @@ struct PrinciplePageView: View {
         VStack(alignment: .leading, spacing: 0) {
             if let num = page.num {
                 Text(num)
-                    .font(.system(size: 80, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.colossalLBold)
                     .italic()
                     .foregroundStyle(Theme.Accent.primarySoft)
                     .padding(.bottom, -8)
@@ -22,7 +22,7 @@ struct PrinciplePageView: View {
 
             if let title = page.title {
                 Text(title)
-                    .font(.system(size: 24, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.titleLBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
                     .padding(.bottom, 12)
@@ -30,7 +30,7 @@ struct PrinciplePageView: View {
 
             if let body = page.body {
                 Text(body)
-                    .font(.system(size: 14))
+                    .font(Theme.Typography.UI.body)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(5)
                     .padding(.bottom, illustrationImage != nil ? 14 : 20)
@@ -59,7 +59,7 @@ struct PrinciplePageView: View {
                     .padding(.bottom, 10)
 
                 Text(footer)
-                    .font(.system(size: 11))
+                    .font(Theme.Typography.UI.footnote)
                     .foregroundStyle(Theme.Text.secondaryFaded)
                     .lineSpacing(4)
             }
@@ -78,11 +78,11 @@ struct PrincipleItemRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 12, weight: .semibold))
+                .font(Theme.Typography.UI.subheadlineSemibold)
                 .foregroundStyle(Color.ivory)
 
             Text(desc)
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Color.inkSecondary)
                 .lineSpacing(4)
         }

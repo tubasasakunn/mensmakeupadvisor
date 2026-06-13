@@ -53,7 +53,7 @@ struct AnalyzingView: View {
                     .fill(errorMessage == nil ? Theme.Plate.renderingTint : Color.brandPrimary)
                     .frame(width: 6, height: 6)
                 Text(errorMessage == nil ? "ANALYZING" : "FAILED")
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(Theme.Typography.Data.smallMedium)
                     .kerning(2)
                     .foregroundStyle(Theme.Text.primaryFaded)
             }
@@ -74,7 +74,7 @@ struct AnalyzingView: View {
                     appState.navigate(to: .capture)
                 } label: {
                     Text("キャンセル")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(Theme.Typography.UI.subheadlineMedium)
                         .foregroundStyle(Theme.Text.primarySoft)
                         .padding(.horizontal, Theme.Spacing.md)
                         .padding(.vertical, Theme.Spacing.sm)
@@ -93,11 +93,11 @@ struct AnalyzingView: View {
         VStack(alignment: .leading, spacing: 24) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("解析しています")
-                    .font(.system(size: 32, weight: .semibold))
+                    .font(Theme.Typography.UI.displayLargeSemibold)
                     .foregroundStyle(Color.ivory)
 
                 Text("顔の比率と骨格を測っています。10〜20 秒ほどかかります。")
-                    .font(.system(size: 13))
+                    .font(Theme.Typography.UI.callout)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(3)
             }
@@ -123,17 +123,17 @@ struct AnalyzingView: View {
         VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 10) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 28))
+                    .font(Theme.Typography.UI.display)
                     .foregroundStyle(Color.brandPrimary)
 
                 Text(errorMessage ?? "")
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(Theme.Typography.UI.title2Semibold)
                     .foregroundStyle(Color.ivory)
                     .fixedSize(horizontal: false, vertical: true)
 
                 if let detail = errorDetail {
                     Text(detail)
-                        .font(.system(size: 13))
+                        .font(Theme.Typography.UI.callout)
                         .foregroundStyle(Color.inkSecondary)
                         .lineSpacing(4)
                         .fixedSize(horizontal: false, vertical: true)
@@ -161,10 +161,10 @@ struct AnalyzingView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
                 Text(phases[phaseIndex])
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(Theme.Typography.UI.calloutSemibold)
                     .foregroundStyle(Color.ivory)
                 Text("(\(phaseIndex + 1)/\(phases.count))")
-                    .font(.system(size: 11))
+                    .font(Theme.Typography.UI.footnote)
                     .foregroundStyle(Color.inkTertiary)
                 Spacer()
             }

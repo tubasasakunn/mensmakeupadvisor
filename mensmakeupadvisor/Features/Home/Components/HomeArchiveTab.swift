@@ -69,7 +69,7 @@ struct HomeArchiveTab: View {
 
     private var kickerLabel: some View {
         Text("ARCHIVE")
-            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .font(Theme.Typography.Data.baseMedium)
             .kerning(3)
             .foregroundStyle(Theme.Text.secondaryFaded)
     }
@@ -77,12 +77,12 @@ struct HomeArchiveTab: View {
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text("マイ・コレクション")
-                .font(.system(size: 32, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.heroLBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
 
             Text(savedLooks.isEmpty ? "保存ゼロ件" : "保存 \(savedLooks.count) 件")
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Color.inkSecondary)
         }
     }
@@ -106,10 +106,10 @@ struct HomeArchiveTab: View {
                     .font(.system(size: 40, weight: .ultraLight))
                     .foregroundStyle(Theme.Text.secondary)
                 Text("まだ保存したルックがありません")
-                    .font(.system(size: 17, weight: .semibold, design: .serif))
+                    .font(Theme.Typography.Display.headlineSemibold)
                     .foregroundStyle(Color.ivory)
                 Text("「撮影」タブから自分の顔を撮って、\nスタジオで気に入った仕上がりを保存できます。")
-                    .font(.system(size: 12))
+                    .font(Theme.Typography.UI.subheadline)
                     .foregroundStyle(Theme.Text.primaryFaded)
                     .multilineTextAlignment(.center)
                     .lineSpacing(5)
@@ -141,7 +141,7 @@ struct HomeArchiveTab: View {
                 .overlay(alignment: .bottomTrailing) {
                     if look.totalScore > 0 {
                         Text(grade(for: look.totalScore))
-                            .font(.system(size: 12, weight: .light, design: .serif))
+                            .font(Theme.Typography.Display.captionLight)
                             .italic()
                             .foregroundStyle(Color.ivory)
                             .padding(.horizontal, 6)

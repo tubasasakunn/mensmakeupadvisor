@@ -29,7 +29,7 @@ struct HomeReportTab: View {
 
     private var kickerLabel: some View {
         Text("REPORT")
-            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .font(Theme.Typography.Data.baseMedium)
             .kerning(3)
             .foregroundStyle(Theme.Text.secondaryFaded)
     }
@@ -37,11 +37,11 @@ struct HomeReportTab: View {
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text("診断レポート")
-                .font(.system(size: 36, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.heroXLBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
             Text("あなたの顔の診断結果")
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Color.inkSecondary)
         }
     }
@@ -66,32 +66,32 @@ struct HomeReportTab: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack(alignment: .firstTextBaseline) {
                 Text(result.faceShape.label)
-                    .font(.system(size: 30, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.heroBold)
                     .italic()
                     .foregroundStyle(Color.ivory)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 0) {
                     Text(result.grade)
-                        .font(.system(size: 46, weight: .light, design: .serif))
+                        .font(Theme.Typography.Display.numeralXXLLight)
                         .italic()
                         .foregroundStyle(result.gradeColor)
                     Text("\(result.totalScore) pt")
-                        .font(.system(size: 11, design: .monospaced))
+                        .font(Theme.Typography.Data.base)
                         .kerning(1)
                         .foregroundStyle(Theme.Text.secondary)
                 }
             }
             Text(result.faceShape.note)
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Theme.Text.primaryFaded)
                 .lineSpacing(5)
             HairlineDivider()
             HStack(spacing: 6) {
                 Image(systemName: "chart.bar.fill")
-                    .font(.system(size: 10))
+                    .font(Theme.Typography.UI.caption)
                     .foregroundStyle(Theme.Text.secondary)
                 Text(result.rankPercentile)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(Theme.Typography.UI.subheadlineMedium)
                     .foregroundStyle(Theme.Text.primarySoft)
             }
         }
@@ -103,12 +103,12 @@ struct HomeReportTab: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
             HStack {
                 Text("7 つの評価指標")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .font(Theme.Typography.Data.mediumMedium)
                     .kerning(1.5)
                     .foregroundStyle(Theme.Text.primaryFaded)
                 Spacer()
                 Text("SEVEN")
-                    .font(.system(size: 10, design: .monospaced))
+                    .font(Theme.Typography.Data.small)
                     .kerning(2)
                     .foregroundStyle(Theme.Text.tertiary)
             }
@@ -116,17 +116,17 @@ struct HomeReportTab: View {
                 ForEach(Array(result.scores.enumerated()), id: \.element.id) { idx, score in
                     HStack {
                         Text(String(format: "%02d", idx + 1))
-                            .font(.system(size: 10, design: .monospaced))
+                            .font(Theme.Typography.Data.small)
                             .foregroundStyle(Theme.Text.tertiary)
                         Text(score.name)
-                            .font(.system(size: 13, weight: .medium))
+                            .font(Theme.Typography.UI.calloutMedium)
                             .foregroundStyle(Color.ivory)
                         Spacer()
                         Text(score.grade)
-                            .font(.system(size: 14, weight: .heavy))
+                            .font(Theme.Typography.UI.bodyHeavy)
                             .foregroundStyle(score.gradeColor)
                         Text("\(score.score)pt")
-                            .font(.system(size: 11, design: .monospaced))
+                            .font(Theme.Typography.Data.base)
                             .foregroundStyle(Theme.Text.secondary)
                             .frame(width: 44, alignment: .trailing)
                     }
@@ -168,10 +168,10 @@ struct HomeReportTab: View {
                     .font(.system(size: 40, weight: .ultraLight))
                     .foregroundStyle(Theme.Text.secondary)
                 Text("まだ診断結果はありません")
-                    .font(.system(size: 17, weight: .semibold, design: .serif))
+                    .font(Theme.Typography.Display.headlineSemibold)
                     .foregroundStyle(Color.ivory)
                 Text("顔写真を撮ると、ここに 7 つの指標で\nスコアが表示されます。")
-                    .font(.system(size: 12))
+                    .font(Theme.Typography.UI.subheadline)
                     .foregroundStyle(Theme.Text.primaryFaded)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)

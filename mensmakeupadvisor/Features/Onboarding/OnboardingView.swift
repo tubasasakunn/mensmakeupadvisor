@@ -43,7 +43,7 @@ struct OnboardingView: View {
             chapterIndexButton
 
             Text(pages[currentPage].tag)
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .font(Theme.Typography.Data.baseMedium)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(1.5)
                 .animation(.none, value: currentPage)
@@ -63,9 +63,9 @@ struct OnboardingView: View {
         } label: {
             HStack(spacing: 5) {
                 Image(systemName: "list.bullet")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(Theme.Typography.UI.footnoteMedium)
                 Text("目次")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(Theme.Typography.UI.subheadlineMedium)
             }
             .foregroundStyle(Theme.Text.primarySoft)
             .padding(.horizontal, Theme.Spacing.md)
@@ -108,7 +108,7 @@ struct OnboardingView: View {
         HStack {
             Spacer()
             Text("\(currentPage + 1) / \(pages.count) ページ")
-                .font(.system(size: 11))
+                .font(Theme.Typography.UI.footnote)
                 .foregroundStyle(Theme.Text.secondaryFaded)
                 .accessibilityLabel("\(currentPage + 1) ページ目、全 \(pages.count) ページ中")
                 .aid("onboarding_folio_label")
@@ -147,12 +147,12 @@ struct OnboardingView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Text("SWIPE")
-                                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                .font(Theme.Typography.Data.smallMedium)
                                 .kerning(2.5)
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 11, weight: .semibold))
+                                .font(Theme.Typography.UI.footnoteSemibold)
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 11, weight: .semibold))
+                                .font(Theme.Typography.UI.footnoteSemibold)
                                 .opacity(0.5)
                         }
                         .foregroundStyle(Theme.Text.primaryFaded)

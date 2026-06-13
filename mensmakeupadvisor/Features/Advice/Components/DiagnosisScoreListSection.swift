@@ -10,14 +10,14 @@ struct DiagnosisScoreListSection: View {
                 HStack(spacing: 0) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("いちばんの強み")
-                            .font(.system(size: 11, weight: .medium))
+                            .font(Theme.Typography.UI.footnoteMedium)
                             .foregroundStyle(Color.inkSecondary)
                         HStack(spacing: 4) {
                             Text(best.name)
-                                .font(.system(size: 13, weight: .medium))
+                                .font(Theme.Typography.UI.calloutMedium)
                                 .foregroundStyle(Color.ivory)
                             Text(best.grade)
-                                .font(.system(size: 14, weight: .heavy))
+                                .font(Theme.Typography.UI.bodyHeavy)
                                 .foregroundStyle(best.gradeColor)
                         }
                     }
@@ -30,14 +30,14 @@ struct DiagnosisScoreListSection: View {
 
                     VStack(alignment: .trailing, spacing: 4) {
                         Text("伸びしろ")
-                            .font(.system(size: 11, weight: .medium))
+                            .font(Theme.Typography.UI.footnoteMedium)
                             .foregroundStyle(Color.inkSecondary)
                         HStack(spacing: 4) {
                             Text(worst.grade)
-                                .font(.system(size: 14, weight: .heavy))
+                                .font(Theme.Typography.UI.bodyHeavy)
                                 .foregroundStyle(worst.gradeColor)
                             Text(worst.name)
-                                .font(.system(size: 13, weight: .medium))
+                                .font(Theme.Typography.UI.calloutMedium)
                                 .foregroundStyle(Color.ivory)
                         }
                     }
@@ -50,7 +50,7 @@ struct DiagnosisScoreListSection: View {
 
             HStack {
                 Text("7 つの評価指標 — 詳細レポート")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(Theme.Typography.UI.subheadlineMedium)
                     .foregroundStyle(Color.inkSecondary)
                 Spacer()
             }

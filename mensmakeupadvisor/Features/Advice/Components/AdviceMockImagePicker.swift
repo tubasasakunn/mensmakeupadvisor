@@ -17,7 +17,7 @@ struct AdviceMockImagePicker: View {
                         }
                         onSelect(image)
                     }
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .font(Theme.Typography.Data.mediumMedium)
                     .foregroundStyle(Color.ivory)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
@@ -31,9 +31,9 @@ struct AdviceMockImagePicker: View {
 
             HStack(spacing: 6) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 10))
+                    .font(Theme.Typography.UI.caption)
                 Text("MOCK MODE")
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(Theme.Typography.Data.smallMedium)
                     .kerning(2)
             }
             .foregroundStyle(Theme.Status.warning)

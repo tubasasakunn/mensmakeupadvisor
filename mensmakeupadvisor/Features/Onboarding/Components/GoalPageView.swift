@@ -7,7 +7,7 @@ struct GoalPageView: View {
         VStack(alignment: .leading, spacing: 0) {
             if let title = page.title {
                 Text(title)
-                    .font(.system(size: 24, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.titleLBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)
@@ -24,7 +24,7 @@ struct GoalPageView: View {
                         .frame(width: 3)
 
                     Text(quote)
-                        .font(.system(size: 15, weight: .medium, design: .serif))
+                        .font(Theme.Typography.Display.calloutMedium)
                         .italic()
                         .foregroundStyle(Color.ivory)
                         .lineSpacing(6)
@@ -39,7 +39,7 @@ struct GoalPageView: View {
 
             if let body = page.body {
                 Text(body)
-                    .font(.system(size: 13))
+                    .font(Theme.Typography.UI.callout)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(6)
                     .fixedSize(horizontal: false, vertical: true)
@@ -68,14 +68,14 @@ struct GoalPageView: View {
     private func goalIconItem(symbol: String, label: String) -> some View {
         VStack(spacing: 8) {
             Image(systemName: symbol)
-                .font(.system(size: 26))
+                .font(Theme.Typography.UI.titleLarge)
                 .foregroundStyle(Theme.Accent.primaryFaded)
                 .frame(width: 56, height: 56)
                 .background(Theme.Surface.glassWeak)
                 .clipShape(Circle())
 
             Text(label)
-                .font(.system(size: 11, design: .monospaced))
+                .font(Theme.Typography.Data.base)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(0.5)
         }

@@ -71,28 +71,28 @@ struct SplashView: View {
         VStack(alignment: .leading, spacing: 0) {
             // "A QUIET STUDY IN"
             Text("A QUIET STUDY IN")
-                .font(.system(size: 11, weight: .regular, design: .monospaced))
+                .font(Theme.Typography.Data.baseRegular)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(2.5)
                 .padding(.bottom, 16)
 
             // "The"
             Text("The")
-                .font(.system(size: 72, weight: .light, design: .serif))
+                .font(Theme.Typography.Display.colossalLight)
                 .italic()
                 .foregroundStyle(Color.ivory)
                 .padding(.bottom, -8)
 
             // "Better"
             Text("Better")
-                .font(.system(size: 80, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.colossalLBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
                 .padding(.bottom, -8)
 
             // "Self." — バーガンディ赤
             Text("Self.")
-                .font(.system(size: 80, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.colossalLBold)
                 .italic()
                 .foregroundStyle(Color.brandPrimary)
 
@@ -103,7 +103,7 @@ struct SplashView: View {
 
             // 日本語キャッチコピー
             Text("紳士の身嗜み、再考。")
-                .font(.system(size: 13, weight: .regular))
+                .font(Theme.Typography.UI.calloutRegular)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(1.5)
         }
@@ -114,11 +114,11 @@ struct SplashView: View {
         HStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("EST. MMXXV")
-                    .font(.system(size: 9, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.miniRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(2.0)
                 Text("Hommes · Atelier")
-                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.smallRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(1.5)
             }
@@ -126,7 +126,7 @@ struct SplashView: View {
             // タップ可能であることを伝える小さなサイン。HIG: スプラッシュは
             // 「進行中だが触れる」ことを 1 秒以内に分からせるべき。
             Text("Tap to begin")
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
+                .font(Theme.Typography.Data.smallRegular)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(2)
                 .opacity(0.6)

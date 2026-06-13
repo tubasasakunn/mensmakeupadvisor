@@ -61,7 +61,7 @@ struct SaveTitleSheet: View {
             onSave(title, memo)
         } label: {
             Text("保存")
-                .font(.system(size: 13, weight: .semibold))
+                .font(Theme.Typography.UI.calloutSemibold)
                 .foregroundStyle(Color.ivory)
                 .padding(.horizontal, Theme.Spacing.md)
                 .padding(.vertical, 7)
@@ -79,11 +79,11 @@ struct SaveTitleSheet: View {
     private var titleBlock: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text("送り出す前に。")
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.displayLBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
             Text("名前をつけて、自分の記録に残す。")
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Color.inkSecondary)
         }
     }
@@ -97,7 +97,7 @@ struct SaveTitleSheet: View {
                 prompt: Text("名前を入力")
                     .foregroundStyle(Theme.Text.tertiary)
             )
-            .font(.system(size: 20, weight: .medium, design: .serif))
+            .font(Theme.Typography.Display.title2Medium)
             .italic()
             .foregroundStyle(Color.ivory)
             .focused($focused, equals: .title)
@@ -119,7 +119,7 @@ struct SaveTitleSheet: View {
                     .foregroundStyle(Theme.Text.tertiary),
                 axis: .vertical
             )
-            .font(.system(size: 14))
+            .font(Theme.Typography.UI.body)
             .foregroundStyle(Color.ivory)
             .lineLimit(2...5)
             .focused($focused, equals: .memo)
@@ -132,16 +132,16 @@ struct SaveTitleSheet: View {
     private var hint: some View {
         HStack(spacing: 6) {
             Image(systemName: "archivebox")
-                .font(.system(size: 10))
+                .font(Theme.Typography.UI.caption)
             Text("保存した記録はアーカイブから何度でも開けます。")
-                .font(.system(size: 11))
+                .font(Theme.Typography.UI.footnote)
         }
         .foregroundStyle(Theme.Text.tertiary)
     }
 
     private func fieldLabel(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 10, weight: .medium, design: .monospaced))
+            .font(Theme.Typography.Data.smallMedium)
             .kerning(2)
             .foregroundStyle(Theme.Text.secondaryFaded)
     }

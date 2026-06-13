@@ -9,7 +9,7 @@ struct ExamplePageView: View {
 
             if let title = page.title {
                 Text(title)
-                    .font(.system(size: 24, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.titleLBold)
                     .foregroundStyle(Color.ivory)
                     .padding(.bottom, 20)
             }
@@ -39,11 +39,11 @@ struct ExampleItemView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 8) {
                 Text("Q")
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(Theme.Typography.Data.base)
                     .foregroundStyle(Color.inkSecondary)
                     .padding(.top, 2)
                 Text(concern)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(Theme.Typography.UI.calloutMedium)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
@@ -51,11 +51,11 @@ struct ExampleItemView: View {
 
             HStack(alignment: .top, spacing: 8) {
                 Text("→")
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(Theme.Typography.Data.base)
                     .foregroundStyle(Color.brandPrimary)
                     .padding(.top, 2)
                 Text(advice)
-                    .font(.system(size: 12))
+                    .font(Theme.Typography.UI.subheadline)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)

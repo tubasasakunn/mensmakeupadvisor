@@ -12,7 +12,7 @@ struct ComparePageView: View {
         VStack(alignment: .leading, spacing: 0) {
             if let title = page.title {
                 Text(title)
-                    .font(.system(size: 26, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.displayBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
                     .padding(.bottom, 12)
@@ -20,7 +20,7 @@ struct ComparePageView: View {
 
             if let body = page.body {
                 Text(body)
-                    .font(.system(size: 13))
+                    .font(Theme.Typography.UI.callout)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(5)
                     .padding(.bottom, 20)

@@ -85,9 +85,9 @@ struct StudioImagePlate: View {
         VStack {
             HStack(spacing: 6) {
                 Image(systemName: "hand.draw.fill")
-                    .font(.system(size: 12))
+                    .font(Theme.Typography.UI.subheadline)
                 Text("中央をドラッグして比べる")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(Theme.Typography.UI.subheadlineMedium)
             }
             .foregroundStyle(Color.appBackground)
             .padding(.horizontal, 12)
@@ -129,7 +129,7 @@ struct StudioImagePlate: View {
                 Spacer()
                 HStack {
                     Text("Before · 素のまま")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(Theme.Typography.UI.footnoteSemibold)
                         .foregroundStyle(Theme.Plate.labelText)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -145,7 +145,7 @@ struct StudioImagePlate: View {
                 HStack {
                     Spacer()
                     Text("After · メイク後")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(Theme.Typography.UI.footnoteSemibold)
                         .foregroundStyle(Theme.Plate.labelText)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -198,7 +198,7 @@ struct StudioImagePlate: View {
                             .stroke(Theme.Plate.placeholderEllipse, lineWidth: 1)
                             .frame(width: width * 0.55, height: height * 0.68)
                         Text("メイク後のプレビュー")
-                            .font(.system(size: 11))
+                            .font(Theme.Typography.UI.footnote)
                             .foregroundStyle(Color.inkSecondary)
                     }
                 }
@@ -219,7 +219,7 @@ struct StudioImagePlate: View {
                         .scaleEffect(0.6)
                         .tint(Theme.Plate.renderingTint)
                     Text("反映中…")
-                        .font(.system(size: 11, weight: .medium))
+                        .font(Theme.Typography.UI.footnoteMedium)
                         .foregroundStyle(Theme.Plate.renderingTint)
                 }
                 .padding(.horizontal, 10)
@@ -239,10 +239,10 @@ struct StudioImagePlate: View {
     private func scoreChip(result: AnalysisResult) -> some View {
         HStack(spacing: 4) {
             Text("スコア")
-                .font(.system(size: 11))
+                .font(Theme.Typography.UI.footnote)
                 .opacity(0.75)
             Text("\(result.totalScore)")
-                .font(.system(size: 14, weight: .semibold))
+                .font(Theme.Typography.UI.bodySemibold)
         }
         .foregroundStyle(Color.ivory)
         .padding(.horizontal, 10)

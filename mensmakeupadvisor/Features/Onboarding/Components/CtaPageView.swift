@@ -6,7 +6,7 @@ struct CtaPageView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("And so, we begin.")
-                .font(.system(size: 13, weight: .light, design: .serif))
+                .font(Theme.Typography.Display.footnoteLight)
                 .italic()
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(0.5)
@@ -14,7 +14,7 @@ struct CtaPageView: View {
 
             if let title = page.title {
                 Text(title)
-                    .font(.system(size: 32, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.heroLBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
                     .padding(.bottom, 20)
@@ -25,7 +25,7 @@ struct CtaPageView: View {
 
             if let body = page.body {
                 Text(body)
-                    .font(.system(size: 14))
+                    .font(Theme.Typography.UI.body)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(7)
             }

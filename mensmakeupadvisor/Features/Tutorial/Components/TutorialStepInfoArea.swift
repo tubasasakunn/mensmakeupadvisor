@@ -23,12 +23,12 @@ struct TutorialStepInfoArea: View {
     private var headerBlock: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text("STEP \(String(format: "%02d", currentStep.tagNumeric)) · \(currentStep.layer.labelJP)")
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .font(Theme.Typography.Data.smallMedium)
                 .kerning(2)
                 .foregroundStyle(Theme.Text.secondaryFaded)
 
             Text(currentStep.titleJP)
-                .font(.system(size: 24, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.titleLBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
                 .fixedSize(horizontal: false, vertical: true)
@@ -43,7 +43,7 @@ struct TutorialStepInfoArea: View {
 
     private var oneLinerText: some View {
         Text(currentStep.oneLiner)
-            .font(.system(size: 13, weight: .semibold, design: .serif))
+            .font(Theme.Typography.Display.footnoteSemibold)
             .italic()
             .foregroundStyle(Theme.Text.primarySoft)
             .lineSpacing(4)
@@ -53,7 +53,7 @@ struct TutorialStepInfoArea: View {
 
     private var explanationText: some View {
         Text(currentStep.explanation)
-            .font(.system(size: 12, weight: .regular))
+            .font(Theme.Typography.UI.subheadlineRegular)
             .foregroundStyle(Theme.Text.primaryFaded)
             .lineSpacing(6)
             .lineLimit(6)

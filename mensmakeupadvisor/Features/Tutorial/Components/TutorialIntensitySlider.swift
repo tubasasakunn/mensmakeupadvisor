@@ -10,13 +10,13 @@ struct TutorialIntensitySlider: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .lastTextBaseline, spacing: 8) {
                 Text("強さ")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(Theme.Typography.UI.calloutMedium)
                     .foregroundStyle(Color.ivory)
 
                 Spacer()
 
                 Text(String(format: "%.0f", value))
-                    .font(.system(size: 32, weight: .light, design: .serif))
+                    .font(Theme.Typography.Display.heroLLight)
                     .italic()
                     .foregroundStyle(Color.ivory)
             }
@@ -28,15 +28,15 @@ struct TutorialIntensitySlider: View {
 
             HStack {
                 Text("なし")
-                    .font(.system(size: 11))
+                    .font(Theme.Typography.UI.footnote)
                     .foregroundStyle(Color.inkSecondary)
                 Spacer()
                 Text("ふつう")
-                    .font(.system(size: 11))
+                    .font(Theme.Typography.UI.footnote)
                     .foregroundStyle(Color.inkSecondary)
                 Spacer()
                 Text("最大")
-                    .font(.system(size: 11))
+                    .font(Theme.Typography.UI.footnote)
                     .foregroundStyle(Color.inkSecondary)
             }
         }

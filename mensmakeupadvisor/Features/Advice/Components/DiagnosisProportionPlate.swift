@@ -154,7 +154,7 @@ struct DiagnosisProportionPlate: View {
     private func drawLabel(context: inout GraphicsContext, text: String,
                            at point: CGPoint, align: LabelAlign, color: Color) {
         let t = Text(text)
-            .font(.system(size: 8, weight: .semibold, design: .monospaced))
+            .font(Theme.Typography.Data.tinySemibold)
             .foregroundStyle(color)
         let resolved = context.resolve(t)
         let bounds = resolved.measure(in: CGSize(width: 200, height: 40))
@@ -170,10 +170,10 @@ struct DiagnosisProportionPlate: View {
     private var captionLabel: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("図 2")
-                .font(.system(size: 11, weight: .semibold))
+                .font(Theme.Typography.UI.footnoteSemibold)
                 .foregroundStyle(Color.inkSecondary)
             Text("比率 · 三分割 / 五分割")
-                .font(.system(size: 11, weight: .regular))
+                .font(Theme.Typography.UI.footnoteRegular)
                 .foregroundStyle(Color.inkTertiary)
         }
     }

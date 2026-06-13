@@ -13,7 +13,7 @@ struct DiagnosisHeroSection: View {
                     .aid("diagnosis_score_ring")
 
                 Text(result.grade)
-                    .font(.system(size: 18, weight: .heavy))
+                    .font(Theme.Typography.UI.title3Heavy)
                     .foregroundStyle(Color.appBackground)
                     .frame(width: 44, height: 44)
                     .background(result.gradeColor)
@@ -37,36 +37,36 @@ struct DiagnosisHeroSection: View {
             VStack(alignment: .leading, spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("顔型")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(Theme.Typography.UI.subheadlineMedium)
                         .foregroundStyle(Color.inkSecondary)
 
                     Text(result.faceShape.label)
-                        .font(.system(size: 24, weight: .bold))
+                        .font(Theme.Typography.UI.titleBold)
                         .foregroundStyle(Color.ivory)
 
                     HStack(spacing: 5) {
                         // グレード文字だけ色を持たせ、説明文は中立色にする。
                         // バッジ・リング・文字で 3 重に色が乗ると煩いため。
                         Text(result.grade)
-                            .font(.system(size: 13, weight: .heavy))
+                            .font(Theme.Typography.UI.calloutHeavy)
                             .foregroundStyle(result.gradeColor)
                         Text("·")
-                            .font(.system(size: 12))
+                            .font(Theme.Typography.UI.subheadline)
                             .foregroundStyle(Color.inkTertiary)
                         Text(result.gradeDescription)
-                            .font(.system(size: 12, weight: .regular))
+                            .font(Theme.Typography.UI.subheadlineRegular)
                             .foregroundStyle(Theme.Text.primarySoft)
                     }
 
                     Text(result.rankPercentile)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(Theme.Typography.UI.subheadlineMedium)
                         .foregroundStyle(Color.inkSecondary)
                 }
 
                 HairlineDivider()
 
                 Text(result.faceShape.note)
-                    .font(.system(size: 11, weight: .regular))
+                    .font(Theme.Typography.UI.footnoteRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(5)
                     .fixedSize(horizontal: false, vertical: true)

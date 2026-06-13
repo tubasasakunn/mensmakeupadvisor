@@ -86,7 +86,7 @@ struct SavedLookDetailSheet: View {
                         .scaleEffect(0.6)
                 } else {
                     Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(Theme.Typography.UI.subheadlineSemibold)
                         .foregroundStyle(Theme.Text.primarySoft)
                 }
             }
@@ -106,9 +106,9 @@ struct SavedLookDetailSheet: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: "slider.horizontal.3")
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(Theme.Typography.UI.captionSemibold)
                 Text("編集")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(Theme.Typography.UI.subheadlineSemibold)
             }
             .foregroundStyle(Theme.Text.primarySoft)
             .padding(.horizontal, Theme.Spacing.md)
@@ -127,24 +127,24 @@ struct SavedLookDetailSheet: View {
                 VStack(alignment: .leading, spacing: 4) {
                     if let title = look.title, !title.isEmpty {
                         Text(title)
-                            .font(.system(size: 22, weight: .semibold, design: .serif))
+                            .font(Theme.Typography.Display.titleSemibold)
                             .italic()
                             .foregroundStyle(Color.ivory)
                     }
                     Text(look.createdAt, format: .dateTime.year().month().day().hour().minute())
-                        .font(.system(size: 12))
+                        .font(Theme.Typography.UI.subheadline)
                         .foregroundStyle(Color.inkSecondary)
                 }
                 Spacer()
                 if look.totalScore > 0 {
                     Text("\(look.totalScore) 点")
-                        .font(.system(size: 13, weight: .medium))
+                        .font(Theme.Typography.UI.calloutMedium)
                         .foregroundStyle(Color.inkSecondary)
                 }
             }
             if let memo = look.memo, !memo.isEmpty {
                 Text(memo)
-                    .font(.system(size: 13))
+                    .font(Theme.Typography.UI.callout)
                     .foregroundStyle(Theme.Text.primaryFaded)
                     .lineSpacing(4)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -177,10 +177,10 @@ struct SavedLookDetailSheet: View {
     private func zoneRow(title: String, names: [String]) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 12, weight: .medium))
+                .font(Theme.Typography.UI.subheadlineMedium)
                 .foregroundStyle(Color.inkSecondary)
             Text(names.isEmpty ? "—" : names.map(MakeupAreaLabel.display).joined(separator: " · "))
-                .font(.system(size: 13))
+                .font(Theme.Typography.UI.callout)
                 .foregroundStyle(Color.ivory)
         }
     }
@@ -188,7 +188,7 @@ struct SavedLookDetailSheet: View {
     private var intensityRows: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("強さ")
-                .font(.system(size: 12, weight: .medium))
+                .font(Theme.Typography.UI.subheadlineMedium)
                 .foregroundStyle(Color.inkSecondary)
             intensityRow("ベース",       look.base)
             intensityRow("ハイライト",   look.highlight)
@@ -200,11 +200,11 @@ struct SavedLookDetailSheet: View {
     private func intensityRow(_ label: String, _ value: Double) -> some View {
         HStack {
             Text(label)
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Color.inkSecondary)
             Spacer()
             Text(String(format: "%.0f", value))
-                .font(.system(size: 14, weight: .semibold))
+                .font(Theme.Typography.UI.bodySemibold)
                 .foregroundStyle(Color.ivory)
         }
     }

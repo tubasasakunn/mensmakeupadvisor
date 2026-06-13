@@ -40,12 +40,12 @@ struct DuoColumn: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.displayLBold)
                 .italic()
                 .foregroundStyle(accentColor)
 
             Text(labelJP)
-                .font(.system(size: 11, design: .monospaced))
+                .font(Theme.Typography.Data.base)
                 .foregroundStyle(accentColor.opacity(0.7))
                 .kerning(0.5)
                 .lineSpacing(3)
@@ -53,7 +53,7 @@ struct DuoColumn: View {
             HairlineDivider(color: accentColor.opacity(0.3))
 
             Text(desc)
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Color.inkSecondary)
                 .lineSpacing(5)
         }

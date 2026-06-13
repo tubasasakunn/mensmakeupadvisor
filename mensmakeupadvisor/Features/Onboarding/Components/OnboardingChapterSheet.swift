@@ -28,10 +28,10 @@ struct OnboardingChapterSheet: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("目次")
-                .font(.system(size: 22, weight: .bold))
+                .font(Theme.Typography.UI.title2Bold)
                 .foregroundStyle(Color.ivory)
             Text("読みたい章をタップしてください")
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Color.inkSecondary)
         }
         .padding(.bottom, 16)
@@ -62,17 +62,17 @@ struct OnboardingChapterSheet: View {
     private func chapterRow(chapter ch: OnboardingChapter, isCurrent: Bool) -> some View {
         HStack(spacing: 14) {
             Text(ch.id)
-                .font(.system(size: 18, weight: .light, design: .serif))
+                .font(Theme.Typography.Display.title3Light)
                 .italic()
                 .foregroundStyle(isCurrent ? Color.brandPrimary : Color.inkSecondary)
                 .frame(width: 28, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(ch.title)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(Theme.Typography.UI.bodyLargeSemibold)
                     .foregroundStyle(Color.ivory)
                 Text(ch.subtitle)
-                    .font(.system(size: 12))
+                    .font(Theme.Typography.UI.subheadline)
                     .foregroundStyle(Color.inkSecondary)
                     .lineLimit(2)
             }
@@ -81,11 +81,11 @@ struct OnboardingChapterSheet: View {
 
             if isCurrent {
                 Image(systemName: "location.fill")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(Theme.Typography.UI.footnoteSemibold)
                     .foregroundStyle(Color.brandPrimary)
             } else {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(Theme.Typography.UI.subheadlineSemibold)
                     .foregroundStyle(Color.inkTertiary)
             }
         }

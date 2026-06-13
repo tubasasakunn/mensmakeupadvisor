@@ -25,15 +25,15 @@ struct GlassPrimaryButton: View {
             HStack(spacing: Theme.Spacing.sm) {
                 if let icon {
                     Image(systemName: icon)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(Theme.Typography.UI.bodyLargeSemibold)
                 }
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(Theme.Typography.UI.bodyLargeSemibold)
                     .kerning(0.3)
                 Spacer(minLength: 0)
                 if showsTrailingChevron {
                     Image(systemName: "arrow.right")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(Theme.Typography.UI.calloutSemibold)
                         .opacity(0.85)
                 }
             }

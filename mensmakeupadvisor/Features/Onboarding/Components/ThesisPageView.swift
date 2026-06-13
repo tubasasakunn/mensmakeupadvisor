@@ -6,21 +6,21 @@ struct ThesisPageView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("The Thesis.")
-                .font(.system(size: 11, design: .monospaced))
+                .font(Theme.Typography.Data.base)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(2)
                 .padding(.bottom, 20)
 
             if let title = page.title {
                 Text(title)
-                    .font(.system(size: 22, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.titleBold)
                     .foregroundStyle(Color.ivory)
                     .padding(.bottom, 16)
             }
 
             // Text の結合は foregroundStyle が使えないため foregroundColor を用いる（Text API の制約）
             buildCompositeText()
-                .font(.system(size: 22, weight: .regular, design: .serif))
+                .font(Theme.Typography.Display.titleRegular)
                 .lineSpacing(12)
 
             Spacer(minLength: 0)
@@ -36,7 +36,7 @@ struct ThesisPageView: View {
         func append(_ s: String, color: Color, bold: Bool = false) {
             var seg = AttributedString(s)
             seg.foregroundColor = color
-            if bold { seg.font = .system(size: 22, weight: .bold, design: .serif) }
+            if bold { seg.font = Theme.Typography.Display.titleBold }
             combined.append(seg)
         }
         if let b1 = page.body1 { append(b1, color: .ivory) }

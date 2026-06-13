@@ -54,7 +54,7 @@ struct TutorialFacePlate: View {
 
     private var stepTag: some View {
         Text(currentStep.tag)
-            .font(.system(size: 11, weight: .light, design: .monospaced))
+            .font(Theme.Typography.Data.baseLight)
             .foregroundStyle(Theme.Step.labelTag)
             .padding(10)
     }
@@ -71,7 +71,7 @@ struct TutorialFacePlate: View {
             VStack(spacing: 4) {
                 Spacer()
                 Text("ステップ \(currentStep.tagNumeric) · \(currentStep.titleJP)")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(Theme.Typography.UI.footnoteMedium)
                     .foregroundStyle(Color.inkSecondary)
                     .padding(.bottom, 12)
             }

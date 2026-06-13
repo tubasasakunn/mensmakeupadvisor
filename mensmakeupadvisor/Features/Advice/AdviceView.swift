@@ -115,7 +115,7 @@ struct AdviceView: View {
 
     private var chapterLabel: some View {
         Text("CHAPTER 07 · SCAN")
-            .font(.system(size: 10, weight: .regular, design: .monospaced))
+            .font(Theme.Typography.Data.smallRegular)
             .foregroundStyle(Theme.Text.secondaryFaded)
             .kerning(2.8)
     }
@@ -123,12 +123,12 @@ struct AdviceView: View {
     private var titleBlock: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("step one.")
-                .font(.system(size: 44, weight: .light, design: .serif))
+                .font(Theme.Typography.Display.numeralXLLight)
                 .italic()
                 .foregroundStyle(Theme.Text.primaryFaded)
 
             Text("まず、あなたの顔を\nちゃんと、知る。")
-                .font(.system(size: 30, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.heroBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
                 .lineSpacing(6)
@@ -137,7 +137,7 @@ struct AdviceView: View {
 
     private var descriptionText: some View {
         Text("顔の比率・骨格・左右対称性を\n7つの指標で分析。あなただけの\nメイクアドバイスを導き出す。")
-            .font(.system(size: 13, weight: .regular))
+            .font(Theme.Typography.UI.calloutRegular)
             .foregroundStyle(Theme.Text.primaryFaded)
             .lineSpacing(7)
     }
@@ -201,9 +201,9 @@ struct AdviceView: View {
     private var privacyCaption: some View {
         HStack(spacing: 8) {
             Image(systemName: "lock.shield")
-                .font(.system(size: 10))
+                .font(Theme.Typography.UI.caption)
             Text("端末内処理 · アップロードなし · 痕跡なし")
-                .font(.system(size: 10, weight: .regular, design: .monospaced))
+                .font(Theme.Typography.Data.smallRegular)
                 .kerning(1.2)
         }
         .foregroundStyle(Theme.Text.tertiary)

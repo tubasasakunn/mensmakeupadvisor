@@ -15,11 +15,11 @@ struct DiagnosisSharePrompt: View {
 
                 VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                     Text("結果をシェアする")
-                        .font(.system(size: 15, weight: .semibold, design: .serif))
+                        .font(Theme.Typography.Display.calloutSemibold)
                         .italic()
                         .foregroundStyle(Color.ivory)
                     Text("素顔のスコア — あなたは何点？")
-                        .font(.system(size: 12))
+                        .font(Theme.Typography.UI.subheadline)
                         .foregroundStyle(Theme.Text.primaryFaded)
                 }
 
@@ -33,7 +33,7 @@ struct DiagnosisSharePrompt: View {
                     // 塗りつぶしの円のみ。grade 色ではなく bordeaux 固定で
                     // 「シェア = アクション」を一義に示す。
                     Image(systemName: "arrow.up.forward")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(Theme.Typography.UI.bodyLargeSemibold)
                         .foregroundStyle(Color.ivory)
                         .frame(width: 40, height: 40)
                         .background(Circle().fill(Theme.Accent.primary))
@@ -52,7 +52,7 @@ struct DiagnosisSharePrompt: View {
 
             VStack(spacing: 0) {
                 Text("M·M·A")
-                    .font(.system(size: 5, weight: .medium, design: .monospaced))
+                    .font(Theme.Typography.Data.nanoMedium)
                     .foregroundStyle(Theme.Text.secondary)
                     .padding(.top, 5)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -62,12 +62,12 @@ struct DiagnosisSharePrompt: View {
 
                 HStack(alignment: .firstTextBaseline, spacing: 2) {
                     Text("\(result.totalScore)")
-                        .font(.system(size: 20, weight: .light, design: .serif))
+                        .font(Theme.Typography.Display.title2Light)
                         .italic()
                         .foregroundStyle(Color.ivory)
                     Spacer()
                     Text(result.grade)
-                        .font(.system(size: 14, weight: .black, design: .serif))
+                        .font(Theme.Typography.Display.labelBlack)
                         .italic()
                         .foregroundStyle(result.gradeColor)
                 }
@@ -78,7 +78,7 @@ struct DiagnosisSharePrompt: View {
                     .padding(.vertical, 3)
 
                 Text(result.faceShape.label)
-                    .font(.system(size: 7, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.miniBold)
                     .italic()
                     .foregroundStyle(Theme.Text.primaryFaded)
                     .frame(maxWidth: .infinity, alignment: .leading)

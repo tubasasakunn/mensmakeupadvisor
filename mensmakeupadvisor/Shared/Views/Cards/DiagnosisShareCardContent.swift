@@ -5,18 +5,18 @@ extension DiagnosisShareCardView {
         HStack(alignment: .bottom, spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("TOTAL SCORE")
-                    .font(.system(size: 9, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.miniRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(2)
 
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text("\(result.totalScore)")
-                        .font(.system(size: 64, weight: .light, design: .serif))
+                        .font(Theme.Typography.Display.jumboXXLLight)
                         .italic()
                         .foregroundStyle(Color.ivory)
 
                     Text("/ 100")
-                        .font(.system(size: 14, weight: .light, design: .monospaced))
+                        .font(Theme.Typography.Data.largeLight)
                         .foregroundStyle(Color.inkSecondary)
                         .padding(.bottom, 8)
                 }
@@ -26,7 +26,7 @@ extension DiagnosisShareCardView {
 
             VStack(alignment: .trailing, spacing: 4) {
                 Text(result.gradeDescription)
-                    .font(.system(size: 9, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.miniRegular)
                     .foregroundStyle(result.gradeColor.opacity(0.8))
                     .kerning(0.5)
                     .padding(.bottom, 4)
@@ -37,12 +37,12 @@ extension DiagnosisShareCardView {
     var faceShapeBlock: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text("FACE SHAPE")
-                .font(.system(size: 9, weight: .regular, design: .monospaced))
+                .font(Theme.Typography.Data.miniRegular)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(2)
 
             Text(result.faceShape.label)
-                .font(.system(size: 22, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.titleBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
         }
@@ -53,7 +53,7 @@ extension DiagnosisShareCardView {
             ForEach(result.scores.prefix(3)) { score in
                 HStack {
                     Text(score.name)
-                        .font(.system(size: 10, weight: .regular))
+                        .font(Theme.Typography.UI.captionRegular)
                         .foregroundStyle(Color.inkSecondary)
 
                     Spacer()
@@ -68,7 +68,7 @@ extension DiagnosisShareCardView {
                     .padding(.horizontal, 8)
 
                     Text(score.grade)
-                        .font(.system(size: 15, weight: .light, design: .serif))
+                        .font(Theme.Typography.Display.calloutLight)
                         .italic()
                         .foregroundStyle(score.gradeColor)
                         .frame(minWidth: 18, alignment: .trailing)
@@ -81,18 +81,18 @@ extension DiagnosisShareCardView {
         HStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("MensMakeupAdvisor")
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .font(Theme.Typography.Data.smallSemibold)
                     .foregroundStyle(Theme.Text.primaryFaded)
                     .kerning(1)
                 Text("あなたは何点？/ What's yours?")
-                    .font(.system(size: 9, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.miniRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(0.5)
             }
             Spacer()
 
             Text(result.grade)
-                .font(.system(size: 11, weight: .black, design: .monospaced))
+                .font(Theme.Typography.Data.baseBlack)
                 .foregroundStyle(result.gradeColor)
         }
     }

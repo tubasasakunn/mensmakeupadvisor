@@ -10,15 +10,15 @@ struct EmptyStateView: View {
         GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xxl) {
             VStack(spacing: Theme.Spacing.md) {
                 Text(icon)
-                    .font(.system(size: 56, weight: .light, design: .serif))
+                    .font(Theme.Typography.Display.jumboLLight)
                     .italic()
                     .foregroundStyle(Theme.Text.secondary)
                 Text(title)
-                    .font(.system(size: 17, weight: .semibold, design: .serif))
+                    .font(Theme.Typography.Display.headlineSemibold)
                     .italic()
                     .foregroundStyle(Color.ivory)
                 Text(message)
-                    .font(.system(size: 12))
+                    .font(Theme.Typography.UI.subheadline)
                     .foregroundStyle(Theme.Text.primaryFaded)
                     .multilineTextAlignment(.center)
                     .lineSpacing(5)

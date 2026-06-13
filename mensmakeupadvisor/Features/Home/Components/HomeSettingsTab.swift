@@ -90,7 +90,7 @@ struct HomeSettingsTab: View {
 
     private var kickerLabel: some View {
         Text("ATELIER")
-            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .font(Theme.Typography.Data.baseMedium)
             .kerning(3)
             .foregroundStyle(Theme.Text.secondaryFaded)
     }
@@ -98,11 +98,11 @@ struct HomeSettingsTab: View {
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text("身嗜みの設定。")
-                .font(.system(size: 36, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.heroXLBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
             Text("読みもの、記録、このアプリのこと。")
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Color.inkSecondary)
         }
     }
@@ -163,7 +163,7 @@ struct HomeSettingsTab: View {
 
     private func sectionLabel(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 10, weight: .medium, design: .monospaced))
+            .font(Theme.Typography.Data.smallMedium)
             .kerning(2.5)
             .foregroundStyle(Theme.Text.tertiary)
             .padding(.bottom, Theme.Spacing.xs)
@@ -182,20 +182,20 @@ struct HomeSettingsTab: View {
         Button(action: action) {
             HStack(spacing: Theme.Spacing.md) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 15, weight: .regular))
+                    .font(Theme.Typography.UI.bodyLargeRegular)
                     .foregroundStyle(isDestructive ? Theme.Accent.primaryFaded : Theme.Text.primarySoft)
                     .frame(width: 22, alignment: .leading)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 14, weight: .medium))
+                        .font(Theme.Typography.UI.bodyMedium)
                         .foregroundStyle(Color.ivory)
                     Text(detail)
-                        .font(.system(size: 11))
+                        .font(Theme.Typography.UI.footnote)
                         .foregroundStyle(Theme.Text.tertiary)
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(Theme.Typography.UI.footnoteSemibold)
                     .foregroundStyle(Theme.Text.tertiary)
             }
             .padding(.vertical, Theme.Spacing.md)

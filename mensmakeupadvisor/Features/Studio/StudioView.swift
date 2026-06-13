@@ -117,7 +117,7 @@ struct StudioView: View {
                         .scaleEffect(0.6)
                 } else {
                     Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(Theme.Typography.UI.calloutSemibold)
                         .foregroundStyle(Theme.Text.primarySoft)
                 }
             }

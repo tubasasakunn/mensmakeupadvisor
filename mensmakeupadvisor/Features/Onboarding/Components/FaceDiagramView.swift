@@ -118,7 +118,7 @@ struct FaceDiagramView: View {
 
                 if !caption.isEmpty {
                     let figText = Text(caption)
-                        .font(.system(size: 8, design: .monospaced))
+                        .font(Theme.Typography.Data.tiny)
                         .foregroundStyle(Color.inkSecondary)
                     ctx.draw(figText, at: CGPoint(x: w - 4, y: h - 4), anchor: .bottomTrailing)
                 }

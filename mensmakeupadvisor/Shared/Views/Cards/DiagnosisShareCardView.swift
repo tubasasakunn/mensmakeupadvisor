@@ -84,7 +84,7 @@ struct DiagnosisShareCardView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Spacer()
                 Text(result.rankPercentile)
-                    .font(.system(size: 9, weight: .medium, design: .monospaced))
+                    .font(Theme.Typography.Data.miniMedium)
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(1)
                     .padding(.leading, 28)
@@ -93,7 +93,7 @@ struct DiagnosisShareCardView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(result.grade)
-                .font(.system(size: 20, weight: .black, design: .monospaced))
+                .font(Theme.Typography.Data.heroBlack)
                 .foregroundStyle(Color.appBackground)
                 .frame(width: 52, height: 52)
                 .background(result.gradeColor)
@@ -161,17 +161,17 @@ struct DiagnosisShareCardView: View {
     private var topBar: some View {
         HStack {
             Text("M · M · A")
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .font(Theme.Typography.Data.smallMedium)
                 .foregroundStyle(Color.brandPrimary)
                 .kerning(2)
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
                 Text("PRE-MAKEUP BASELINE")
-                    .font(.system(size: 7, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.microRegular)
                     .foregroundStyle(Color.inkTertiary)
                     .kerning(1.5)
                 Text("FACE DIAGNOSIS")
-                    .font(.system(size: 9, weight: .regular, design: .monospaced))
+                    .font(Theme.Typography.Data.miniRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(2)
             }

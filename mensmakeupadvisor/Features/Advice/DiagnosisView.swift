@@ -106,7 +106,7 @@ struct DiagnosisView: View {
 
     private var reportHeader: some View {
         Text("CHAPTER 07 · RESULT")
-            .font(.system(size: 10, weight: .regular, design: .monospaced))
+            .font(Theme.Typography.Data.smallRegular)
             .foregroundStyle(Theme.Text.secondaryFaded)
             .kerning(2.8)
     }
@@ -114,12 +114,12 @@ struct DiagnosisView: View {
     private var titleBlock: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text("step two.")
-                .font(.system(size: 40, weight: .light, design: .serif))
+                .font(Theme.Typography.Display.numeralLight)
                 .italic()
                 .foregroundStyle(Theme.Text.primaryFaded)
 
             Text("診断結果.")
-                .font(.system(size: 46, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.numeralXXLBold)
                 .italic()
                 .foregroundStyle(Color.ivory)
         }
@@ -127,7 +127,7 @@ struct DiagnosisView: View {
 
     private var captionLine: some View {
         Text("— a study of seven proportions —")
-            .font(.system(size: 10, weight: .regular, design: .monospaced))
+            .font(Theme.Typography.Data.smallRegular)
             .foregroundStyle(Theme.Text.secondaryFaded)
             .kerning(1.8)
     }
@@ -149,7 +149,7 @@ struct DiagnosisView: View {
             HStack(spacing: Theme.Spacing.md) {
                 if let icon {
                     Image(systemName: icon)
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(Theme.Typography.UI.title3Semibold)
                         .foregroundStyle(Color.ivory)
                         .frame(width: 24)
                 }
@@ -158,12 +158,12 @@ struct DiagnosisView: View {
                         .font(.system(size: 15, weight: isProminent ? .semibold : .medium))
                         .foregroundStyle(isProminent ? Color.ivory : Theme.Text.primarySoft)
                     Text(subtitle)
-                        .font(.system(size: 11, weight: .regular))
+                        .font(Theme.Typography.UI.footnoteRegular)
                         .foregroundStyle(isProminent ? Theme.Text.primaryFaded : Theme.Text.secondaryFaded)
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "arrow.right")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(Theme.Typography.UI.calloutSemibold)
                     .foregroundStyle(isProminent ? Color.ivory.opacity(0.85) : Theme.Text.primaryFaded)
             }
             .padding(.horizontal, Theme.Spacing.xl)

@@ -14,10 +14,10 @@ struct GlassSecondaryButton: View {
             HStack(spacing: Theme.Spacing.sm) {
                 if let icon {
                     Image(systemName: icon)
-                        .font(.system(size: 14, weight: .regular))
+                        .font(Theme.Typography.UI.bodyRegular)
                 }
                 Text(title)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(Theme.Typography.UI.bodyMedium)
                     .kerning(0.3)
             }
             .foregroundStyle(Theme.Text.primarySoft)

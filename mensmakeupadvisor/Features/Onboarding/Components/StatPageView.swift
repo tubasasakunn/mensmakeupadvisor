@@ -8,14 +8,14 @@ struct StatPageView: View {
             Spacer(minLength: 32)
 
             Text(page.tag)
-                .font(.system(size: 11, weight: .regular, design: .monospaced))
+                .font(Theme.Typography.Data.baseRegular)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(2.5)
                 .padding(.bottom, 31)
 
             if let stat = page.stat {
                 Text(stat)
-                    .font(.system(size: 88, weight: .bold, design: .serif))
+                    .font(Theme.Typography.Display.colossalXLBold)
                     .foregroundStyle(Color.ivory)
                     .minimumScaleFactor(0.5)
                     .lineLimit(1)
@@ -24,7 +24,7 @@ struct StatPageView: View {
 
             if let label = page.statLabel {
                 Text(label)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(Theme.Typography.UI.headlineMedium)
                     .foregroundStyle(Theme.Plate.renderingTint)
                     .lineSpacing(5)
                     .padding(.bottom, 26)
@@ -35,7 +35,7 @@ struct StatPageView: View {
 
             if let body = page.body {
                 Text(body)
-                    .font(.system(size: 15, weight: .regular))
+                    .font(Theme.Typography.UI.bodyLargeRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(8)
                     .padding(.bottom, 16)
@@ -43,7 +43,7 @@ struct StatPageView: View {
 
             if let source = page.source {
                 Text(source)
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(Theme.Typography.Data.base)
                     .foregroundStyle(Theme.Text.secondaryDim)
                     .kerning(0.5)
             }
