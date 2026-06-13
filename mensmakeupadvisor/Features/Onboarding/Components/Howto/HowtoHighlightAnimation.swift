@@ -94,7 +94,7 @@ struct HowtoHighlightAnimation: View {
             (min(p + 0.03, 1), spot.ringMaxScale), (1.00, spot.ringMaxScale)
         ])
         return Ellipse()
-            .stroke(Theme.Howto.highlightGold, lineWidth: 4)
+            .stroke(Theme.Howto.highlightGold, lineWidth: Theme.Size.Line.thick)
             .frame(width: spot.rx * 2, height: spot.ry * 2)
             .scaleEffect(scale)
             .opacity(opacity)

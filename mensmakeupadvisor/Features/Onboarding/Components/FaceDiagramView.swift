@@ -41,7 +41,7 @@ struct FaceDiagramView: View {
 
                 let faceRect = CGRect(x: faceLeft, y: faceTop, width: faceW, height: faceH)
                 let facePath = Path(ellipseIn: faceRect)
-                ctx.stroke(facePath, with: .color(Theme.Diagram.faceOutline), lineWidth: 1.2)
+                ctx.stroke(facePath, with: .color(Theme.Diagram.faceOutline), lineWidth: Theme.Size.Line.bold)
 
                 let jawTop = faceTop + faceH * 0.65
                 var jawPath = Path()
@@ -55,7 +55,7 @@ struct FaceDiagramView: View {
                     to: CGPoint(x: cx, y: faceBottom),
                     control: CGPoint(x: faceRight - faceW * 0.04, y: faceBottom - faceH * 0.06)
                 )
-                ctx.stroke(jawPath, with: .color(Theme.Diagram.jawLine), lineWidth: 0.8)
+                ctx.stroke(jawPath, with: .color(Theme.Diagram.jawLine), lineWidth: Theme.Size.Line.medium)
 
                 let browY = faceTop + faceH * 0.26
                 let browSpread = faceW * 0.24
@@ -100,7 +100,7 @@ struct FaceDiagramView: View {
                     to: CGPoint(x: cx - noseW, y: noseTipY - 2),
                     control: CGPoint(x: cx - noseW * 0.5, y: noseTipY + 5)
                 )
-                ctx.stroke(nosePath, with: .color(Theme.Diagram.nose), lineWidth: 0.9)
+                ctx.stroke(nosePath, with: .color(Theme.Diagram.nose), lineWidth: Theme.Size.Line.firm)
 
                 let mouthY = faceTop + faceH * 0.71
                 let mouthW = faceW * 0.22
@@ -110,7 +110,7 @@ struct FaceDiagramView: View {
                     to: CGPoint(x: cx + mouthW, y: mouthY),
                     control: CGPoint(x: cx, y: mouthY + 5)
                 )
-                ctx.stroke(mouthPath, with: .color(Theme.Diagram.jawLine), lineWidth: 0.9)
+                ctx.stroke(mouthPath, with: .color(Theme.Diagram.jawLine), lineWidth: Theme.Size.Line.firm)
 
                 var centerLine = Path()
                 centerLine.move(to: CGPoint(x: cx, y: faceTop + faceH * 0.04))
@@ -118,7 +118,7 @@ struct FaceDiagramView: View {
                 ctx.stroke(
                     centerLine,
                     with: .color(Theme.Mesh.placeholderGrid),
-                    style: StrokeStyle(lineWidth: 0.5, dash: [3, 4])
+                    style: StrokeStyle(lineWidth: Theme.Size.Line.thin, dash: [3, 4])
                 )
 
                 if !caption.isEmpty {

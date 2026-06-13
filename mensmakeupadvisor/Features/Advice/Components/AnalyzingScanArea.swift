@@ -63,14 +63,14 @@ struct AnalyzingScanArea: View {
                 let x = CGFloat(col) * cellW
                 path.move(to: CGPoint(x: x, y: 0))
                 path.addLine(to: CGPoint(x: x, y: size.height))
-                context.stroke(path, with: .color(Theme.Plate.scanGridLine), lineWidth: 0.5)
+                context.stroke(path, with: .color(Theme.Plate.scanGridLine), lineWidth: Theme.Size.Line.thin)
             }
             for row in 0...rows {
                 var path = Path()
                 let y = CGFloat(row) * cellH
                 path.move(to: CGPoint(x: 0, y: y))
                 path.addLine(to: CGPoint(x: size.width, y: y))
-                context.stroke(path, with: .color(Theme.Plate.scanGridLine), lineWidth: 0.5)
+                context.stroke(path, with: .color(Theme.Plate.scanGridLine), lineWidth: Theme.Size.Line.thin)
             }
         }
         .allowsHitTesting(false)

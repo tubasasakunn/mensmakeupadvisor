@@ -41,7 +41,7 @@ struct AdviceMockImagePicker: View {
         .padding(Theme.Spacing.md)
         .overlay(
             RoundedRectangle(cornerRadius: Theme.Radius.md)
-                .stroke(Theme.Status.warningBorder, lineWidth: 1)
+                .stroke(Theme.Status.warningBorder, lineWidth: Theme.Size.Line.regular)
         )
         .aid("advice_mock_image_picker")
     }

@@ -34,7 +34,7 @@ struct ScoreAnnotationDrawer {
             width: max(templeL.x, cheekL.x, jawL.x) - min(templeR.x, cheekR.x, jawR.x),
             height: chinY - foreheadY
         )
-        ctx.stroke(Path(roundedRect: rect, cornerRadius: 2), with: .color(accent), lineWidth: 1.0)
+        ctx.stroke(Path(roundedRect: rect, cornerRadius: 2), with: .color(accent), lineWidth: Theme.Size.Line.regular)
         drawHorizontalRange(ctx: &ctx, a: cheekR, b: cheekL, color: primary, label: "頬骨幅")
         drawHorizontalRange(ctx: &ctx, a: jawR, b: jawL, color: sub, label: "顎幅")
         drawVerticalRange(ctx: &ctx,
@@ -82,7 +82,7 @@ struct ScoreAnnotationDrawer {
             var p = Path()
             p.move(to: CGPoint(x: x, y: foreheadY))
             p.addLine(to: CGPoint(x: x, y: chinY))
-            ctx.stroke(p, with: .color(sub), lineWidth: 0.9)
+            ctx.stroke(p, with: .color(sub), lineWidth: Theme.Size.Line.firm)
         }
         for (left, right) in zip(xs.dropLast(), xs.dropFirst()) {
             guard let label = left.1 else { continue }
@@ -127,7 +127,7 @@ struct ScoreAnnotationDrawer {
         var p = Path()
         p.move(to: point(FaceLandmarkID.noseRoot))
         p.addLine(to: point(FaceLandmarkID.noseTip))
-        ctx.stroke(p, with: .color(accent), lineWidth: 1.0)
+        ctx.stroke(p, with: .color(accent), lineWidth: Theme.Size.Line.regular)
     }
 
     // MARK: - 口の比率
@@ -157,7 +157,7 @@ struct ScoreAnnotationDrawer {
         var center = Path()
         center.move(to: CGPoint(x: midX, y: topMid.y))
         center.addLine(to: CGPoint(x: midX, y: bottomMid.y))
-        ctx.stroke(center, with: .color(accent), lineWidth: 1.0)
+        ctx.stroke(center, with: .color(accent), lineWidth: Theme.Size.Line.regular)
 
         let pairs: [(Int, Int, String)] = [
             (FaceLandmarkID.eyeOuterR,  FaceLandmarkID.eyeOuterL,  "目尻"),
@@ -175,7 +175,7 @@ struct ScoreAnnotationDrawer {
             line.move(to: pr)
             line.addLine(to: pl)
             ctx.stroke(line, with: .color(primary.opacity(0.6)),
-                       style: StrokeStyle(lineWidth: 0.7, dash: [3, 3]))
+                       style: StrokeStyle(lineWidth: Theme.Size.Line.soft, dash: [3, 3]))
             drawLabel(ctx: &ctx, text: label,
                       at: CGPoint(x: (pr.x + pl.x) / 2, y: (pr.y + pl.y) / 2 - 6),
                       align: .center, color: primary)
@@ -197,12 +197,12 @@ struct ScoreAnnotationDrawer {
         var line = Path()
         line.move(to: CGPoint(x: a.x, y: y))
         line.addLine(to: CGPoint(x: b.x, y: y))
-        ctx.stroke(line, with: .color(color), lineWidth: 1.2)
+        ctx.stroke(line, with: .color(color), lineWidth: Theme.Size.Line.bold)
         for x in [a.x, b.x] {
             var bar = Path()
             bar.move(to: CGPoint(x: x, y: y - 4))
             bar.addLine(to: CGPoint(x: x, y: y + 4))
-            ctx.stroke(bar, with: .color(color), lineWidth: 1.0)
+            ctx.stroke(bar, with: .color(color), lineWidth: Theme.Size.Line.regular)
         }
         drawLabel(ctx: &ctx, text: label,
                   at: CGPoint(x: (a.x + b.x) / 2, y: y - 7),
@@ -215,12 +215,12 @@ struct ScoreAnnotationDrawer {
         var line = Path()
         line.move(to: CGPoint(x: x, y: top.y))
         line.addLine(to: CGPoint(x: x, y: bottom.y))
-        ctx.stroke(line, with: .color(color), lineWidth: 1.2)
+        ctx.stroke(line, with: .color(color), lineWidth: Theme.Size.Line.bold)
         for y in [top.y, bottom.y] {
             var bar = Path()
             bar.move(to: CGPoint(x: x - 4, y: y))
             bar.addLine(to: CGPoint(x: x + 4, y: y))
-            ctx.stroke(bar, with: .color(color), lineWidth: 1.0)
+            ctx.stroke(bar, with: .color(color), lineWidth: Theme.Size.Line.regular)
         }
         drawLabel(ctx: &ctx, text: label,
                   at: CGPoint(x: x + 10, y: (top.y + bottom.y) / 2),

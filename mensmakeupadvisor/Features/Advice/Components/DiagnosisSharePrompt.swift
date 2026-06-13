@@ -92,7 +92,7 @@ struct DiagnosisSharePrompt: View {
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 2))
-        .hairlineBorder(Color.lineStrong, cornerRadius: 2, lineWidth: 0.5)
+        .hairlineBorder(Color.lineStrong, cornerRadius: 2, lineWidth: Theme.Size.Line.thin)
     }
 
     private func shareResult() async {

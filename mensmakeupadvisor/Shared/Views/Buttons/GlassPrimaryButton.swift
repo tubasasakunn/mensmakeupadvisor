@@ -70,7 +70,7 @@ struct GlassPrimaryButtonSurface: ViewModifier {
                                 startPoint: .top,
                                 endPoint: .center
                             ),
-                            lineWidth: 0.6
+                            lineWidth: Theme.Size.Line.light
                         )
                 )
                 .shadow(color: Theme.Accent.primary.opacity(0.28), radius: 18, x: 0, y: 6)
@@ -79,7 +79,7 @@ struct GlassPrimaryButtonSurface: ViewModifier {
                 .glassEffect(.clear, in: .capsule)
                 .overlay(
                     Capsule()
-                        .strokeBorder(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
+                        .strokeBorder(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.light)
                 )
         }
     }

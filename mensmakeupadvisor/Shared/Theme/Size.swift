@@ -71,5 +71,24 @@ extension Theme {
             // Analyzing のスキャン領域
             nonisolated static let scan:  CGFloat = 240
         }
+
+        // MARK: - Line (Canvas / Shape の描画ストローク幅)
+
+        // 顔メッシュ・評価線・区切りなどシェイプ描画の lineWidth。frame の Stroke とは
+        // 別物 (こちらはサブポイントの細線を含む描画専用スケール)。
+        enum Line {
+            nonisolated static let hair: CGFloat = 0.3
+            nonisolated static let faint: CGFloat = 0.4
+            nonisolated static let thin: CGFloat = 0.5
+            nonisolated static let light: CGFloat = 0.6
+            nonisolated static let soft: CGFloat = 0.7
+            nonisolated static let medium: CGFloat = 0.8
+            nonisolated static let firm: CGFloat = 0.9
+            nonisolated static let regular: CGFloat = 1
+            nonisolated static let bold: CGFloat = 1.2
+            nonisolated static let heavy: CGFloat = 2
+            nonisolated static let thick: CGFloat = 4
+            nonisolated static let chunky: CGFloat = 5
+        }
     }
 }

@@ -136,7 +136,7 @@ struct HomeArchiveTab: View {
                 .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm))
                 .overlay(
                     RoundedRectangle(cornerRadius: Theme.Radius.sm)
-                        .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                        .stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
                 )
                 .overlay(alignment: .bottomTrailing) {
                     if look.totalScore > 0 {

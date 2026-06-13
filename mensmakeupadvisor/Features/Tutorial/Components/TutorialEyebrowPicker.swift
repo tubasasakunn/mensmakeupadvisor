@@ -61,7 +61,7 @@ struct TutorialEyebrowPicker: View {
                 Capsule()
                     .stroke(
                         isActive ? Color.clear : Theme.Line.outlineIvorySoft,
-                        lineWidth: 0.5
+                        lineWidth: Theme.Size.Line.thin
                     )
             )
         }

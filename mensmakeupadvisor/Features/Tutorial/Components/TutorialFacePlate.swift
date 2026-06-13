@@ -65,7 +65,7 @@ struct TutorialFacePlate: View {
             Theme.Surface.raised
 
             Ellipse()
-                .stroke(Theme.Plate.placeholderEllipse, lineWidth: 1)
+                .stroke(Theme.Plate.placeholderEllipse, lineWidth: Theme.Size.Line.regular)
                 .frame(width: width * 0.55, height: height * 0.68)
 
             VStack(spacing: 4) {

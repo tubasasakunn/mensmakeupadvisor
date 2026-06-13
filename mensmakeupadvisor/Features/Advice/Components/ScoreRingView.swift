@@ -9,7 +9,7 @@ struct ScoreRingView: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(Color.lineColor, lineWidth: 1)
+                .stroke(Color.lineColor, lineWidth: Theme.Size.Line.regular)
 
             tickMarks
 
@@ -17,7 +17,7 @@ struct ScoreRingView: View {
                 .trim(from: 0, to: CGFloat(animatedValue) / 100)
                 .stroke(
                     Color.ivory,
-                    style: StrokeStyle(lineWidth: 2, lineCap: .butt)
+                    style: StrokeStyle(lineWidth: Theme.Size.Line.heavy, lineCap: .butt)
                 )
                 .rotationEffect(.degrees(-90))
                 .animation(reduceMotion ? .none : .interpolatingSpring(duration: 1.4),
@@ -63,7 +63,7 @@ struct ScoreRingView: View {
                 var path = Path()
                 path.move(to: CGPoint(x: x1, y: y1))
                 path.addLine(to: CGPoint(x: x2, y: y2))
-                context.stroke(path, with: .color(Theme.Mesh.tickMark), lineWidth: 0.5)
+                context.stroke(path, with: .color(Theme.Mesh.tickMark), lineWidth: Theme.Size.Line.thin)
             }
         }
     }

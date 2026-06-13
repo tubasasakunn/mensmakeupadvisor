@@ -195,7 +195,7 @@ struct StudioImagePlate: View {
                     Theme.Surface.raised
                     VStack(spacing: 8) {
                         Ellipse()
-                            .stroke(Theme.Plate.placeholderEllipse, lineWidth: 1)
+                            .stroke(Theme.Plate.placeholderEllipse, lineWidth: Theme.Size.Line.regular)
                             .frame(width: width * 0.55, height: height * 0.68)
                         Text("メイク後のプレビュー")
                             .font(Theme.Typography.UI.footnote)

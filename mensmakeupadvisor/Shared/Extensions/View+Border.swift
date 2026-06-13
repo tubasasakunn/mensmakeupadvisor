@@ -1,7 +1,7 @@
 import SwiftUI
 
 extension View {
-    // 直角の罫線枠。`.overlay(Rectangle().stroke(Color.lineColor, lineWidth: 1))`
+    // 直角の罫線枠。`.overlay(Rectangle().stroke(Color.lineColor, lineWidth: Theme.Size.Line.regular))`
     // をアプリ全体で書き散らしていたのを集約する。
     func hairlineBorder(
         _ color: Color = Color.lineColor,

@@ -39,7 +39,7 @@ struct GlassCard<Content: View>: View {
             .overlay(
                 // 面の輪郭を ivory で 1px 強調すると luxury 感が出る。
                 RoundedRectangle(cornerRadius: radius)
-                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
             )
     }
 }
@@ -58,7 +58,7 @@ struct GlassPanel<Content: View>: View {
             .background(Theme.Surface.panel, in: .rect(cornerRadius: radius))
             .overlay(
                 RoundedRectangle(cornerRadius: radius)
-                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
             )
     }
 }

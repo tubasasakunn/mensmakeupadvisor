@@ -93,7 +93,7 @@ struct HowtoBaseAnimation: View {
                 p.addQuadCurve(to: arrow.to, control: arrow.control)
             }
             .trim(from: 0, to: trimEnd)
-            .stroke(color, style: .init(lineWidth: 5, lineCap: .round))
+            .stroke(color, style: .init(lineWidth: Theme.Size.Line.chunky, lineCap: .round))
 
             ArrowTipShape()
                 .fill(color)

@@ -163,7 +163,7 @@ struct SavedLookDetailSheet: View {
             .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.Radius.md)
-                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
             )
     }
 

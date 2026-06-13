@@ -32,7 +32,7 @@ struct MakeupShareCardView: View {
             gridTexture
 
             Rectangle()
-                .stroke(Color.lineColor, lineWidth: 0.5)
+                .stroke(Color.lineColor, lineWidth: Theme.Size.Line.thin)
 
             VStack(alignment: .leading, spacing: 0) {
                 topBar
@@ -86,13 +86,13 @@ struct MakeupShareCardView: View {
                 var p = Path()
                 p.move(to: CGPoint(x: col, y: 0))
                 p.addLine(to: CGPoint(x: col, y: size.height))
-                context.stroke(p, with: .color(.white.opacity(0.025)), lineWidth: 0.5)
+                context.stroke(p, with: .color(.white.opacity(0.025)), lineWidth: Theme.Size.Line.thin)
             }
             for row in stride(from: CGFloat(0), through: size.height, by: step) {
                 var p = Path()
                 p.move(to: CGPoint(x: 0, y: row))
                 p.addLine(to: CGPoint(x: size.width, y: row))
-                context.stroke(p, with: .color(.white.opacity(0.025)), lineWidth: 0.5)
+                context.stroke(p, with: .color(.white.opacity(0.025)), lineWidth: Theme.Size.Line.thin)
             }
         }
         .allowsHitTesting(false)

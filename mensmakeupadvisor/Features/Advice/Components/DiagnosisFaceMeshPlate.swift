@@ -61,7 +61,7 @@ struct DiagnosisFaceMeshPlate: View {
                 meshPath.move(to: CGPoint(x: pa.x * size.width, y: pa.y * size.height))
                 meshPath.addLine(to: CGPoint(x: pb.x * size.width, y: pb.y * size.height))
             }
-            context.stroke(meshPath, with: .color(Theme.Diagram.highlightArea), lineWidth: 0.4)
+            context.stroke(meshPath, with: .color(Theme.Diagram.highlightArea), lineWidth: Theme.Size.Line.faint)
 
             for p in landmarks {
                 let r: CGFloat = 0.9
@@ -83,14 +83,14 @@ struct DiagnosisFaceMeshPlate: View {
                 let x = CGFloat(col) * size.width / CGFloat(cols)
                 p.move(to: CGPoint(x: x, y: 0))
                 p.addLine(to: CGPoint(x: x, y: size.height))
-                context.stroke(p, with: .color(Theme.Mesh.placeholderGrid), lineWidth: 0.5)
+                context.stroke(p, with: .color(Theme.Mesh.placeholderGrid), lineWidth: Theme.Size.Line.thin)
             }
             for row in 0...rows {
                 var p = Path()
                 let y = CGFloat(row) * size.height / CGFloat(rows)
                 p.move(to: CGPoint(x: 0, y: y))
                 p.addLine(to: CGPoint(x: size.width, y: y))
-                context.stroke(p, with: .color(Theme.Mesh.placeholderGrid), lineWidth: 0.5)
+                context.stroke(p, with: .color(Theme.Mesh.placeholderGrid), lineWidth: Theme.Size.Line.thin)
             }
         }
         .allowsHitTesting(false)

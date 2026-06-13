@@ -27,7 +27,7 @@ struct GlassSecondaryButton: View {
             .background(Theme.Surface.panel, in: .capsule)
             .overlay(
                 Capsule()
-                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
+                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.light)
             )
         }
         .buttonStyle(GlassPressedButtonStyle())

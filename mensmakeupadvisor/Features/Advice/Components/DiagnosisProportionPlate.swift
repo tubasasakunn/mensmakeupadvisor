@@ -71,7 +71,7 @@ struct DiagnosisProportionPlate: View {
                 var p = Path()
                 p.move(to: CGPoint(x: 0, y: y))
                 p.addLine(to: CGPoint(x: w, y: y))
-                context.stroke(p, with: .color(thirdsColor), lineWidth: 0.8)
+                context.stroke(p, with: .color(thirdsColor), lineWidth: Theme.Size.Line.medium)
             }
 
             // 三分割ラベル（右端）
@@ -101,7 +101,7 @@ struct DiagnosisProportionPlate: View {
                 var p = Path()
                 p.move(to: CGPoint(x: x, y: foreheadY))
                 p.addLine(to: CGPoint(x: x, y: chinY))
-                context.stroke(p, with: .color(fifthsColor), lineWidth: 0.7)
+                context.stroke(p, with: .color(fifthsColor), lineWidth: Theme.Size.Line.soft)
             }
 
             // ─── 目幅・口幅・鼻幅 ───
@@ -135,14 +135,14 @@ struct DiagnosisProportionPlate: View {
         var line = Path()
         line.move(to: CGPoint(x: a.x, y: y))
         line.addLine(to: CGPoint(x: b.x, y: y))
-        context.stroke(line, with: .color(color), lineWidth: 1.2)
+        context.stroke(line, with: .color(color), lineWidth: Theme.Size.Line.bold)
 
         // 両端の小さな縦バー
         for x in [a.x, b.x] {
             var bar = Path()
             bar.move(to: CGPoint(x: x, y: y - 4))
             bar.addLine(to: CGPoint(x: x, y: y + 4))
-            context.stroke(bar, with: .color(color), lineWidth: 1.0)
+            context.stroke(bar, with: .color(color), lineWidth: Theme.Size.Line.regular)
         }
 
         drawLabel(context: &context, text: label,
