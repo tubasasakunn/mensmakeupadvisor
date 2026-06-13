@@ -155,7 +155,7 @@ struct DiagnosisView: View {
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 15, weight: isProminent ? .semibold : .medium))
+                        .font(isProminent ? Theme.Typography.UI.bodyLargeSemibold : Theme.Typography.UI.bodyLargeMedium)
                         .foregroundStyle(isProminent ? Color.ivory : Theme.Text.primarySoft)
                     Text(subtitle)
                         .font(Theme.Typography.UI.footnoteRegular)

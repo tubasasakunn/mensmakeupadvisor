@@ -103,7 +103,7 @@ struct HomeArchiveTab: View {
         GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xxl) {
             VStack(spacing: Theme.Spacing.lg) {
                 Image(systemName: "heart")
-                    .font(.system(size: 40, weight: .ultraLight))
+                    .font(Theme.Typography.UI.numeralUltraLight)
                     .foregroundStyle(Theme.Text.secondary)
                 Text("まだ保存したルックがありません")
                     .font(Theme.Typography.Display.headlineSemibold)

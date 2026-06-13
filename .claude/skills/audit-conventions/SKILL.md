@@ -32,6 +32,12 @@ allowed-tools: Grep, Glob, Read, Bash
 | 10 | `onChange\(of:.*\) \{ _, _ in` | 旧形式 onChange（引数なし形式へ） |
 | 11 | `"[ぁ-んァ-ヶ一-龠]`（`Strings.swift` 以外） | 日本語文字列の直書き（コメント行は除外。Strings へ） |
 | 12 | `nonisolated\(unsafe\)\|@unchecked Sendable` | 新規追加の検出（理由コメントの有無を確認・前回からの増分を見る） |
+| 13 | `\.system\(size:` | フォントの数値直書き（`Theme.Typography.*` を通す。`Shared/Theme/` は除外） |
+| 14 | `lineWidth:\s*\d` | 描画ストローク幅の直書き（`Theme.Size.Line.*` を通す。`Shared/Theme/` は除外） |
+
+> 既知の残課題（規約対象だが未集約）：`\.padding\(\d` / `spacing:\s*\d` / `cornerRadius:\s*\d`。
+> `Theme.Spacing` / `Theme.Radius` の現行スケールが実使用値（24/10/14/6 等）を
+> カバーしておらず、現値保持での集約にはスケール再設計の意思決定が要る。判断したら ADR に残す。
 
 ## 報告形式
 

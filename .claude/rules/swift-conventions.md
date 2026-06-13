@@ -16,7 +16,10 @@ paths:
 
 | 何を書くとき | 通す場所（推奨ファイル） | 直書きの例（禁止） |
 |---|---|---|
-| 色・余白・角丸・サイズ・フォント | `Tokens.*`（`Design/DesignTokens.swift`） | `.padding(16)` / `.frame(width: 44)` / `Font.custom(...)` |
+| 色 | `Theme.*`（`Shared/Theme/Theme.swift`） | `Color(...)` / `.opacity(...)` の直書き |
+| 余白・角丸 | `Theme.Spacing.*` / `Theme.Radius.*` | `.padding(16)` / `cornerRadius: 20` |
+| frame サイズ・描画線幅 | `Theme.Size.*`（`Shared/Theme/Size.swift`） | `.frame(width: 44)` / `lineWidth: 0.5` |
+| フォント | `Theme.Typography.*`（`Shared/Theme/Typography.swift`） | `.font(.system(size: 11))` |
 | ユーザー向け文字列 | `Strings.*`（`Resources/Strings.swift`） | `Text("完了")` |
 | 日付の表示フォーマット | `DisplayDate.*`（`Resources/DateFormatters.swift`） | ビュー内で `DateFormatter()` を生成 |
 | `@AppStorage` / UserDefaults キー | `AppStorageKeys.*` | `@AppStorage("someKey")` |

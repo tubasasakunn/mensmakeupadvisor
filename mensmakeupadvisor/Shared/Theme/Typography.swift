@@ -46,6 +46,7 @@ extension Theme {
             nonisolated static let bodySemibold: Font = .system(size: 14, weight: .semibold)
             nonisolated static let bodyHeavy: Font = .system(size: 14, weight: .heavy)
             nonisolated static let bodyLargeRegular: Font = .system(size: 15, weight: .regular)
+            nonisolated static let bodyLargeMedium: Font = .system(size: 15, weight: .medium)
             nonisolated static let bodyLargeSemibold: Font = .system(size: 15, weight: .semibold)
             nonisolated static let headlineMedium: Font = .system(size: 16, weight: .medium)
             nonisolated static let headlineBold: Font = .system(size: 16, weight: .bold)
@@ -57,6 +58,8 @@ extension Theme {
             nonisolated static let titleLarge: Font = .system(size: 26)
             nonisolated static let display: Font = .system(size: 28)
             nonisolated static let displayLargeSemibold: Font = .system(size: 32, weight: .semibold)
+            // 空状態などの大きな SF Symbol グリフ
+            nonisolated static let numeralUltraLight: Font = .system(size: 40, weight: .ultraLight)
         }
 
         // MARK: - Data (monospaced — スコア・数値・技術ラベル)

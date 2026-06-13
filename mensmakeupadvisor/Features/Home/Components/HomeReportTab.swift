@@ -165,7 +165,7 @@ struct HomeReportTab: View {
         GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xxl) {
             VStack(spacing: Theme.Spacing.lg) {
                 Image(systemName: "face.dashed")
-                    .font(.system(size: 40, weight: .ultraLight))
+                    .font(Theme.Typography.UI.numeralUltraLight)
                     .foregroundStyle(Theme.Text.secondary)
                 Text("まだ診断結果はありません")
                     .font(Theme.Typography.Display.headlineSemibold)

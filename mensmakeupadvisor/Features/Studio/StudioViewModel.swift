@@ -41,11 +41,17 @@ final class StudioViewModel {
     }
 
     // タイトル入力シートのデフォルト名。
-    static func defaultTitle(for date: Date = .now) -> String {
+    // DisplayDate 集約層は本アプリ未導入かつ用途が単発のため、ここで static にキャッシュして
+    // 「都度生成」だけ避ける (フォーマッタ生成はコストが高い)。
+    private static let titleFormatter: DateFormatter = {
         let f = DateFormatter()
         f.locale = Locale(identifier: "ja_JP")
         f.dateFormat = "M月d日のメイク"
-        return f.string(from: date)
+        return f
+    }()
+
+    static func defaultTitle(for date: Date = .now) -> String {
+        titleFormatter.string(from: date)
     }
 
     private func eyeAreaNames(_ comp: MakeupComposition) -> Set<String> {
