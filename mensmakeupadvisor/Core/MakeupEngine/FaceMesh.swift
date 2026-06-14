@@ -103,14 +103,6 @@ nonisolated final class FaceMesh {
         }
         faceMeshLog.notice("detect: face landmarks=\(face.count, privacy: .public) (image=\(Int(image.size.width), privacy: .public)x\(Int(image.size.height), privacy: .public))")
 
-        // 各 Judge / FaceMetrics は虹彩 (468–477) を含む 478 点を直接添字でアクセスする。
-        // refine_landmarks 無効のモデルに差し替わると 468 点になり、それらが範囲外
-        // クラッシュする。478 点未満は「検出失敗」として扱い、上流で fallback させる。
-        guard face.count >= 478 else {
-            faceMeshLog.warning("detect: insufficient landmarks=\(face.count, privacy: .public) (<478), treating as not detected")
-            throw FaceMeshError.faceNotDetected
-        }
-
         let w = Int(image.size.width * image.scale)
         let h = Int(image.size.height * image.scale)
 
