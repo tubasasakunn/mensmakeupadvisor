@@ -49,7 +49,10 @@ nonisolated enum DistanceTransform {
         for q in 1..<n {
             var s = ((f[q] + Float(q * q)) - (f[v[k]] + Float(v[k] * v[k])))
                 / Float(2 * q - 2 * v[k])
-            while s <= z[k] {
+            // inf を有限の 1e20 で近似しているため、参照実装が前提とする
+            // 「z[0] = -∞ で必ず停止」が成り立たず k が負へ抜けうる。v/z は
+            // UnsafeMutablePointer で境界チェックが無いので k > 0 を明示ガードする。
+            while k > 0 && s <= z[k] {
                 k -= 1
                 s = ((f[q] + Float(q * q)) - (f[v[k]] + Float(v[k] * v[k])))
                     / Float(2 * q - 2 * v[k])

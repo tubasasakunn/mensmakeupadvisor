@@ -13,6 +13,8 @@ nonisolated enum GaussianBlur {
         let half = k / 2
         let w = buffer.width
         let h = buffer.height
+        // 0 幅/高さでは端の折り返しで rowBase[w-1] / col[h-1] が範囲外になる。
+        guard w > 0, h > 0 else { return }
 
         let temp = FloatBuffer(width: w, height: h)
         let stride = vDSP_Stride(1)

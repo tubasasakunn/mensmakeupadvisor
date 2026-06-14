@@ -150,7 +150,8 @@ nonisolated struct MakeupRenderer {
         let h = image.height
         guard w > targetWidth else { return image }
         let tw = targetWidth
-        let th = Int(Double(h) * Double(tw) / Double(w))
+        // 極端な横長画像では Int 丸めで高さが 0 になり CGContext 生成が失敗する。
+        let th = max(1, Int(Double(h) * Double(tw) / Double(w)))
         let bytesPerRow = tw * 4
         let info: CGBitmapInfo = [
             CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
