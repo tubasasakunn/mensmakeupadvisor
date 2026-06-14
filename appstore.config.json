@@ -1,41 +1,41 @@
 {
-  "_comment": "swift-base 共通設定。新しいアプリにコピーしたら、まずこのファイルの値を全部置き換える。scripts/*.py・fastlane/Fastfile・post/_brand.py がここを読む。",
+  "_comment": "swift-base 共通設定。scripts/*.py・fastlane/Fastfile・post/_brand.py がここを読む。アプリ＝Tone（メンズメイク診断）。",
 
   "app": {
-    "name": "MyApp",
-    "reading": "マイアップ",
-    "bundle_id": "com.example.myapp",
-    "scheme": "MyApp",
-    "xcodeproj": "MyApp.xcodeproj",
-    "url_scheme": "myapp",
+    "name": "Tone",
+    "reading": "トーン",
+    "bundle_id": "com.tubasasakun.mensmakeupadvisor",
+    "scheme": "mensmakeupadvisor",
+    "xcodeproj": "mensmakeupadvisor.xcodeproj",
+    "url_scheme": "tone",
     "deployment_target": "26.0"
   },
 
   "appstore": {
     "primary_locale": "ja",
-    "contact_email": "you@example.com",
-    "github_repo": "owner/repo",
-    "primary_category": "PHOTO_AND_VIDEO",
-    "secondary_category": "LIFESTYLE",
-    "marketing_domain": "https://myapp.example.com"
+    "contact_email": "bassa.application@gmail.com",
+    "github_repo": "tubasasakunn/mensmakeupadvisor",
+    "primary_category": "LIFESTYLE",
+    "secondary_category": "PHOTO_AND_VIDEO",
+    "marketing_domain": "https://tone.basaapp.com"
   },
 
   "brand": {
-    "_comment": "ストア画像・SNS 画像の共通カラートークン。アプリの DesignTokens と揃える。RGB 0-255。",
-    "bg": [247, 244, 240],
-    "ink": [42, 37, 32],
-    "sub_ink": [111, 103, 96],
-    "card": [255, 255, 255],
-    "wordmark": "MyApp",
+    "_comment": "ストア画像・SNS 画像の共通カラートークン。アプリの DesignTokens（ダーク×ウォームラグジュアリー）と揃える。RGB 0-255。",
+    "bg": [22, 18, 17],
+    "ink": [240, 233, 224],
+    "sub_ink": [156, 146, 137],
+    "card": [38, 32, 30],
+    "wordmark": "Tone",
     "accents": {
-      "morning": [232, 168, 124],
-      "forenoon": [242, 201, 76],
-      "afternoon": [168, 197, 160],
-      "evening": [224, 123, 84],
-      "night": [155, 114, 207],
-      "midnight": [91, 127, 166]
+      "morning": [214, 150, 110],
+      "forenoon": [214, 176, 96],
+      "afternoon": [196, 122, 92],
+      "evening": [202, 70, 54],
+      "night": [180, 142, 96],
+      "midnight": [126, 138, 158]
     },
-    "icon_color": [197, 111, 82]
+    "icon_color": [202, 70, 54]
   },
 
   "fonts": {
