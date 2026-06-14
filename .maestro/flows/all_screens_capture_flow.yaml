@@ -1,0 +1,174 @@
+appId: com.tubasasakun.mensmakeupadvisor
+---
+# 全画面スクリーンショット採取フロー（material/ 用）
+#
+# 実行手順（引数はリスト形式が maestro 2.x で使えないため simctl で渡す）:
+#   ID=<booted udid>; BID=com.tubasasakun.mensmakeupadvisor
+#   xcrun simctl terminate "$ID" "$BID"
+#   xcrun simctl launch "$ID" "$BID" --mock-mode --mock-image-picker
+#   sleep 0.6
+#   xcrun simctl io "$ID" screenshot /tmp/maestro_screens/01_splash.png   # スプラッシュは短命なので別撮り
+#   maestro test .maestro/flows/all_screens_capture_flow.yaml
+#   cp /tmp/maestro_screens/*.png material/
+#
+# 既知の癖（このアプリ固有）:
+#   - ScreenHeader の戻る/閉じる、.sheet 内の Button、TabView のタブ切替は
+#     .accessibilityIdentifier で拾えない（accessibilityLabel が表示テキストを上書き、
+#     あるいは sheet/tab の階層差）。→ 表示テキスト or 座標でタップする。
+#   - オンボーディングは 53 ページ。next_hint を多めに連打して最終ページの CTA へ。
+#   - ミラーモード(12)は戻り遷移が appState ナビゲーションで戻るボタンを拾えないため、
+#     この線形フローには含めない。別途 studio_view から studio_mirror_button を押し、
+#     mirror_view を simctl screenshot して採取する。
+
+# ── 02 Onboarding（01 splash は simctl で別撮り）
+- extendedWaitUntil:
+    visible:
+      id: "onboarding_view"
+    timeout: 8000
+- takeScreenshot: /tmp/maestro_screens/02_onboarding
+# 最終ページまで送る（next_hint はタップでも次ページに進む）
+- repeat:
+    times: 60
+    commands:
+      - tapOn:
+          id: "onboarding_next_hint"
+          optional: true
+      - waitForAnimationToEnd:
+          timeout: 250
+- tapOn:
+    id: "onboarding_continue_button"
+
+# ── 03 Capture
+- extendedWaitUntil:
+    visible:
+      id: "advice_capture_view"
+    timeout: 8000
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: /tmp/maestro_screens/03_capture
+
+# ── 04 Analyzing（サンプル画像で実解析→診断）
+- tapOn:
+    id: "advice_sample_button"
+- extendedWaitUntil:
+    visible:
+      id: "analyzing_view"
+    timeout: 8000
+- takeScreenshot: /tmp/maestro_screens/04_analyzing
+
+# ── 05-07 Diagnosis
+- extendedWaitUntil:
+    visible:
+      id: "diagnosis_view"
+    timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 1500
+- takeScreenshot: /tmp/maestro_screens/05_diagnosis_top
+- swipe:
+    start: 50%, 70%
+    end: 50%, 30%
+    duration: 400
+- takeScreenshot: /tmp/maestro_screens/06_diagnosis_mesh
+- swipe:
+    start: 50%, 70%
+    end: 50%, 35%
+    duration: 400
+- takeScreenshot: /tmp/maestro_screens/07_diagnosis_proportions
+# 詳細レポートが長いので最下部の CTA までスクロール
+- repeat:
+    times: 8
+    commands:
+      - swipe:
+          start: 50%, 75%
+          end: 50%, 25%
+          duration: 300
+
+# ── 08 Tutorial
+- tapOn:
+    id: "diagnosis_begin_button"
+- extendedWaitUntil:
+    visible:
+      id: "tutorial_view"
+    timeout: 10000
+- takeScreenshot: /tmp/maestro_screens/08_tutorial
+- repeat:
+    times: 20
+    commands:
+      - tapOn:
+          id: "tutorial_next_button"
+          optional: true
+      - waitForAnimationToEnd:
+          timeout: 500
+
+# ── 09 Studio
+- extendedWaitUntil:
+    visible:
+      id: "studio_view"
+    timeout: 10000
+- takeScreenshot: /tmp/maestro_screens/09_studio
+
+# ── 10-11 Arrange シート（タブ/閉じるは id で拾えないため text/座標）
+- tapOn:
+    id: "studio_arrange_button"
+- extendedWaitUntil:
+    visible:
+      id: "studio_arrange_sheet"
+    timeout: 6000
+- takeScreenshot: /tmp/maestro_screens/10_studio_arrange_compare
+- tapOn: "カラー"
+- extendedWaitUntil:
+    visible:
+      id: "studio_color_view"
+    timeout: 6000
+- takeScreenshot: /tmp/maestro_screens/11_studio_arrange_color
+# 閉じる（× は ScreenHeader sheet 戻る、左上座標）
+- tapOn:
+    point: "10%,9%"
+- extendedWaitUntil:
+    visible:
+      id: "studio_view"
+    timeout: 6000
+
+# ── 12 Mirror はこのフローでは採取しない（上部コメント参照）
+
+# ── 13 Save シート（保存ボタンは id/表示テキストで拾えないため右上座標）
+- tapOn:
+    id: "studio_next_button"
+- extendedWaitUntil:
+    visible:
+      id: "save_title_sheet"
+    timeout: 6000
+- takeScreenshot: /tmp/maestro_screens/13_save_title_sheet
+- tapOn:
+    point: "91%,49%"
+
+# ── 14 Completion
+- extendedWaitUntil:
+    visible:
+      id: "completion_view"
+    timeout: 10000
+- takeScreenshot: /tmp/maestro_screens/14_completion
+
+# ── 15 Home
+- tapOn:
+    id: "completion_continue_button"
+- extendedWaitUntil:
+    visible:
+      id: "home_view"
+    timeout: 8000
+- takeScreenshot: /tmp/maestro_screens/15_home
+
+# ── 16 Archive（タブ切替は表示テキスト「保存」）
+- tapOn: "保存"
+- waitForAnimationToEnd:
+    timeout: 1500
+- takeScreenshot: /tmp/maestro_screens/16_archive
+
+# ── 17 Progress
+- tapOn:
+    id: "home_archive_progress_button"
+- extendedWaitUntil:
+    visible:
+      id: "progress_view"
+    timeout: 8000
+- takeScreenshot: /tmp/maestro_screens/17_progress

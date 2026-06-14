@@ -296,17 +296,27 @@ def phone_mockup(shot: Image.Image, screen_r=186, bezel=34) -> Image.Image:
 # MARK: - アプリアイコングリフ（h キャラの代わりの汎用プレースホルダ）
 
 def icon_glyph(height: int, color=ICON_COLOR) -> Image.Image:
-    """角丸スクエアにワードマーク頭文字を載せた簡易アイコン。
+    """アプリアイコンを角丸マスクして返す。
 
-    元アプリのマスコット／ロゴに差し替える前提のプレースホルダ。差し替えは
-    この関数を書き換えるか、PNG を読み込む実装にする。
+    material/app_icon_1024.png があれば実アイコンを採用し、無ければワードマーク
+    頭文字のプレースホルダにフォールバックする。
     """
     ss = 4
     size = height * ss
+    radius = int(size * 0.22)
+    mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, size, size], radius=radius, fill=255)
+
+    real = MATERIAL / "app_icon_1024.png"
+    if real.exists():
+        src = Image.open(real).convert("RGBA").resize((size, size), Image.LANCZOS)
+        img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        img.paste(src, (0, 0), mask)
+        return img.resize((height, height), Image.LANCZOS)
+
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([0, 0, size, size], radius=int(size * 0.22),
-                        fill=color + (255,))
+    d.rounded_rectangle([0, 0, size, size], radius=radius, fill=color + (255,))
     letter = (WORDMARK[:1] or "A").upper()
     f = ImageFont.truetype(str(LATIN_SANS), int(size * 0.62))
     bbox = d.textbbox((0, 0), letter, font=f)
@@ -427,6 +437,11 @@ def main():
                         .read_text(encoding="utf-8"))["slides"]
     out_path = out_dir()
     for dev in DEVICES.values():
+        # iPhone 専用アプリ。素材ディレクトリの無いデバイス（例 ipad13）は黙ってスキップ。
+        material = MATERIAL / dev["material"] if dev["material"] else MATERIAL
+        if not material.exists():
+            print("skip device (no material dir):", material)
+            continue
         for spec in slides:
             make_slide(spec["out"], spec, dev, out_path)
 

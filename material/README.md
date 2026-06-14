@@ -22,15 +22,32 @@
 - 注意 2：シートの暗幕（scrim）が映像領域に重なると緑が沈んでキーが抜けない。
   素の映像領域が必要な面は scrim の無い状態で別に撮る。
 
-## ファイル一覧（例・アプリに合わせて編集）
+## ファイル一覧（全画面スクショ・iPhone 16e / iOS 26）
+
+ハッピーパス（起動 → オンボーディング → 撮影 → 解析 → 診断 → チュートリアル →
+スタジオ → 保存 → ホーム → 履歴 → 推移）を一周しながら採取。番号は遷移順。
 
 | ファイル | 画面 |
 |---|---|
-| `screen-hero.png` | アプリの主役画面（フル画面・クロマキー領域あり） |
-| `screen-core.png` | コア操作の画面 |
-| `screen-detail.png` | 入力・詳細画面 |
-| `screen-review.png` | 一覧・振り返り画面 |
-| `screen-privacy.png` | 設定・ロック・プライバシー系 |
+| `01_splash.png` | スプラッシュ（起動直後・短命） |
+| `02_onboarding.png` | オンボーディング（全 53 ページの 1 ページ目） |
+| `03_capture.png` | 撮影（キャプチャ）画面 |
+| `04_analyzing.png` | 解析中（顔比率・骨格計測） |
+| `05_diagnosis_top.png` | 診断結果トップ（スコアリング・顔型） |
+| `06_diagnosis_mesh.png` | 診断: フェイスメッシュ可視化 |
+| `07_diagnosis_proportions.png` | 診断: 比率プレート＋7 項目詳細レポート |
+| `08_tutorial.png` | チュートリアル（5 ステップのガイド・強度スライダー） |
+| `09_studio.png` | スタジオ（Before/After 比較・スコア） |
+| `10_studio_arrange_compare.png` | スタジオ > アレンジ: プリセット比較 |
+| `11_studio_arrange_color.png` | スタジオ > アレンジ: カラー調整 |
+| `12_mirror.png` | ミラーモード（モック表示） |
+| `13_save_title_sheet.png` | 保存タイトルシート（送り出し前） |
+| `14_completion.png` | 完了（送り出し） |
+| `15_home.png` | ホーム（撮影タブ） |
+| `16_archive.png` | ホーム > 保存（アーカイブ・マイコレクション） |
+| `17_progress.png` | スコア推移（あなたの軌跡） |
+
+再取得は `.maestro/flows/all_screens_capture_flow.yaml`。手順は本ファイル末尾「再取得の手順」を参照。
 
 ## 再取得の手順（Debug ビルドの環境変数フック方式）
 
