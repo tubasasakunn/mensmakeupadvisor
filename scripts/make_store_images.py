@@ -79,8 +79,10 @@ DEVICES = {
         "screen_r": 84,          # iPad はベゼル一定・角丸小さめ（@2x 相当）
         "bezel": 56,
         "phone_cx": (1990, 745),
-        "text_x": (180, 1560),
-        "scale": 1.15,
+        # text-right の開始 x は端末の右端をかわしつつ、8 文字見出しが canvas 右端
+        # （2752）に収まる位置。scale は iPhone と同じ 1.0（1.15 だと句点がはみ出す）。
+        "text_x": (180, 1490),
+        "scale": 1.0,
         "char_bottom": 170,
         "dots_y": 1800,
         "wordmark_y": 200,
