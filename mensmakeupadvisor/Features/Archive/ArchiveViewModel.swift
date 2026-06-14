@@ -1,11 +1,18 @@
+import OSLog
 import SwiftUI
 import SwiftData
+
+private let archiveLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "Archive")
 
 @Observable @MainActor
 final class ArchiveViewModel {
     func deleteLook(_ look: SavedLook, modelContext: ModelContext) {
         modelContext.delete(look)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            archiveLog.error("deleteLook: 削除の保存に失敗 — \(String(describing: error), privacy: .public)")
+        }
     }
 
     // 保存ルックの設定を Studio で開き直して微調整する。

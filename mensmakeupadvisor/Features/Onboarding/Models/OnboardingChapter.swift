@@ -36,12 +36,9 @@ struct OnboardingChapter: Identifiable, Hashable, Sendable {
     ]
 
     // 現在のページ番号 (0-based) を含む章を返す。
+    // firstPageIndex は昇順で先頭章が 0 始まりのため、page>=0 なら必ず該当する。
+    // all は静的な非空リテラルなので all[0] は構造的に安全 (強制アンラップは使わない)。
     static func current(forPage page: Int) -> OnboardingChapter {
-        let last = all.last!
-        for i in stride(from: all.count - 1, through: 0, by: -1)
-            where all[i].firstPageIndex <= page {
-            return all[i]
-        }
-        return last
+        all.last(where: { $0.firstPageIndex <= page }) ?? all[0]
     }
 }

@@ -1,5 +1,8 @@
+import OSLog
 import SwiftData
 import SwiftUI
+
+private let settingsLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "HomeSettings")
 
 // アトリエタブ。コアループに入らない裏方の操作 (ガイド再読・データ削除・About) を集約。
 // 他の Home タブの体裁 (kicker mono + serif italic title + HairlineDivider) を踏襲する。
@@ -222,7 +225,11 @@ struct HomeSettingsTab: View {
 
     private func deleteAllLooks() {
         for look in savedLooks { modelContext.delete(look) }
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            settingsLog.error("deleteAllLooks: 全削除の保存に失敗 — \(String(describing: error), privacy: .public)")
+        }
     }
 
     private func clearCapturedCache() {

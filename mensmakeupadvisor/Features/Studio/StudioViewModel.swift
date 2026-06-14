@@ -1,5 +1,8 @@
+import OSLog
 import SwiftUI
 import SwiftData
+
+private let studioLog = Logger(subsystem: "com.tubasasakun.mensmakeupadvisor", category: "Studio")
 
 @Observable @MainActor
 final class StudioViewModel {
@@ -37,7 +40,12 @@ final class StudioViewModel {
             memo: (cleanedMemo?.isEmpty == false) ? cleanedMemo : nil
         )
         modelContext.insert(look)
-        try? modelContext.save()
+        // 保存失敗はユーザーに見えない (完了画面へ無条件遷移する) ため、最低限ログに残す。
+        do {
+            try modelContext.save()
+        } catch {
+            studioLog.error("saveLook: ルックの保存に失敗 — \(String(describing: error), privacy: .public)")
+        }
     }
 
     // タイトル入力シートのデフォルト名。

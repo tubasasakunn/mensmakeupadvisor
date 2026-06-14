@@ -117,7 +117,9 @@ struct ScoreCardView: View {
 
     @ViewBuilder
     private var expandedAnnotation: some View {
-        if capturedImage != nil, landmarks?.isEmpty == false {
+        // ScoreAnnotationView は landmarks.count >= 478 でのみ描画する。ここを
+        // 「非空」で判定すると 1–477 点のとき評価線が無音で空表示になるため条件を揃える。
+        if capturedImage != nil, (landmarks?.count ?? 0) >= 478 {
             VStack(alignment: .leading, spacing: 6) {
                 ScoreAnnotationView(
                     scoreName: score.name,
