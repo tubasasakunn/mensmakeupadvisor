@@ -108,7 +108,7 @@ struct SavedLookDetailSheet: View {
             Haptics.medium()
             onApply()
         } label: {
-            HStack(spacing: 4) {
+            HStack(spacing: Theme.Spacing.xs) {
                 Image(systemName: "slider.horizontal.3")
                     .font(Theme.Typography.UI.captionSemibold)
                 Text("編集")
@@ -128,7 +128,7 @@ struct SavedLookDetailSheet: View {
     private var meta: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                     if let title = look.title, !title.isEmpty {
                         Text(title)
                             .font(Theme.Typography.Display.titleSemibold)
@@ -179,7 +179,7 @@ struct SavedLookDetailSheet: View {
     }
 
     private func zoneRow(title: String, names: [String]) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text(title)
                 .font(Theme.Typography.UI.subheadlineMedium)
                 .foregroundStyle(Color.inkSecondary)
@@ -267,7 +267,7 @@ struct SavedLookDetailSheet: View {
             Theme.Surface.raised
             SavedLookMeshThumbnail(look: look, geometry: SavedLookMeshGeometry.makeLatest())
                 .aspectRatio(1, contentMode: .fit)
-                .padding(.vertical, 8)
+                .padding(.vertical, Theme.Spacing.sm)
         }
         .frame(width: Theme.Size.ShareCard.width, height: Theme.Size.ShareCard.bodyHeight)
         return ShareHelper.render(hero)

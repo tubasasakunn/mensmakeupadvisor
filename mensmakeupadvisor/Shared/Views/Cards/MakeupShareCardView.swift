@@ -36,17 +36,17 @@ struct MakeupShareCardView: View {
 
             VStack(alignment: .leading, spacing: 0) {
                 topBar
-                    .padding(.top, 28)
-                    .padding(.horizontal, 28)
+                    .padding(.top, Theme.Spacing.xxl)
+                    .padding(.horizontal, Theme.Spacing.xxl)
 
                 facePhotoSection
-                    .padding(.top, 16)
+                    .padding(.top, Theme.Spacing.lg)
 
                 VStack(alignment: .leading, spacing: 0) {
                     statementBlock
                         .padding(.top, 18)
 
-                    HairlineDivider().padding(.top, 16)
+                    HairlineDivider().padding(.top, Theme.Spacing.lg)
 
                     intensityBars.padding(.top, 14)
 
@@ -69,9 +69,9 @@ struct MakeupShareCardView: View {
                     HairlineDivider()
                     bottomBar
                         .padding(.top, 10)
-                        .padding(.bottom, 28)
+                        .padding(.bottom, Theme.Spacing.xxl)
                 }
-                .padding(.horizontal, 28)
+                .padding(.horizontal, Theme.Spacing.xxl)
             }
         }
         .frame(width: Theme.Size.ShareCard.width, height: Theme.Size.ShareCard.height)
@@ -168,8 +168,8 @@ struct MakeupShareCardView: View {
                     .foregroundStyle(Color.ivory)
                     .kerning(1.5)
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            .padding(.horizontal, Theme.Spacing.sm)
+            .padding(.vertical, Theme.Spacing.xs)
             .background(Capsule().fill(Color.appBackground.opacity(0.6)))
             .padding(.leading, 18)
             .padding(.bottom, 18)
@@ -183,7 +183,7 @@ struct MakeupShareCardView: View {
     // 「どんな顔タイプ向けに、どんな化粧にしたか」を 1 行で語る。
     private var statementBlock: some View {
         HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                 if let result {
                     Text(result.faceShape.label.uppercased())
                         .font(Theme.Typography.Data.miniRegular)
@@ -267,7 +267,7 @@ struct MakeupShareCardView: View {
 
     private var bottomBar: some View {
         HStack(alignment: .bottom) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                 Text("MensMakeupAdvisor")
                     .font(Theme.Typography.Data.smallSemibold)
                     .foregroundStyle(Theme.Text.primaryFaded)

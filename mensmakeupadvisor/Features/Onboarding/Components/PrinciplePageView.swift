@@ -25,7 +25,7 @@ struct PrinciplePageView: View {
                     .font(Theme.Typography.Display.titleLBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
-                    .padding(.bottom, 12)
+                    .padding(.bottom, Theme.Spacing.md)
             }
 
             if let body = page.body {
@@ -42,16 +42,16 @@ struct PrinciplePageView: View {
                     .scaledToFit()
                     .frame(maxWidth: .infinity, maxHeight: 220)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .padding(.bottom, 16)
+                    .padding(.bottom, Theme.Spacing.lg)
             }
 
             if let items = page.items {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
                     ForEach(items.indices, id: \.self) { i in
                         PrincipleItemRow(title: items[i].title, desc: items[i].desc)
                     }
                 }
-                .padding(.bottom, 12)
+                .padding(.bottom, Theme.Spacing.md)
             }
 
             if let footer = page.footer {
@@ -67,7 +67,7 @@ struct PrinciplePageView: View {
             Spacer(minLength: 0)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        .padding(.top, 16)
+        .padding(.top, Theme.Spacing.lg)
     }
 }
 
@@ -76,7 +76,7 @@ struct PrincipleItemRow: View {
     let desc: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text(title)
                 .font(Theme.Typography.UI.subheadlineSemibold)
                 .foregroundStyle(Color.ivory)
@@ -86,7 +86,7 @@ struct PrincipleItemRow: View {
                 .foregroundStyle(Color.inkSecondary)
                 .lineSpacing(4)
         }
-        .padding(.leading, 12)
+        .padding(.leading, Theme.Spacing.md)
         .overlay(
             Rectangle()
                 .fill(Theme.Plate.scanLineGlow)

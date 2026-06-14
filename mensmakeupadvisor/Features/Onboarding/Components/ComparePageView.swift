@@ -19,7 +19,7 @@ struct ComparePageView: View {
                     .font(Theme.Typography.Display.displayBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
-                    .padding(.bottom, 12)
+                    .padding(.bottom, Theme.Spacing.md)
             }
 
             if let body = page.body {
@@ -27,7 +27,7 @@ struct ComparePageView: View {
                     .font(Theme.Typography.UI.callout)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(5)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, Theme.Spacing.xl)
             }
 
             BeforeAfterSlider(
@@ -40,6 +40,6 @@ struct ComparePageView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .aid("onboarding_compare_slider")
         }
-        .padding(.top, 16)
+        .padding(.top, Theme.Spacing.lg)
     }
 }

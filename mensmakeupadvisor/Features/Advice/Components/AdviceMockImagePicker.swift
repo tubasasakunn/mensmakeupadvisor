@@ -20,10 +20,10 @@ struct AdviceMockImagePicker: View {
                     .font(Theme.Typography.Data.mediumMedium)
                     .foregroundStyle(Color.ivory)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, Theme.Spacing.md)
                     .background(Theme.Surface.panelRaised, in: .capsule)
                     .overlay(
-                        Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                        Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
                     )
                     .aid("advice_mock_image_\(index)")
                 }

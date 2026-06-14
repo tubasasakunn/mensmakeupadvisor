@@ -11,7 +11,7 @@ struct FaceDiagramView: View {
     var caption: String = ""
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: Theme.Spacing.sm) {
             Canvas { ctx, size in
                 let w = size.width
                 let h = size.height
@@ -136,7 +136,7 @@ struct FaceDiagramView: View {
 // MARK: - Preview
 
 #Preview {
-    HStack(spacing: 16) {
+    HStack(spacing: Theme.Spacing.lg) {
         ForEach(["base", "highlight", "shadow", "eyes", "brows"], id: \.self) { r in
             VStack {
                 FaceDiagramView(region: r, caption: "FIG. \(r.uppercased())")

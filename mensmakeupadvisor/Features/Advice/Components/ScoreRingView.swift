@@ -71,6 +71,6 @@ struct ScoreRingView: View {
 
 #Preview {
     ScoreRingView(value: 73, size: 160)
-        .padding(40)
+        .padding(Theme.Spacing.xxxl)
         .background(Color.appBackground)
 }

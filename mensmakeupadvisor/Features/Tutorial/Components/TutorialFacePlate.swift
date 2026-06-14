@@ -68,12 +68,12 @@ struct TutorialFacePlate: View {
                 .stroke(Theme.Plate.placeholderEllipse, lineWidth: Theme.Size.Line.regular)
                 .frame(width: width * 0.55, height: height * 0.68)
 
-            VStack(spacing: 4) {
+            VStack(spacing: Theme.Spacing.xs) {
                 Spacer()
                 Text("ステップ \(currentStep.tagNumeric) · \(currentStep.titleJP)")
                     .font(Theme.Typography.UI.footnoteMedium)
                     .foregroundStyle(Color.inkSecondary)
-                    .padding(.bottom, 12)
+                    .padding(.bottom, Theme.Spacing.md)
             }
         }
     }
@@ -85,7 +85,7 @@ struct TutorialFacePlate: View {
         capturedImage: nil,
         renderedImage: nil
     )
-    .padding(28)
+    .padding(Theme.Spacing.xxl)
     .background(Color.appBackground)
     .modelContainer(for: [SavedLook.self], inMemory: true)
 }

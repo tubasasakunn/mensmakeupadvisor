@@ -64,7 +64,7 @@ struct ScreenHeader<Trailing: View>: View {
             .padding(.vertical, 7)
             .background(Theme.Surface.panelRaised, in: .capsule)
             .overlay(
-                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
             )
         }
         .accessibilityLabel(backAccessibilityLabel)
@@ -82,7 +82,7 @@ struct ScreenHeader<Trailing: View>: View {
                 .frame(width: Theme.Size.Control.circleSmall, height: Theme.Size.Control.circleSmall)
                 .background(Theme.Surface.panelRaised, in: .circle)
                 .overlay(
-                    Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                    Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
                 )
         }
         .accessibilityLabel(backAccessibilityLabel)
@@ -152,7 +152,7 @@ extension ScreenHeader where Trailing == EmptyView {
                             .frame(width: Theme.Size.Control.circleSmall, height: Theme.Size.Control.circleSmall)
                             .background(Theme.Surface.panelRaised, in: .circle)
                             .overlay(
-                                Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                                Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
                             )
                     }
                 }
@@ -180,7 +180,7 @@ extension ScreenHeader where Trailing == EmptyView {
                         .padding(.vertical, 7)
                         .background(Theme.Surface.panelRaised, in: .capsule)
                         .overlay(
-                            Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                            Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
                         )
                 }
             )

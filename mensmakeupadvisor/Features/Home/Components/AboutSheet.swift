@@ -68,7 +68,7 @@ struct AboutSheet: View {
     private var privacy: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             sectionTitle("プライバシー")
-            HStack(alignment: .top, spacing: 8) {
+            HStack(alignment: .top, spacing: Theme.Spacing.sm) {
                 Image(systemName: "lock.shield")
                     .font(Theme.Typography.UI.subheadline)
                     .foregroundStyle(Theme.Text.primaryFaded)

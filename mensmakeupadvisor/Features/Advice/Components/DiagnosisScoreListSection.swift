@@ -8,11 +8,11 @@ struct DiagnosisScoreListSection: View {
         VStack(spacing: 0) {
             if let best = result.strongestScore, let worst = result.weakestScore {
                 HStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                         Text("いちばんの強み")
                             .font(Theme.Typography.UI.footnoteMedium)
                             .foregroundStyle(Color.inkSecondary)
-                        HStack(spacing: 4) {
+                        HStack(spacing: Theme.Spacing.xs) {
                             Text(best.name)
                                 .font(Theme.Typography.UI.calloutMedium)
                                 .foregroundStyle(Color.ivory)
@@ -28,11 +28,11 @@ struct DiagnosisScoreListSection: View {
 
                     Spacer()
 
-                    VStack(alignment: .trailing, spacing: 4) {
+                    VStack(alignment: .trailing, spacing: Theme.Spacing.xs) {
                         Text("伸びしろ")
                             .font(Theme.Typography.UI.footnoteMedium)
                             .foregroundStyle(Color.inkSecondary)
-                        HStack(spacing: 4) {
+                        HStack(spacing: Theme.Spacing.xs) {
                             Text(worst.grade)
                                 .font(Theme.Typography.UI.bodyHeavy)
                                 .foregroundStyle(worst.gradeColor)
@@ -42,7 +42,7 @@ struct DiagnosisScoreListSection: View {
                         }
                     }
                 }
-                .padding(.vertical, 16)
+                .padding(.vertical, Theme.Spacing.lg)
                 .overlay(alignment: .bottom) {
                     HairlineDivider()
                 }
@@ -54,8 +54,8 @@ struct DiagnosisScoreListSection: View {
                     .foregroundStyle(Color.inkSecondary)
                 Spacer()
             }
-            .padding(.top, 16)
-            .padding(.bottom, 4)
+            .padding(.top, Theme.Spacing.lg)
+            .padding(.bottom, Theme.Spacing.xs)
 
             ForEach(Array(result.scores.enumerated()), id: \.element.id) { index, score in
                 ScoreCardView(

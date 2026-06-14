@@ -6,9 +6,9 @@ struct DuoPageView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HairlineDivider()
-                .padding(.bottom, 20)
+                .padding(.bottom, Theme.Spacing.xl)
 
-            HStack(alignment: .top, spacing: 16) {
+            HStack(alignment: .top, spacing: Theme.Spacing.lg) {
                 DuoColumn(
                     label: page.leftLabel ?? "",
                     labelJP: page.leftJP ?? "",
@@ -27,7 +27,7 @@ struct DuoPageView: View {
                 )
             }
         }
-        .padding(.top, 16)
+        .padding(.top, Theme.Spacing.lg)
     }
 }
 
@@ -38,7 +38,7 @@ struct DuoColumn: View {
     let accentColor: Color
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text(label)
                 .font(Theme.Typography.Display.displayLBold)
                 .italic()

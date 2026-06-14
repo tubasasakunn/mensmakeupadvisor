@@ -57,7 +57,7 @@ struct StudioArrangeSheet: View {
                     mode = m
                 } label: {
                     Text(m.label)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(Theme.Typography.UI.calloutSemibold)
                         .foregroundStyle(mode == m ? Theme.Text.onAccent : Color.ivory)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
@@ -66,8 +66,8 @@ struct StudioArrangeSheet: View {
                 .aid("studio_arrange_tab_\(m.rawValue)")
             }
         }
-        .padding(4)
+        .padding(Theme.Spacing.xs)
         .background(Theme.Surface.panel, in: .capsule)
-        .overlay(Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5))
+        .overlay(Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin))
     }
 }

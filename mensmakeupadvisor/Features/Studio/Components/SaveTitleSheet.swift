@@ -67,7 +67,7 @@ struct SaveTitleSheet: View {
                 .padding(.vertical, 7)
                 .background(Theme.Surface.panelRaised, in: .capsule)
                 .overlay(
-                    Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                    Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
                 )
         }
         .accessibilityLabel("この仕上がりを保存する")

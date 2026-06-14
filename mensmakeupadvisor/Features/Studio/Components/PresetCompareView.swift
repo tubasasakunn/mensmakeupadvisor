@@ -6,6 +6,10 @@ import UIKit
 //
 // engine 未準備 (モック等) では render が失敗するため、renderedImage /
 // capturedImage にフォールバックして UI は成立させる。
+private enum Layout {
+    nonisolated static let previewHeight: CGFloat = 220
+}
+
 struct PresetCompareView: View {
     @Environment(AppState.self) private var appState
     let onApply: () -> Void
@@ -29,7 +33,7 @@ struct PresetCompareView: View {
             }
 
             Text("左右でプリセットを切り替えて見比べ、好みの方を「使う」")
-                .font(.system(size: 11))
+                .font(Theme.Typography.UI.footnote)
                 .foregroundStyle(Theme.Text.primaryFaded)
                 .multilineTextAlignment(.center)
         }
@@ -48,15 +52,15 @@ struct PresetCompareView: View {
                         .scaledToFit()
                 }
             }
-            .frame(height: 220)
+            .frame(height: Layout.previewHeight)
             .clipShape(.rect(cornerRadius: Theme.Radius.md))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.Radius.md)
-                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                    .stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
             )
 
             // プリセット切替チップ
-            HStack(spacing: 4) {
+            HStack(spacing: Theme.Spacing.xs) {
                 ForEach(MakeupPreset.all) { p in
                     chip(p.label, selected: p.id == presetID.wrappedValue) {
                         presetID.wrappedValue = p.id
@@ -79,13 +83,13 @@ struct PresetCompareView: View {
     private func chip(_ label: String, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
-                .font(.system(size: 10, weight: .medium))
+                .font(Theme.Typography.UI.captionMedium)
                 .foregroundStyle(selected ? Theme.Text.onAccent : Color.ivory)
-                .padding(.horizontal, 8)
+                .padding(.horizontal, Theme.Spacing.sm)
                 .padding(.vertical, 5)
                 .frame(maxWidth: .infinity)
                 .background(selected ? Color.ivory : Theme.Surface.panel, in: .capsule)
-                .overlay(Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5))
+                .overlay(Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin))
         }
         .aid("studio_compare_chip_\(label)")
     }

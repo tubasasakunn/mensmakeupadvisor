@@ -7,7 +7,7 @@ private enum Layout {
 extension DiagnosisShareCardView {
     var scoreWithGrade: some View {
         HStack(alignment: .bottom, spacing: 0) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                 Text("TOTAL SCORE")
                     .font(Theme.Typography.Data.miniRegular)
                     .foregroundStyle(Color.inkSecondary)
@@ -22,24 +22,24 @@ extension DiagnosisShareCardView {
                     Text("/ 100")
                         .font(Theme.Typography.Data.largeLight)
                         .foregroundStyle(Color.inkSecondary)
-                        .padding(.bottom, 8)
+                        .padding(.bottom, Theme.Spacing.sm)
                 }
             }
 
             Spacer()
 
-            VStack(alignment: .trailing, spacing: 4) {
+            VStack(alignment: .trailing, spacing: Theme.Spacing.xs) {
                 Text(result.gradeDescription)
                     .font(Theme.Typography.Data.miniRegular)
                     .foregroundStyle(result.gradeColor.opacity(0.8))
                     .kerning(0.5)
-                    .padding(.bottom, 4)
+                    .padding(.bottom, Theme.Spacing.xs)
             }
         }
     }
 
     var faceShapeBlock: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
+        HStack(alignment: .firstTextBaseline, spacing: Theme.Spacing.sm) {
             Text("FACE SHAPE")
                 .font(Theme.Typography.Data.miniRegular)
                 .foregroundStyle(Color.inkSecondary)
@@ -69,7 +69,7 @@ extension DiagnosisShareCardView {
                             .frame(width: Layout.barTrack * CGFloat(score.score) / 100.0)
                     }
                     .frame(width: Layout.barTrack, height: Theme.Size.Stroke.regular)
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, Theme.Spacing.sm)
 
                     Text(score.grade)
                         .font(Theme.Typography.Display.calloutLight)
@@ -83,7 +83,7 @@ extension DiagnosisShareCardView {
 
     var bottomBar: some View {
         HStack(alignment: .bottom) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                 Text("MensMakeupAdvisor")
                     .font(Theme.Typography.Data.smallSemibold)
                     .foregroundStyle(Theme.Text.primaryFaded)

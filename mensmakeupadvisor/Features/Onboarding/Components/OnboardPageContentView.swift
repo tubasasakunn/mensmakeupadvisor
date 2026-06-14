@@ -9,8 +9,8 @@ struct OnboardPageContentView: View {
                 pageContent
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .frame(minHeight: geo.size.height, alignment: .top)
-                    .padding(.horizontal, 28)
-                    .padding(.vertical, 12)
+                    .padding(.horizontal, Theme.Spacing.xxl)
+                    .padding(.vertical, Theme.Spacing.md)
             }
         }
     }

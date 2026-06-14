@@ -20,7 +20,7 @@ struct AnalyzingView: View {
 
             VStack(spacing: 0) {
                 topMeta
-                    .padding(.top, 56)
+                    .padding(.top, Theme.Spacing.huge)
                     .padding(.horizontal, 24)
 
                 Spacer()
@@ -36,7 +36,7 @@ struct AnalyzingView: View {
 
                 if errorMessage == nil {
                     progressSection
-                        .padding(.bottom, 56)
+                        .padding(.bottom, Theme.Spacing.huge)
                 }
             }
         }
@@ -61,7 +61,7 @@ struct AnalyzingView: View {
             .padding(.vertical, Theme.Spacing.sm)
             .background(Theme.Surface.panelRaised, in: .capsule)
             .overlay(
-                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
             )
 
             Spacer()
@@ -80,7 +80,7 @@ struct AnalyzingView: View {
                         .padding(.vertical, Theme.Spacing.sm)
                         .background(Theme.Surface.panelRaised, in: .capsule)
                         .overlay(
-                            Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                            Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
                         )
                 }
                 .accessibilityLabel("分析をキャンセルして撮影画面に戻る")
@@ -120,7 +120,7 @@ struct AnalyzingView: View {
 
     @ViewBuilder
     private var errorContent: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
             VStack(alignment: .leading, spacing: 10) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(Theme.Typography.UI.display)
@@ -158,7 +158,7 @@ struct AnalyzingView: View {
     // MARK: - Progress Section
 
     private var progressSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack(spacing: 6) {
                 Text(phases[phaseIndex])
                     .font(Theme.Typography.UI.calloutSemibold)

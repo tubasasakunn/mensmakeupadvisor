@@ -10,7 +10,7 @@ struct ConceptPageView: View {
                     .font(Theme.Typography.Display.jumboXLLight)
                     .italic()
                     .foregroundStyle(Color.ivory)
-                    .padding(.bottom, 4)
+                    .padding(.bottom, Theme.Spacing.xs)
             }
 
             if let jp = page.titleJP {
@@ -18,18 +18,18 @@ struct ConceptPageView: View {
                     .font(Theme.Typography.Data.largeMedium)
                     .foregroundStyle(Color.brandPrimary)
                     .kerning(2)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, Theme.Spacing.xl)
             }
 
             HairlineDivider()
-                .padding(.bottom, 16)
+                .padding(.bottom, Theme.Spacing.lg)
 
             if let body = page.body {
                 Text(body)
                     .font(Theme.Typography.UI.bodyLargeRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(8)
-                    .padding(.bottom, 12)
+                    .padding(.bottom, Theme.Spacing.md)
             }
 
             if let source = page.source {
@@ -41,6 +41,6 @@ struct ConceptPageView: View {
             Spacer(minLength: 0)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        .padding(.top, 16)
+        .padding(.top, Theme.Spacing.lg)
     }
 }

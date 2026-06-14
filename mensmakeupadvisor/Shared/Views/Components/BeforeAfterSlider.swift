@@ -86,7 +86,7 @@ struct BeforeAfterSlider: View {
             .kerning(2)
             .padding(6)
             .background(Theme.Surface.scrim)
-            .padding(8)
+            .padding(Theme.Spacing.sm)
     }
 
     private func dragHandle(h: CGFloat, x: CGFloat) -> some View {

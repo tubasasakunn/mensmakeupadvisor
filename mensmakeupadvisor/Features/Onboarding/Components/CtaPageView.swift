@@ -17,11 +17,11 @@ struct CtaPageView: View {
                     .font(Theme.Typography.Display.heroLBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, Theme.Spacing.xl)
             }
 
             HairlineDivider()
-                .padding(.bottom, 16)
+                .padding(.bottom, Theme.Spacing.lg)
 
             if let body = page.body {
                 Text(body)

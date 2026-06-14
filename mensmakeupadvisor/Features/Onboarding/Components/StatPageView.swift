@@ -38,7 +38,7 @@ struct StatPageView: View {
                     .font(Theme.Typography.UI.bodyLargeRegular)
                     .foregroundStyle(Color.inkSecondary)
                     .lineSpacing(8)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, Theme.Spacing.lg)
             }
 
             if let source = page.source {
@@ -51,6 +51,6 @@ struct StatPageView: View {
             Spacer(minLength: 0)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        .padding(.top, 16)
+        .padding(.top, Theme.Spacing.lg)
     }
 }

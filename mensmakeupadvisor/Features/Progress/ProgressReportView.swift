@@ -5,6 +5,10 @@ import SwiftUI
 // 集計し、折れ線・サマリ統計・直近の記録一覧で「成長の軌跡」を提示する。
 //
 // 入口は Archive タブの「スコアの推移」ボタン。戻ると Archive タブへ復帰する。
+private enum Layout {
+    nonisolated static let labelColumn: CGFloat = 56
+}
+
 struct ProgressReportView: View {
     @Environment(AppState.self) private var appState
     @Query(sort: \SavedLook.createdAt, order: .forward) private var savedLooks: [SavedLook]
@@ -57,11 +61,11 @@ struct ProgressReportView: View {
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             Text("あなたの軌跡")
-                .font(.system(size: 34, weight: .bold, design: .serif))
+                .font(Theme.Typography.Display.s34Bold)
                 .italic()
                 .foregroundStyle(Color.ivory)
             Text("保存したルックのスコア推移")
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Color.inkSecondary)
         }
     }
@@ -91,16 +95,16 @@ struct ProgressReportView: View {
         GlassCard(radius: Theme.Radius.md, padding: Theme.Spacing.lg) {
             VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                 Text(label)
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(Theme.Typography.Data.smallMedium)
                     .kerning(1.5)
                     .foregroundStyle(Theme.Text.secondaryFaded)
                 HStack(alignment: .firstTextBaseline, spacing: 2) {
                     Text("\(value)")
-                        .font(.system(size: 28, weight: .light, design: .serif))
+                        .font(Theme.Typography.Display.s28Light)
                         .italic()
                         .foregroundStyle(accent)
                     Text("pt")
-                        .font(.system(size: 10, design: .monospaced))
+                        .font(Theme.Typography.Data.small)
                         .foregroundStyle(Theme.Text.tertiary)
                 }
             }
@@ -113,12 +117,12 @@ struct ProgressReportView: View {
             VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
                 HStack {
                     Text("スコアの推移")
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .font(Theme.Typography.Data.mediumMedium)
                         .kerning(1.5)
                         .foregroundStyle(Theme.Text.primaryFaded)
                     Spacer()
                     Text("\(metrics.count) 件")
-                        .font(.system(size: 10, design: .monospaced))
+                        .font(Theme.Typography.Data.small)
                         .kerning(1)
                         .foregroundStyle(Theme.Text.tertiary)
                 }
@@ -131,7 +135,7 @@ struct ProgressReportView: View {
                         Spacer()
                         Text(to.formatted(.dateTime.year().month().day()))
                     }
-                    .font(.system(size: 10, design: .monospaced))
+                    .font(Theme.Typography.Data.small)
                     .foregroundStyle(Theme.Text.tertiary)
                 }
 
@@ -139,10 +143,10 @@ struct ProgressReportView: View {
 
                 HStack(spacing: 6) {
                     Image(systemName: deltaIcon)
-                        .font(.system(size: 10))
+                        .font(Theme.Typography.UI.caption)
                         .foregroundStyle(deltaColor)
                     Text(metrics.deltaCaption)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(Theme.Typography.UI.subheadlineMedium)
                         .foregroundStyle(Theme.Text.primarySoft)
                 }
             }
@@ -170,7 +174,7 @@ struct ProgressReportView: View {
     private var recentList: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
             Text("最近の記録")
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .font(Theme.Typography.Data.mediumMedium)
                 .kerning(1.5)
                 .foregroundStyle(Theme.Text.primaryFaded)
 
@@ -178,15 +182,15 @@ struct ProgressReportView: View {
                 ForEach(recentEntries) { point in
                     HStack {
                         Text(point.date.formatted(.dateTime.month().day()))
-                            .font(.system(size: 12, design: .monospaced))
+                            .font(Theme.Typography.Data.s12)
                             .foregroundStyle(Theme.Text.secondary)
-                            .frame(width: 56, alignment: .leading)
+                            .frame(width: Layout.labelColumn, alignment: .leading)
                         Text(ScoreGrade.letter(for: point.score))
-                            .font(.system(size: 15, weight: .heavy))
+                            .font(Theme.Typography.UI.s15Heavy)
                             .foregroundStyle(ScoreGrade.color(for: point.score))
                         Spacer()
                         Text("\(point.score)pt")
-                            .font(.system(size: 12, design: .monospaced))
+                            .font(Theme.Typography.Data.s12)
                             .foregroundStyle(Color.ivory)
                     }
                     .overlay(alignment: .bottom) {
@@ -221,13 +225,13 @@ struct ProgressReportView: View {
         GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xxl) {
             VStack(spacing: Theme.Spacing.lg) {
                 Image(systemName: "chart.line.uptrend.xyaxis")
-                    .font(.system(size: 40, weight: .ultraLight))
+                    .font(Theme.Typography.UI.numeralUltraLight)
                     .foregroundStyle(Theme.Text.secondary)
                 Text("まだ推移はありません")
-                    .font(.system(size: 17, weight: .semibold, design: .serif))
+                    .font(Theme.Typography.Display.headlineSemibold)
                     .foregroundStyle(Color.ivory)
                 Text("ルックを保存するたびに、その時のスコアが\nここに記録され、成長の軌跡が見えてきます。")
-                    .font(.system(size: 12))
+                    .font(Theme.Typography.UI.subheadline)
                     .foregroundStyle(Theme.Text.primaryFaded)
                     .multilineTextAlignment(.center)
                     .lineSpacing(5)

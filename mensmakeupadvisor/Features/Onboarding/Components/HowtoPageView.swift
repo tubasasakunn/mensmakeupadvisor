@@ -35,14 +35,14 @@ struct HowtoPageView: View {
             }
 
             HairlineDivider()
-                .padding(.bottom, 16)
+                .padding(.bottom, Theme.Spacing.lg)
 
             if let step = animatedStep {
                 HowtoAnimationView(step: step)
                     .aspectRatio(1, contentMode: .fit)
                     .frame(maxWidth: Layout.animationMaxWidth)
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, Theme.Spacing.lg)
             }
 
             if let body = page.body {
@@ -52,6 +52,6 @@ struct HowtoPageView: View {
                     .lineSpacing(7)
             }
         }
-        .padding(.top, 8)
+        .padding(.top, Theme.Spacing.sm)
     }
 }

@@ -38,7 +38,7 @@ struct GlassSecondaryButton: View {
 #Preview {
     ZStack {
         LuxeBackground()
-        VStack(spacing: 20) {
+        VStack(spacing: Theme.Spacing.xl) {
             GlassSecondaryButton(
                 title: "スキップ",
                 accessibilityID: "preview_secondary"
@@ -49,6 +49,6 @@ struct GlassSecondaryButton: View {
                 accessibilityID: "preview_secondary_icon"
             ) {}
         }
-        .padding(28)
+        .padding(Theme.Spacing.xxl)
     }
 }

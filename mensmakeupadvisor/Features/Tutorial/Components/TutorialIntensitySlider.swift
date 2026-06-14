@@ -8,7 +8,7 @@ struct TutorialIntensitySlider: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .lastTextBaseline, spacing: 8) {
+            HStack(alignment: .lastTextBaseline, spacing: Theme.Spacing.sm) {
                 Text("強さ")
                     .font(Theme.Typography.UI.calloutMedium)
                     .foregroundStyle(Color.ivory)

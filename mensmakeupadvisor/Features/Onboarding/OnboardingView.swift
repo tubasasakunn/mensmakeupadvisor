@@ -55,8 +55,8 @@ struct OnboardingView: View {
 
             Spacer()
         }
-        .padding(.horizontal, 28)
-        .padding(.top, 12)
+        .padding(.horizontal, Theme.Spacing.xxl)
+        .padding(.top, Theme.Spacing.md)
         .padding(.bottom, 10)
     }
 
@@ -76,7 +76,7 @@ struct OnboardingView: View {
             .padding(.vertical, 7)
             .background(Theme.Surface.panelRaised, in: .capsule)
             .overlay(
-                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
             )
         }
         .accessibilityLabel("目次を開く")
@@ -101,7 +101,7 @@ struct OnboardingView: View {
             }
         }
         .frame(height: Theme.Size.Stroke.thin)
-        .padding(.horizontal, 28)
+        .padding(.horizontal, Theme.Spacing.xxl)
         .padding(.bottom, 6)
         .aid("onboarding_progress_bar")
     }
@@ -117,8 +117,8 @@ struct OnboardingView: View {
                 .accessibilityLabel("\(currentPage + 1) ページ目、全 \(pages.count) ページ中")
                 .aid("onboarding_folio_label")
         }
-        .padding(.horizontal, 28)
-        .padding(.bottom, 4)
+        .padding(.horizontal, Theme.Spacing.xxl)
+        .padding(.bottom, Theme.Spacing.xs)
     }
 
     // MARK: - Navigation: 最終ページは CTA、それ以外はスワイプヒント
@@ -164,7 +164,7 @@ struct OnboardingView: View {
                         .padding(.vertical, Theme.Spacing.sm)
                         .background(Theme.Surface.panelRaised, in: .capsule)
                         .overlay(
-                            Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                            Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
                         )
                     }
                     .accessibilityLabel("次のページへ")

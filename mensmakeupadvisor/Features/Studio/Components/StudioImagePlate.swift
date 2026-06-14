@@ -90,11 +90,11 @@ struct StudioImagePlate: View {
                     .font(Theme.Typography.UI.subheadlineMedium)
             }
             .foregroundStyle(Color.appBackground)
-            .padding(.horizontal, 12)
+            .padding(.horizontal, Theme.Spacing.md)
             .padding(.vertical, 6)
             .background(Theme.Surface.toastBackground)
             .clipShape(Capsule())
-            .padding(.top, 12)
+            .padding(.top, Theme.Spacing.md)
             Spacer()
         }
     }
@@ -131,8 +131,8 @@ struct StudioImagePlate: View {
                     Text("Before · 素のまま")
                         .font(Theme.Typography.UI.footnoteSemibold)
                         .foregroundStyle(Theme.Plate.labelText)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, Theme.Spacing.sm)
+                        .padding(.vertical, Theme.Spacing.xs)
                         .background(Theme.Surface.labelBackdrop)
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)
@@ -147,8 +147,8 @@ struct StudioImagePlate: View {
                     Text("After · メイク後")
                         .font(Theme.Typography.UI.footnoteSemibold)
                         .foregroundStyle(Theme.Plate.labelText)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, Theme.Spacing.sm)
+                        .padding(.vertical, Theme.Spacing.xs)
                         .background(Theme.Surface.labelBackdrop)
                         .padding(.horizontal, 10)
                         .padding(.bottom, 10)
@@ -193,7 +193,7 @@ struct StudioImagePlate: View {
             } else {
                 ZStack {
                     Theme.Surface.raised
-                    VStack(spacing: 8) {
+                    VStack(spacing: Theme.Spacing.sm) {
                         Ellipse()
                             .stroke(Theme.Plate.placeholderEllipse, lineWidth: Theme.Size.Line.regular)
                             .frame(width: width * 0.55, height: height * 0.68)
@@ -229,7 +229,7 @@ struct StudioImagePlate: View {
             }
             Spacer()
         }
-        .padding(8)
+        .padding(Theme.Spacing.sm)
     }
 
     private func placeholderHalf(width: CGFloat, height: CGFloat) -> some View {
@@ -237,7 +237,7 @@ struct StudioImagePlate: View {
     }
 
     private func scoreChip(result: AnalysisResult) -> some View {
-        HStack(spacing: 4) {
+        HStack(spacing: Theme.Spacing.xs) {
             Text("スコア")
                 .font(Theme.Typography.UI.footnote)
                 .opacity(0.75)
@@ -255,7 +255,7 @@ struct StudioImagePlate: View {
 
 #Preview {
     StudioImagePlate(viewModel: StudioViewModel())
-        .padding(28)
+        .padding(Theme.Spacing.xxl)
         .background(Color.appBackground)
         .environment(AppState())
         .modelContainer(for: [SavedLook.self], inMemory: true)

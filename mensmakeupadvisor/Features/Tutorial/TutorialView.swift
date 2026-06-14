@@ -26,11 +26,11 @@ struct TutorialView: View {
 
             VStack(spacing: 0) {
                 headerBar
-                    .padding(.top, 8)
+                    .padding(.top, Theme.Spacing.sm)
 
                 stepDots
-                    .padding(.top, 12)
-                    .padding(.bottom, 12)
+                    .padding(.top, Theme.Spacing.md)
+                    .padding(.bottom, Theme.Spacing.md)
 
                 // 顔プレートは撮影画像のアスペクト比だけでサイズが決まるよう固定。
                 // maxHeight: .infinity を載せると Info 本文量で残り空間が変動し、
@@ -40,22 +40,22 @@ struct TutorialView: View {
                     capturedImage: appState.capturedImage,
                     renderedImage: appState.renderedImage
                 )
-                .padding(.horizontal, 28)
+                .padding(.horizontal, Theme.Spacing.xxl)
 
                 TutorialStepInfoArea(
                     currentStep: currentStep,
                     intensity: intensityBinding,
                     eyebrowType: $bindableVM.eyebrowType
                 )
-                .padding(.top, 16)
-                .padding(.horizontal, 28)
+                .padding(.top, Theme.Spacing.lg)
+                .padding(.horizontal, Theme.Spacing.xxl)
 
                 Spacer(minLength: 0)
 
                 navigationBar
-                    .padding(.top, 12)
+                    .padding(.top, Theme.Spacing.md)
                     .padding(.bottom, 32)
-                    .padding(.horizontal, 28)
+                    .padding(.horizontal, Theme.Spacing.xxl)
             }
         }
         // 進む / 戻るは左右スワイプでも操作できる。

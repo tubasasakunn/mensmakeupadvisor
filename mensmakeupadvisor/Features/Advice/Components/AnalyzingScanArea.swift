@@ -9,12 +9,12 @@ struct AnalyzingScanArea: View {
         ZStack(alignment: .top) {
             capturedImageView
                 .frame(height: Theme.Size.Canvas.scan)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.xs))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle(cornerRadius: Theme.Radius.xs)
                         .fill(Theme.Surface.imageDim)
                 )
-                .hairlineBorder(cornerRadius: 4)
+                .hairlineBorder(cornerRadius: Theme.Radius.xs)
 
             Rectangle()
                 .fill(
@@ -30,7 +30,7 @@ struct AnalyzingScanArea: View {
 
             meshOverlay
                 .frame(height: Theme.Size.Canvas.scan)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.xs))
         }
         .frame(height: Theme.Size.Canvas.scan)
         .clipped()

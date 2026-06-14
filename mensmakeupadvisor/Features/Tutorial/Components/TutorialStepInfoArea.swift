@@ -82,6 +82,6 @@ struct TutorialStepInfoArea: View {
             intensity: $intensity,
             eyebrowType: $brow
         )
-        .padding(28)
+        .padding(Theme.Spacing.xxl)
     }
 }

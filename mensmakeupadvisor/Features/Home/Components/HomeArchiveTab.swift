@@ -148,7 +148,7 @@ struct HomeArchiveTab: View {
                             .padding(.vertical, 3)
                             .background(Theme.Surface.panelRaised, in: .capsule)
                             .overlay(
-                                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
                             )
                             .padding(6)
                     }

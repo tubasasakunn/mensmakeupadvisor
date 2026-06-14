@@ -5,6 +5,11 @@ import SwiftUI
 // Swift Charts を使わず Path で手描きするのは、本アプリが顔メッシュや
 // スコアリングを全て自前描画する editorial な作画方針を取っており、
 // 既定チャートの見た目が浮くため。少数データ (1〜数十点) 前提で軽量に描く。
+private enum Layout {
+    nonisolated static let chartHeight: CGFloat = 150
+    nonisolated static let gridLine: CGFloat = 0.5
+}
+
 struct ScoreTrendChart: View {
     let points: [ProgressMetrics.Point]
 
@@ -23,7 +28,7 @@ struct ScoreTrendChart: View {
                 dots(pts)
             }
         }
-        .frame(height: 150)
+        .frame(height: Layout.chartHeight)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilitySummary)
         .aid("progress_trend_chart")
@@ -60,12 +65,12 @@ struct ScoreTrendChart: View {
             ForEach(0..<3, id: \.self) { _ in
                 Rectangle()
                     .fill(Theme.Mesh.tickMark)
-                    .frame(height: 0.5)
+                    .frame(height: Layout.gridLine)
                 Spacer()
             }
             Rectangle()
                 .fill(Theme.Mesh.tickMark)
-                .frame(height: 0.5)
+                .frame(height: Layout.gridLine)
         }
     }
 
@@ -97,7 +102,7 @@ struct ScoreTrendChart: View {
         }
         .stroke(
             Theme.Line.progressFill,
-            style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round)
+            style: StrokeStyle(lineWidth: Theme.Size.Line.strong, lineCap: .round, lineJoin: .round)
         )
     }
 
@@ -108,7 +113,7 @@ struct ScoreTrendChart: View {
                 .fill(isLast ? Theme.Accent.primary : Color.ivory)
                 .frame(width: isLast ? 8 : 4, height: isLast ? 8 : 4)
                 .overlay(
-                    Circle().stroke(Color.ivory.opacity(isLast ? 0.9 : 0), lineWidth: 1)
+                    Circle().stroke(Color.ivory.opacity(isLast ? 0.9 : 0), lineWidth: Theme.Size.Line.regular)
                 )
                 .position(p)
         }
@@ -132,6 +137,6 @@ struct ScoreTrendChart: View {
             .init(id: "4", date: .now.addingTimeInterval(-86400 * 5), score: 72),
             .init(id: "5", date: .now, score: 78),
         ])
-        .padding(28)
+        .padding(Theme.Spacing.xxl)
     }
 }

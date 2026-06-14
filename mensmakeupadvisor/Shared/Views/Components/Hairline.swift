@@ -39,6 +39,6 @@ struct HairlineVDivider: View {
             }
             .foregroundStyle(Color.ivory)
         }
-        .padding(40)
+        .padding(Theme.Spacing.xxxl)
     }
 }

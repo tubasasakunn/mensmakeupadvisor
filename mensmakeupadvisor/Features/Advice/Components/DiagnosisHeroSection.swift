@@ -34,7 +34,7 @@ struct DiagnosisHeroSection: View {
                     }
             }
 
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.md) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("顔型")
                         .font(Theme.Typography.UI.subheadlineMedium)

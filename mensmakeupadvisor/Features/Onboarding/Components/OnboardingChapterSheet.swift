@@ -34,7 +34,7 @@ struct OnboardingChapterSheet: View {
                 .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Color.inkSecondary)
         }
-        .padding(.bottom, 16)
+        .padding(.bottom, Theme.Spacing.lg)
     }
 
     private var chapterList: some View {

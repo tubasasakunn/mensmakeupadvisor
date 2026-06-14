@@ -11,11 +11,11 @@ struct GoalPageView: View {
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, Theme.Spacing.xl)
             }
 
             goalIconRow
-                .padding(.bottom, 20)
+                .padding(.bottom, Theme.Spacing.xl)
 
             if let quote = page.quote {
                 HStack(alignment: .top, spacing: 14) {
@@ -31,7 +31,7 @@ struct GoalPageView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.bottom, 16)
+                .padding(.bottom, Theme.Spacing.lg)
             }
 
             HairlineDivider()
@@ -47,7 +47,7 @@ struct GoalPageView: View {
 
             Spacer(minLength: 0)
         }
-        .padding(.top, 16)
+        .padding(.top, Theme.Spacing.lg)
     }
 
     private var goalIconRow: some View {
@@ -60,13 +60,13 @@ struct GoalPageView: View {
             goalIconItem(symbol: "face.smiling.fill", label: "あの顔")
             Spacer()
         }
-        .padding(.vertical, 16)
+        .padding(.vertical, Theme.Spacing.lg)
         .background(Theme.Surface.glassWeak)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 
     private func goalIconItem(symbol: String, label: String) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: Theme.Spacing.sm) {
             Image(systemName: symbol)
                 .font(Theme.Typography.UI.titleLarge)
                 .foregroundStyle(Theme.Accent.primaryFaded)

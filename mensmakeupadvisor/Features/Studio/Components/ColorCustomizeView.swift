@@ -3,6 +3,11 @@ import UIKit
 
 // メイク種別ごとに色を選び直すカスタマイズ。各メッシュの強度 (alpha) は保ったまま
 // RGB だけ差し替える。プレビューは engine で非破壊レンダリング、「適用」で session へ。
+private enum Layout {
+    nonisolated static let previewHeight: CGFloat = 260
+    nonisolated static let swatch: CGFloat = 38
+}
+
 struct ColorCustomizeView: View {
     @Environment(AppState.self) private var appState
     let onApply: () -> Void
@@ -53,11 +58,11 @@ struct ColorCustomizeView: View {
                 ProgressView().tint(Color.ivory)
             }
         }
-        .frame(height: 260)
+        .frame(height: Layout.previewHeight)
         .clipShape(.rect(cornerRadius: Theme.Radius.md))
         .overlay(
             RoundedRectangle(cornerRadius: Theme.Radius.md)
-                .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                .stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
         )
     }
 
@@ -69,12 +74,12 @@ struct ColorCustomizeView: View {
                         selectedKind = kind
                     } label: {
                         Text(kind.labelJP)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(Theme.Typography.UI.subheadlineMedium)
                             .foregroundStyle(selectedKind == kind ? Theme.Text.onAccent : Color.ivory)
                             .padding(.horizontal, Theme.Spacing.md)
                             .padding(.vertical, 7)
                             .background(selectedKind == kind ? Color.ivory : Theme.Surface.panel, in: .capsule)
-                            .overlay(Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5))
+                            .overlay(Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin))
                     }
                     .aid("studio_color_kind_\(kind.rawValue)")
                 }
@@ -93,8 +98,8 @@ struct ColorCustomizeView: View {
                 } label: {
                     Circle()
                         .fill(option.color)
-                        .frame(width: 38, height: 38)
-                        .overlay(Circle().stroke(Theme.Line.outlineIvory, lineWidth: 1))
+                        .frame(width: Layout.swatch, height: Layout.swatch)
+                        .overlay(Circle().stroke(Theme.Line.outlineIvory, lineWidth: Theme.Size.Line.regular))
                 }
                 .accessibilityLabel(option.name)
                 .aid("studio_color_swatch_\(option.name)")

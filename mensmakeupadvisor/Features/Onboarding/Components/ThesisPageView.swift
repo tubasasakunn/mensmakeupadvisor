@@ -9,13 +9,13 @@ struct ThesisPageView: View {
                 .font(Theme.Typography.Data.base)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(2)
-                .padding(.bottom, 20)
+                .padding(.bottom, Theme.Spacing.xl)
 
             if let title = page.title {
                 Text(title)
                     .font(Theme.Typography.Display.titleBold)
                     .foregroundStyle(Color.ivory)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, Theme.Spacing.lg)
             }
 
             // Text の結合は foregroundStyle が使えないため foregroundColor を用いる（Text API の制約）
@@ -26,7 +26,7 @@ struct ThesisPageView: View {
             Spacer(minLength: 0)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        .padding(.top, 16)
+        .padding(.top, Theme.Spacing.lg)
     }
 
     private func buildCompositeText() -> Text {

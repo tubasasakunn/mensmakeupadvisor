@@ -17,7 +17,7 @@ struct LoadingView: View {
         .background(Theme.Surface.panel, in: .rect(cornerRadius: Theme.Radius.lg))
         .overlay(
             RoundedRectangle(cornerRadius: Theme.Radius.lg)
-                .stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                .stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
         )
         .aid("loading_view")
     }

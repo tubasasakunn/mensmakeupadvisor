@@ -10,7 +10,7 @@ struct CoverPageView: View {
                     .font(Theme.Typography.Display.colossalXLBold)
                     .italic()
                     .foregroundStyle(Color.brandPrimary)
-                    .padding(.bottom, 4)
+                    .padding(.bottom, Theme.Spacing.xs)
             }
 
             if let title = page.title {
@@ -18,7 +18,7 @@ struct CoverPageView: View {
                     .font(Theme.Typography.Display.heroBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, Theme.Spacing.lg)
             }
 
             if let sub = page.subtitle {
@@ -42,6 +42,6 @@ struct CoverPageView: View {
             Spacer(minLength: 0)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        .padding(.top, 16)
+        .padding(.top, Theme.Spacing.lg)
     }
 }

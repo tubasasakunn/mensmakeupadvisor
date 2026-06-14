@@ -70,7 +70,7 @@ struct MirrorView: View {
                     .ignoresSafeArea()
             }
             Text("[MOCK] ミラーモード")
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .font(Theme.Typography.Data.baseMedium)
                 .foregroundStyle(Theme.Status.warning)
                 .padding(.vertical, 6)
                 .padding(.horizontal, Theme.Spacing.md)
@@ -85,7 +85,7 @@ struct MirrorView: View {
             ProgressView()
                 .tint(Color.ivory)
             Text(message)
-                .font(.system(size: 12))
+                .font(Theme.Typography.UI.subheadline)
                 .foregroundStyle(Theme.Text.primaryFaded)
         }
     }
@@ -110,13 +110,13 @@ struct MirrorView: View {
         GlassCard(radius: Theme.Radius.xl, padding: Theme.Spacing.xxl) {
             VStack(spacing: Theme.Spacing.lg) {
                 Image(systemName: icon)
-                    .font(.system(size: 36, weight: .ultraLight))
+                    .font(Theme.Typography.UI.s36UltraLight)
                     .foregroundStyle(Theme.Text.secondary)
                 Text(title)
-                    .font(.system(size: 16, weight: .semibold, design: .serif))
+                    .font(Theme.Typography.Display.s16Semibold)
                     .foregroundStyle(Color.ivory)
                 Text(body)
-                    .font(.system(size: 12))
+                    .font(Theme.Typography.UI.subheadline)
                     .foregroundStyle(Theme.Text.primaryFaded)
                     .multilineTextAlignment(.center)
                     .lineSpacing(5)
@@ -150,7 +150,7 @@ struct MirrorView: View {
 
     private var caption: some View {
         Text("鏡を見ながら、いまの仕上がりを確認できます")
-            .font(.system(size: 12, weight: .medium))
+            .font(Theme.Typography.UI.subheadlineMedium)
             .foregroundStyle(Color.ivory)
             .padding(.vertical, Theme.Spacing.sm)
             .padding(.horizontal, Theme.Spacing.lg)

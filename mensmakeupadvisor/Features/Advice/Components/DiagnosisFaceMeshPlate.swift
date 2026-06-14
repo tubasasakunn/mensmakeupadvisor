@@ -11,11 +11,11 @@ struct DiagnosisFaceMeshPlate: View {
                 meshContent(in: geo.size)
             }
             .aspectRatio(imageAspect, contentMode: .fit)
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-            .hairlineBorder(cornerRadius: 4)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.xs))
+            .hairlineBorder(cornerRadius: Theme.Radius.xs)
 
             captionLabel
-                .padding(12)
+                .padding(Theme.Spacing.md)
         }
         .aspectRatio(imageAspect, contentMode: .fit)
         .aid("diagnosis_face_mesh_plate")

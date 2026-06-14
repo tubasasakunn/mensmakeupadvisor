@@ -10,11 +10,11 @@ struct ListPageView: View {
                     .font(Theme.Typography.Display.titleLBold)
                     .foregroundStyle(Color.ivory)
                     .lineSpacing(4)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, Theme.Spacing.xl)
             }
 
             if let items = page.listItems {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
                     ForEach(items.indices, id: \.self) { i in
                         NumberedListItem(
                             number: String(format: "%02d", i + 1),
@@ -25,7 +25,7 @@ struct ListPageView: View {
                 }
             }
         }
-        .padding(.top, 16)
+        .padding(.top, Theme.Spacing.lg)
     }
 }
 
@@ -35,13 +35,13 @@ struct NumberedListItem: View {
     let desc: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: Theme.Spacing.md) {
             Text(number)
                 .font(Theme.Typography.Data.base)
                 .foregroundStyle(Color.brandPrimary)
                 .padding(.top, 2)
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                 Text(title)
                     .font(Theme.Typography.UI.calloutSemibold)
                     .foregroundStyle(Color.ivory)

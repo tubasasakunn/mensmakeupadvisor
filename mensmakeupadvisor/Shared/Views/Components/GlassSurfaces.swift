@@ -76,7 +76,7 @@ struct GlassPill<Content: View>: View {
             .padding(.vertical, vPadding)
             .background(Theme.Surface.panelRaised, in: .capsule)
             .overlay(
-                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
             )
     }
 }
@@ -102,7 +102,7 @@ struct GlassIconButton: View {
         }
         .background(Theme.Surface.panelRaised, in: .circle)
         .overlay(
-            Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.5)
+            Circle().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.thin)
         )
         .accessibilityLabel(accessibilityLabel ?? systemImage)
         .aid(accessibilityID)

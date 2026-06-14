@@ -13,8 +13,8 @@ struct ScoreAnnotationView: View {
             content(in: geo.size)
         }
         .aspectRatio(imageAspect, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: 4))
-        .hairlineBorder(cornerRadius: 4)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.xs))
+        .hairlineBorder(cornerRadius: Theme.Radius.xs)
     }
 
     private var imageAspect: CGFloat {

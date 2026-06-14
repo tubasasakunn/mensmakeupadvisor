@@ -38,7 +38,7 @@ struct FeaturePageView: View {
         VStack(alignment: .leading, spacing: 0) {
             // ラベル行
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                     if let no = page.featureNo {
                         Text(no)
                             .font(Theme.Typography.Display.jumboBold)
@@ -66,7 +66,7 @@ struct FeaturePageView: View {
                     )
                 }
             }
-            .padding(.bottom, 12)
+            .padding(.bottom, Theme.Spacing.md)
 
             // before/after スライダー（画像がある場合のみ）
             if beforeImage != nil || afterImage != nil {
@@ -100,6 +100,6 @@ struct FeaturePageView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(.top, 16)
+        .padding(.top, Theme.Spacing.lg)
     }
 }

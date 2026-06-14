@@ -60,6 +60,8 @@ extension Theme {
             nonisolated static let displayLargeSemibold: Font = .system(size: 32, weight: .semibold)
             // 空状態などの大きな SF Symbol グリフ
             nonisolated static let numeralUltraLight: Font = .system(size: 40, weight: .ultraLight)
+            nonisolated static let s15Heavy: Font = .system(size: 15, weight: .heavy)
+            nonisolated static let s36UltraLight: Font = .system(size: 36, weight: .ultraLight)
         }
 
         // MARK: - Data (monospaced — スコア・数値・技術ラベル)
@@ -86,6 +88,7 @@ extension Theme {
             nonisolated static let largeLight: Font = .system(size: 14, weight: .light, design: .monospaced)
             nonisolated static let largeMedium: Font = .system(size: 14, weight: .medium, design: .monospaced)
             nonisolated static let heroBlack: Font = .system(size: 20, weight: .black, design: .monospaced)
+            nonisolated static let s12: Font = .system(size: 12, design: .monospaced)
         }
 
         // MARK: - Display (serif — エディトリアル見出し・大きな数字)
@@ -129,6 +132,9 @@ extension Theme {
             nonisolated static let colossalLBold: Font = .system(size: 80, weight: .bold, design: .serif)
             nonisolated static let colossalXLBold: Font = .system(size: 88, weight: .bold, design: .serif)
             nonisolated static let megaBold: Font = .system(size: 120, weight: .bold, design: .serif)
+            nonisolated static let s16Semibold: Font = .system(size: 16, weight: .semibold, design: .serif)
+            nonisolated static let s28Light: Font = .system(size: 28, weight: .light, design: .serif)
+            nonisolated static let s34Bold: Font = .system(size: 34, weight: .bold, design: .serif)
         }
 
     }

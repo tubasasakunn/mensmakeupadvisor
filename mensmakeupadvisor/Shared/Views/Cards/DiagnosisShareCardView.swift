@@ -19,11 +19,11 @@ struct DiagnosisShareCardView: View {
 
             VStack(alignment: .leading, spacing: 0) {
                 topBar
-                    .padding(.top, 28)
-                    .padding(.horizontal, 28)
+                    .padding(.top, Theme.Spacing.xxl)
+                    .padding(.horizontal, Theme.Spacing.xxl)
 
                 faceMeshSection
-                    .padding(.top, 16)
+                    .padding(.top, Theme.Spacing.lg)
 
                 VStack(alignment: .leading, spacing: 0) {
                     scoreWithGrade
@@ -34,15 +34,15 @@ struct DiagnosisShareCardView: View {
 
                     HairlineDivider().padding(.top, 18)
 
-                    topScoresList.padding(.top, 12)
+                    topScoresList.padding(.top, Theme.Spacing.md)
 
-                    HairlineDivider().padding(.top, 12)
+                    HairlineDivider().padding(.top, Theme.Spacing.md)
 
                     Spacer(minLength: 10)
 
-                    bottomBar.padding(.bottom, 28)
+                    bottomBar.padding(.bottom, Theme.Spacing.xxl)
                 }
-                .padding(.horizontal, 28)
+                .padding(.horizontal, Theme.Spacing.xxl)
             }
         }
         .frame(width: Theme.Size.ShareCard.width, height: Theme.Size.ShareCard.height)
@@ -79,7 +79,7 @@ struct DiagnosisShareCardView: View {
                 .fill(Theme.Surface.glassWeak)
 
             meshCanvas
-                .padding(20)
+                .padding(Theme.Spacing.xl)
 
             VStack(alignment: .leading, spacing: 2) {
                 Spacer()
@@ -87,7 +87,7 @@ struct DiagnosisShareCardView: View {
                     .font(Theme.Typography.Data.miniMedium)
                     .foregroundStyle(Color.inkSecondary)
                     .kerning(1)
-                    .padding(.leading, 28)
+                    .padding(.leading, Theme.Spacing.xxl)
                     .padding(.bottom, 14)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -98,7 +98,7 @@ struct DiagnosisShareCardView: View {
                 .frame(width: Theme.Size.ShareCard.avatar, height: Theme.Size.ShareCard.avatar)
                 .background(result.gradeColor)
                 .clipShape(RoundedRectangle(cornerRadius: 2))
-                .padding(.trailing, 28)
+                .padding(.trailing, Theme.Spacing.xxl)
                 .padding(.bottom, 10)
         }
         .frame(width: Theme.Size.ShareCard.width, height: Theme.Size.ShareCard.diagnosisBodyHeight)

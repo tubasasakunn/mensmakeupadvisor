@@ -39,7 +39,7 @@ struct GlassPrimaryButton: View {
             }
             .foregroundStyle(Color.ivory)
             .padding(.horizontal, Theme.Spacing.xl)
-            .padding(.vertical, 16)
+            .padding(.vertical, Theme.Spacing.lg)
             .frame(maxWidth: .infinity)
             .modifier(GlassPrimaryButtonSurface(isProminent: isProminent))
         }
@@ -99,7 +99,7 @@ struct GlassPressedButtonStyle: ButtonStyle {
 #Preview {
     ZStack {
         LuxeBackground()
-        VStack(spacing: 20) {
+        VStack(spacing: Theme.Spacing.xl) {
             GlassPrimaryButton(
                 title: "撮影をはじめる",
                 icon: "camera.fill",
@@ -116,6 +116,6 @@ struct GlassPressedButtonStyle: ButtonStyle {
                 isProminent: false
             ) {}
         }
-        .padding(28)
+        .padding(Theme.Spacing.xxl)
     }
 }

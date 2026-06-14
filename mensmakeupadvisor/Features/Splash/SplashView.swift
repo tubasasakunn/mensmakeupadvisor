@@ -24,7 +24,7 @@ struct SplashView: View {
             VStack(spacing: 0) {
                 // 上部メタ情報
                 topMeta
-                    .padding(.top, 56)
+                    .padding(.top, Theme.Spacing.huge)
 
                 Spacer()
 
@@ -37,7 +37,7 @@ struct SplashView: View {
                 bottomBlock
                     .padding(.bottom, 48)
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, Theme.Spacing.xxl)
         }
         // タップでスキップ可能 (HIG: 自動再生やスプラッシュは触れたら止めるべき)
         .contentShape(Rectangle())
@@ -74,7 +74,7 @@ struct SplashView: View {
                 .font(Theme.Typography.Data.baseRegular)
                 .foregroundStyle(Color.inkSecondary)
                 .kerning(2.5)
-                .padding(.bottom, 16)
+                .padding(.bottom, Theme.Spacing.lg)
 
             // "The"
             Text("The")
@@ -99,7 +99,7 @@ struct SplashView: View {
             // 区切り線
             HairlineDivider()
                 .padding(.top, 24)
-                .padding(.bottom, 16)
+                .padding(.bottom, Theme.Spacing.lg)
 
             // 日本語キャッチコピー
             Text("紳士の身嗜み、再考。")
@@ -112,7 +112,7 @@ struct SplashView: View {
 
     private var bottomBlock: some View {
         HStack(alignment: .bottom) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                 Text("EST. MMXXV")
                     .font(Theme.Typography.Data.miniRegular)
                     .foregroundStyle(Color.inkSecondary)

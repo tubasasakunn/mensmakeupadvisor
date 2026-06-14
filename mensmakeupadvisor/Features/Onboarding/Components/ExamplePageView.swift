@@ -11,7 +11,7 @@ struct ExamplePageView: View {
                 Text(title)
                     .font(Theme.Typography.Display.titleLBold)
                     .foregroundStyle(Color.ivory)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, Theme.Spacing.xl)
             }
 
             if let items = page.exampleItems {
@@ -36,8 +36,8 @@ struct ExampleItemView: View {
     let advice: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top, spacing: 8) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            HStack(alignment: .top, spacing: Theme.Spacing.sm) {
                 Text("Q")
                     .font(Theme.Typography.Data.base)
                     .foregroundStyle(Color.inkSecondary)
@@ -49,7 +49,7 @@ struct ExampleItemView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            HStack(alignment: .top, spacing: 8) {
+            HStack(alignment: .top, spacing: Theme.Spacing.sm) {
                 Text("→")
                     .font(Theme.Typography.Data.base)
                     .foregroundStyle(Color.brandPrimary)

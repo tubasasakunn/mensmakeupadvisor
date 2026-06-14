@@ -86,6 +86,7 @@ extension Theme {
             nonisolated static let firm: CGFloat = 0.9
             nonisolated static let regular: CGFloat = 1
             nonisolated static let bold: CGFloat = 1.2
+            nonisolated static let strong: CGFloat = 1.5
             nonisolated static let heavy: CGFloat = 2
             nonisolated static let thick: CGFloat = 4
             nonisolated static let chunky: CGFloat = 5

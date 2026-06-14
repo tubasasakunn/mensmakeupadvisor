@@ -179,9 +179,9 @@ struct AdviceView: View {
         PhotosPicker(selection: $pickedItem, matching: .images, photoLibrary: .shared()) {
             HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "photo.on.rectangle")
-                    .font(.system(size: 14, weight: .regular))
+                    .font(Theme.Typography.UI.bodyRegular)
                 Text("ライブラリから選ぶ")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(Theme.Typography.UI.bodyMedium)
                     .kerning(0.3)
             }
             .foregroundStyle(Theme.Text.primarySoft)
@@ -190,7 +190,7 @@ struct AdviceView: View {
             .frame(maxWidth: .infinity)
             .background(Theme.Surface.panel, in: .capsule)
             .overlay(
-                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: 0.6)
+                Capsule().stroke(Theme.Line.outlineIvorySoft, lineWidth: Theme.Size.Line.light)
             )
         }
         .aid("advice_library_button")
@@ -199,7 +199,7 @@ struct AdviceView: View {
     // MARK: - Privacy Caption
 
     private var privacyCaption: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "lock.shield")
                 .font(Theme.Typography.UI.caption)
             Text("端末内処理 · アップロードなし · 痕跡なし")
