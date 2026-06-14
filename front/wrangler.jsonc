@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tone-lp",
+  "main": "./dist/index.js",
+  "compatibility_date": "2026-06-01",
+  // 静的画像（hero.png / icon.png / shot_diagnosis.png）を配信。
+  // アセットに一致しないパス（/ , /privacy , /support）は Worker が処理する。
+  "assets": {
+    "directory": "./public"
+  },
+  // カスタムドメイン。basaapp.com ゾーンが同一 Cloudflare アカウントにある前提。
+  // `wrangler deploy` 時に tone.basaapp.com を自動でこの Worker に割り当てる。
+  "routes": [
+    {
+      "pattern": "tone.basaapp.com",
+      "custom_domain": true
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
