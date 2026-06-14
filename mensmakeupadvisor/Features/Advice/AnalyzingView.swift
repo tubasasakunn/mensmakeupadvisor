@@ -211,6 +211,9 @@ struct AnalyzingView: View {
             let result = try await analysisService.analyze(
                 image: image, sharedEngine: appState.makeupEngine
             )
+            // キャンセル (戻る) 後に解析が完了した場合、状態書き換えと遷移を止める。
+            // これが無いと capture へ戻った直後に勝手に Diagnosis/Studio へ飛ぶ。
+            if Task.isCancelled { return }
             withAnimation { progress = 0.70 }
 
             phaseIndex = 3

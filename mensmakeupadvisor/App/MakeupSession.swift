@@ -35,7 +35,6 @@ final class MakeupSession {
     let makeupEngine: MakeupEngineService = MakeupEngineService()
 
     private var renderTask: Task<Void, Never>?
-    private var presetsInitializedFromAnalysis = false
 
     // Archive 「試す」フロー: 保存ルックを別の顔で当てて見る一回限りの体験。
     // Diagnosis 完了時のプリセット既定を当てないために MakeupSession でも持つ。
@@ -49,23 +48,20 @@ final class MakeupSession {
         activePresetID = nil
         isRenderingMakeup = false
         tryingSavedLook = false
-        presetsInitializedFromAnalysis = false
         renderTask?.cancel()
         renderTask = nil
         Task { await makeupEngine.reset() }
     }
 
-    // 顔診断完了時、ユーザーがまだ化粧を触っていなければ顔型に応じた
-    // 既定 composition を入れる。一度でも触ったら以降は上書きしない。
+    // 顔診断結果が新しく設定されるたびに、顔型に応じた既定 composition を入れ直す。
+    // 解析結果は「撮影 1 回につき 1 度」だけ設定される（Studio 編集中に再設定される
+    // 経路は無い）ため、ここで毎回当て直してもユーザー編集を踏み潰さない。むしろ
+    // 以前は一度きりのフラグで初期化を抑止しており、reset() が呼ばれない実装と相まって
+    // 2 回目以降の撮影で前の顔の composition が残るバグになっていた。
     // Try フロー (Archive 経由) は保存ルックの composition を保ちたいので既定を当てない。
     private func applyPresetDefaultsFromAnalysisIfNeeded() {
-        guard !presetsInitializedFromAnalysis else { return }
-        guard !tryingSavedLook else {
-            presetsInitializedFromAnalysis = analysisResult != nil
-            return
-        }
-        composition = MakeupCompositionBuilder.makeDefault(for: analysisResult?.faceShape)
-        presetsInitializedFromAnalysis = analysisResult != nil
+        guard let result = analysisResult, !tryingSavedLook else { return }
+        composition = MakeupCompositionBuilder.makeDefault(for: result.faceShape)
     }
 
     // 化粧反映を非同期で要求する。短時間に複数回呼ばれても直近の 1 回だけ実行する。
