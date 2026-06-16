@@ -12,6 +12,7 @@
 - `/audit-conventions` ── 規約違反の全走査（`--fix` で修正まで）
 - `/adr` ── 意思決定の記録を `docs/adr/` に起こす
 - `/release-assets` ── App Store 提出素材（`release/<version>/` のメタデータ .txt とストア画像）の用意・更新
+- `/release-version` ── バージョンアップ〜審査提出の運用ランブック（main で反映＋審査PR、production で審査自動提出）
 - `/sns-post` ── TikTok / Lemon8 のカルーセル画像投稿（`post/postN/`）を新規に1本作る
 
 ---

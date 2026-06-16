@@ -114,8 +114,31 @@ Apple 側・GitHub 側の 1 回だけの手作業（詳細は `release/README.md
    （`release/<version>/app_privacy.md`）。
 8. **サポート / プライバシー URL のサイト**をデプロイ（審査時に開けないと却下）。
 9. **「価格」「コンテンツ配信権」** ── API 非対応なので ASC 画面で 1 回設定。
-10. **提出直前** ── Xcode から Archive → Distribute でビルド（ipa）をアップロードし、
-    ASC で内容を確認して審査へ提出（電話番号が要る）。
+10. **`production` ブランチを作る** ── 審査提出の自動化に必要（`main` から作成）。
+    無いと `release-pr.yml` はスキップする。
+11. **「PR 作成」権限を ON** ── Settings → Actions → General → Workflow permissions の
+    「Allow GitHub Actions to create and approve pull requests」を ON（審査PRの自動作成に必要）。
+12. **Xcode Cloud のワークフローを作成** ── 当該バージョンの archive を ASC に
+    アップロードする（`ci_scripts/ci_post_clone.sh` がビルド番号を一意化、
+    `ci_scripts/ci_pre_xcodebuild.sh` が MediaPipe plist を修正）。
+
+---
+
+## 6.5 審査提出の自動化（メタデータの先の段階）
+
+メタデータ反映（節 6）に加え、**バイナリの審査提出までを自動化**している。
+ブランチにマージすると何が起きるかは `/release-version` の運用ランブックが正本。要点：
+
+- **バイナリのビルド／アップロードは Xcode Cloud**（GitHub の CI ではやらない）。
+- `release/<version>/` を **main** へマージ → メタデータ反映（`appstore-metadata.yml`）＋
+  「<version> 審査PR」(main→production) を自動作成（`release-pr.yml`）。
+- その審査PRを **production** へマージ → `appstore-release.yml` が Xcode Cloud の
+  処理済み最新ビルドを待って審査へ提出（`fastlane submit_latest_build`）。
+- 審査通過後はストアで**手動公開**（`automatic_release: false`）。
+
+提出時の固定申告（`fastlane/Fastfile` の `submit_latest_build`）：
+輸出コンプラ=暗号化なし／第三者コンテンツなし／IDFA 不使用。アプリの内容が
+変わったら（広告 SDK 追加・第三者素材の同梱など）この 3 値を見直す。
 
 ---
 
