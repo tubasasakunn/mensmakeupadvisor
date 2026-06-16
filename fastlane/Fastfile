@@ -1,6 +1,8 @@
-# release/<version>/ の文言・スクショを App Store Connect へ反映するレーン。
-# 起動は .github/workflows/appstore-metadata.yml（main push の release/** 変更時）。
-# バイナリ（ipa）のアップロードはここでは扱わない。
+# App Store Connect への 2 レーン：
+#   push_metadata      ── release/<version>/ の文言・スクショを反映（審査提出はしない）
+#   submit_latest_build ── Xcode Cloud が上げた最新ビルドを選び、審査へ提出する
+# 起動は .github/workflows/{appstore-metadata,appstore-release}.yml。
+# バイナリ（ipa）のビルドとアップロードは Xcode Cloud 側。ここでは扱わない。
 #
 # アプリ固有値（bundle id・連絡先メール）は ../appstore.config.json から読む。
 
@@ -22,51 +24,128 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # App Review 情報（審査の連絡先）。一度も保存されていないアプリでは
-    # deliver が内部の fetch_app_store_review_detail で "No data" クラッシュする
-    # （fastlane#21272）。app_review_information を渡すと無ければ新規作成される
-    # ため、その回避を兼ねて**必ず非空で**渡す。値は Secrets で上書き可能。
-    # 注意：未設定の GitHub Secrets は env 上「空文字列」になり、Ruby では
-    # 空文字列も truthy。`ENV[...] || デフォルト` では拾えないので presence で弾く。
-    presence = ->(value) { value.to_s.strip.empty? ? nil : value }
-
-    # ASC は電話番号を E.164（+国番号）でしか受け付けない。
-    # 国内表記（090-xxxx-xxxx 等）は +81 へ正規化し、それでも '+' 始まりに
-    # ならない値は外して続行する（電話は審査提出までに入っていればよい）。
-    phone = presence.call(ENV["ASC_CONTACT_PHONE"])
-    if phone
-      digits = phone.gsub(/[^\d+]/, "")
-      digits = "+81#{digits[1..]}" if digits.start_with?("0")
-      phone = digits.start_with?("+") ? digits : nil
-      UI.important("ASC_CONTACT_PHONE を E.164 に正規化できないため除外") if phone.nil?
-    end
-
-    review_info = {
-      first_name: presence.call(ENV["ASC_CONTACT_FIRST_NAME"]),
-      last_name: presence.call(ENV["ASC_CONTACT_LAST_NAME"]),
-      phone_number: phone,
-      email_address: presence.call(ENV["ASC_CONTACT_EMAIL"]) || DEFAULT_EMAIL
-    }.compact
-
-    # 年齢制限指定。release/<version>/rating.json から反映する。
+    # 対象バージョン。ASC に無ければ新規作成される（sync スクリプトが
+    # pbxproj の MARKETING_VERSION から導出して環境変数で渡す）
     version = ENV.fetch("APP_VERSION")
     rating_path = File.expand_path("../release/#{version}/rating.json", __dir__)
 
     deliver(
       api_key: api_key,
       app_identifier: APP_IDENTIFIER,
-      # 対象バージョン。ASC に無ければ新規作成される（sync スクリプトが
-      # pbxproj の MARKETING_VERSION から導出して環境変数で渡す）
       app_version: version,
       metadata_path: "fastlane/metadata",
       screenshots_path: "fastlane/screenshots",
+      # 年齢制限指定。release/<version>/rating.json から反映する。
       app_rating_config_path: (File.exist?(rating_path) ? rating_path : nil),
-      app_review_information: review_info,
+      app_review_information: review_information,
       overwrite_screenshots: true,
       skip_binary_upload: true,
       run_precheck_before_submit: false,
       submit_for_review: false,
       force: true  # HTML プレビューの対話確認を CI でスキップ
     )
+  end
+
+  desc "Xcode Cloud がアップした最新ビルドを選び、審査へ提出する"
+  lane :submit_latest_build do
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_content: ENV.fetch("ASC_KEY_CONTENT"),
+      is_key_content_base64: true
+    )
+
+    version = ENV.fetch("APP_VERSION")
+    build = wait_for_processed_build(version)
+    UI.success("審査に出すビルド: #{version} (#{build.version})")
+
+    rating_path = File.expand_path("../release/#{version}/rating.json", __dir__)
+
+    deliver(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      app_version: version,
+      # wait_for_processed_build が選んだ「処理済み」ビルドを明示指定する。
+      # production マージ直後はまだ PROCESSING のことがあるため省略はしない。
+      build_number: build.version,
+      metadata_path: "fastlane/metadata",
+      screenshots_path: "fastlane/screenshots",
+      app_rating_config_path: (File.exist?(rating_path) ? rating_path : nil),
+      app_review_information: review_information,
+      # 提出時に ASC が要求する申告。初回は ASC 画面で答えた内容を毎回そのまま渡す。
+      submission_information: {
+        # Info.plist の ITSAppUsesNonExemptEncryption=NO と一致させる
+        export_compliance_uses_encryption: false,
+        # Tone は端末内完結で、第三者の表示コンテンツ（BGM・素材等）を同梱しない
+        content_rights_contains_third_party_content: false,
+        # 広告・トラッキングなし（rating.json の advertising=false と一致）
+        add_id_info_uses_idfa: false
+      },
+      overwrite_screenshots: true,
+      submit_for_review: true,
+      # 審査通過後はストアで手動公開（自動公開にするなら true）
+      automatic_release: false,
+      run_precheck_before_submit: true,
+      precheck_include_in_app_purchases: false,
+      force: true
+    )
+  end
+end
+
+# --- helpers ----------------------------------------------------------------
+
+# 審査連絡先（App Review 情報）。一度も保存されていないアプリでは deliver が
+# 内部の fetch_app_store_review_detail で "No data" クラッシュする（fastlane#21272）。
+# app_review_information を渡すと無ければ新規作成されるため、その回避を兼ねて
+# **必ず非空で**渡す。値は Secrets で上書き可能。
+# 注意：未設定の GitHub Secrets は env 上「空文字列」になり、Ruby では空文字列も
+# truthy。`ENV[...] || デフォルト` では拾えないので presence で弾く。
+def review_information
+  presence = ->(value) { value.to_s.strip.empty? ? nil : value }
+
+  # ASC は電話番号を E.164（+国番号）でしか受け付けない。
+  # 国内表記（090/080/070-xxxx-xxxx 等）は先頭 0 を外して +81 を付ける。
+  # それでも '+' 始まりにならない値は外して続行する。
+  phone = presence.call(ENV["ASC_CONTACT_PHONE"])
+  if phone
+    digits = phone.gsub(/[^\d+]/, "")
+    digits = "+81#{digits[1..]}" if digits.start_with?("0")
+    phone = digits.start_with?("+") ? digits : nil
+    UI.important("ASC_CONTACT_PHONE を E.164 に正規化できないため除外") if phone.nil?
+  end
+
+  {
+    first_name: presence.call(ENV["ASC_CONTACT_FIRST_NAME"]),
+    last_name: presence.call(ENV["ASC_CONTACT_LAST_NAME"]),
+    phone_number: phone,
+    email_address: presence.call(ENV["ASC_CONTACT_EMAIL"]) || DEFAULT_EMAIL
+  }.compact
+end
+
+# Xcode Cloud のアップロード→ASC のバイナリ処理完了を待ち、処理済みビルドを返す。
+# production マージ直後は処理中（PROCESSING）のことがあるためポーリングする。
+# version はマーケティングバージョン（preReleaseVersion）。
+def wait_for_processed_build(version, timeout: 45 * 60, interval: 60)
+  app = Spaceship::ConnectAPI::App.find(APP_IDENTIFIER)
+  UI.user_error!("ASC にアプリが見つからない: #{APP_IDENTIFIER}") if app.nil?
+
+  deadline = Time.now + timeout
+  loop do
+    builds = Spaceship::ConnectAPI::Build.all(
+      app_id: app.id,
+      version: version,
+      sort: "-uploadedDate",
+      limit: 5,
+      includes: "preReleaseVersion"
+    )
+    ready = builds.find { |build| build.processing_state == "VALID" }
+    return ready if ready
+
+    if Time.now > deadline
+      states = builds.map { |build| "#{build.version}:#{build.processing_state}" }.join(", ")
+      UI.user_error!("#{version} の処理済みビルドが時間内に見つからなかった（#{states}）")
+    end
+    UI.message("ビルド処理待ち（#{version}）… #{interval}s 後に再確認")
+    sleep(interval)
   end
 end

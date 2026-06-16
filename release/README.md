@@ -88,18 +88,33 @@ python3 scripts/make_store_images.py
 
 ## 自動反映（CI）
 
-main に `release/**` の変更が入ると、`.github/workflows/appstore-metadata.yml` が
-文言とスクショを App Store Connect へ自動反映する（手動実行も workflow_dispatch で可）。
+App Store への自動化は 3 ワークフロー・2 fastlane レーンで段階に分かれる。
+ブランチへのマージで何が起きるかの運用ランブックは `/release-version` が正本。
+
+| ワークフロー | 起動 | 役割 |
+|---|---|---|
+| `appstore-metadata.yml` | main の `release/**` 変更 | 文言・スクショを ASC へ反映（`push_metadata`） |
+| `release-pr.yml` | main push（`release/**`） | production に無い版を検出し main→production の審査PRを自動作成 |
+| `appstore-release.yml` | **production** への push | 最新ビルドを待って審査へ提出（`submit_latest_build`） |
 
 ```
-release/<MARKETING_VERSION>/
+release/<MARKETING_VERSION>/ を main へ
   → scripts/sync_fastlane_metadata.py（deliver レイアウトへ変換・名前の対応表の正本）
-  → fastlane deliver（fastlane/Fastfile の push_metadata レーン）
+  → fastlane deliver（push_metadata レーン）でメタデータ反映
+  → release-pr.yml が「<version> 審査PR」(main→production) を作成
+審査PR を production へマージ
+  → fastlane submit_latest_build が Xcode Cloud の処理済み最新ビルドを審査提出
 ```
 
 - 対象バージョンは pbxproj の `MARKETING_VERSION`。ASC に無ければ新規作成される。
-  **バイナリ（ipa）と審査提出は扱わない**（`skip_binary_upload` /
-  `submit_for_review: false`。提出は ASC から手動）。
+- **バイナリ（ipa）のビルド・アップロードは Xcode Cloud 側**（GitHub の CI ではやらない。
+  `ci_scripts/ci_post_clone.sh` がビルド番号を一意化）。
+- `push_metadata` は `skip_binary_upload` / `submit_for_review: false`（反映のみ）。
+  審査提出は `submit_latest_build` が production マージ時に行う
+  （`submit_for_review: true` / `automatic_release: false` で通過後は手動公開）。
+- 提出時の固定申告は `submit_latest_build` にハードコード：輸出コンプラ=暗号化なし
+  （pbxproj の `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption=NO` と一致）／
+  第三者コンテンツなし／IDFA 不使用。アプリ内容が変わったら見直す。
 - スクショは `overwrite_screenshots: true` で全置き換え。
 - 前段で `check_release_metadata.py` が走り、文字数超過があれば反映前に落ちる。
 - カテゴリ・著作権・年齢制限指定（`rating.json`）も毎回反映する。
@@ -150,7 +165,10 @@ release/<MARKETING_VERSION>/
 - [ ] 「アプリのプライバシー」を ASC 画面で回答（`app_privacy.md`）
 - [ ] サポート URL / プライバシー URL のサイトをデプロイ（審査時に開けないと却下）
 - [ ] 「価格」と「コンテンツ配信権」を ASC 画面で設定（API 非対応）
-- [ ] 提出直前：Xcode からビルド（ipa）をアップロードし、内容を確認して審査へ提出
+- [ ] `production` ブランチを作成（審査提出の自動化に必要。無いと審査PRはスキップ）
+- [ ] Settings → Actions →「Allow GitHub Actions to create and approve pull requests」を ON
+- [ ] Xcode Cloud のワークフローを作成（archive を ASC へアップロード）
+- [ ] 提出は自動：審査PR を production へマージすると最新ビルドを審査へ提出（`/release-version`）
 
 ## 更新の流れ
 
