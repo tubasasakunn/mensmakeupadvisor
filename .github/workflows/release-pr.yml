@@ -1,0 +1,69 @@
+# main に新しい release/<version>/ が増えたら、main → production の
+# 「<version> 審査PR」を自動で作る／更新する。production にマージされると
+# appstore-release.yml が走り、最新ビルドを審査へ提出する。
+# 「増えた」の判定は production に無い release/ ディレクトリ（＝まだ出していない版）。
+name: Release PR
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "release/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-review-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: production に無い release/<version>/ を検出
+        id: detect
+        run: |
+          set -euo pipefail
+          # production が無ければ初回。ここでは何もしない（ブランチは手で用意する）。
+          if ! git fetch origin production:refs/remotes/origin/production --depth=1 2>/dev/null; then
+            echo "production ブランチが無いためスキップ"
+            echo "versions=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          main_dirs=$(git ls-tree -d --name-only HEAD release/ | sed 's#release/##' | sort)
+          prod_dirs=$(git ls-tree -d --name-only origin/production release/ | sed 's#release/##' | sort)
+          new=$(comm -23 <(printf '%s\n' "$main_dirs") <(printf '%s\n' "$prod_dirs") | grep -v '^$' || true)
+          versions=$(printf '%s' "$new" | tr '\n' ' ' | sed 's/  */ /g; s/^ //; s/ $//')
+          echo "未リリースの版: ${versions:-(なし)}"
+          echo "versions=$versions" >> "$GITHUB_OUTPUT"
+
+      - name: 審査 PR を作成 / 更新
+        if: steps.detect.outputs.versions != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          versions="${{ steps.detect.outputs.versions }}"
+          label=$(echo "$versions" | sed 's/ /, /g')
+          title="$label 審査PR"
+          body=$(printf '%s\n' \
+            "未リリースの版を検出したため作成しました： $label" \
+            "" \
+            "この PR を **production にマージ**すると、審査提出ワークフロー（appstore-release.yml）が" \
+            "最新ビルドを選んで App Store の審査へ自動提出します。" \
+            "" \
+            "マージ前チェック：" \
+            "- [ ] Xcode Cloud で当該バージョンのビルドをアップロード済み" \
+            "- [ ] release/<version>/whats_new.txt を実際の変更点に更新済み" \
+            "- [ ] サポート / プライバシー URL が開ける（審査時に到達できないと却下）")
+          # main → production の PR は同時に 1 本しか開けない（同じ head/base）。
+          existing=$(gh pr list --base production --head main --state open --json number --jq '.[0].number' || echo "")
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$title" --body "$body"
+            echo "既存 PR #$existing を更新しました"
+          else
+            gh pr create --base production --head main --title "$title" --body "$body"
+          fi
