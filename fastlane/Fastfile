@@ -83,8 +83,8 @@ platform :ios do
       },
       overwrite_screenshots: true,
       submit_for_review: true,
-      # 審査通過後はストアで手動公開（自動公開にするなら true）
-      automatic_release: false,
+      # 審査通過後に自動公開する（手動公開にするなら false）
+      automatic_release: true,
       run_precheck_before_submit: true,
       precheck_include_in_app_purchases: false,
       force: true
