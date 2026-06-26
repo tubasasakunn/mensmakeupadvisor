@@ -1,0 +1,89 @@
+{
+  "id": "tone",
+  "name": "Tone",
+  "bundleId": "com.tubasasakun.mensmakeupadvisor",
+  "ascAppId": "6768039453",
+  "concept": "Tone=メンズメイク診断。撮るだけAIが顔型/スコア(73点)/7項目を診断→似合うメイク提案→Before/Afterスタジオ。盛るより整える/気づかれない範囲。実app画面は material/(05_diagnosis_top,09_studio等)。コンテンツ正本: target/mensmakeupadvisor/.claude/skills/sns-post/SKILL.md。",
+  "default_accent": "evening",
+  "tags": {
+    "tiktok": [
+      "#メンズメイク",
+      "#メンズ美容",
+      "#顔診断",
+      "#垢抜け",
+      "#メンズコスメ"
+    ],
+    "lemon8": [
+      "#メンズメイク",
+      "#メンズ美容",
+      "#顔診断",
+      "#垢抜け",
+      "#自分磨き"
+    ]
+  },
+  "brand": {
+    "bg": [
+      22,
+      18,
+      17
+    ],
+    "ink": [
+      240,
+      233,
+      224
+    ],
+    "sub_ink": [
+      156,
+      146,
+      137
+    ],
+    "card": [
+      38,
+      32,
+      30
+    ],
+    "accents": {
+      "morning": [
+        214,
+        150,
+        110
+      ],
+      "forenoon": [
+        214,
+        176,
+        96
+      ],
+      "afternoon": [
+        196,
+        122,
+        92
+      ],
+      "evening": [
+        202,
+        70,
+        54
+      ],
+      "night": [
+        180,
+        142,
+        96
+      ],
+      "midnight": [
+        126,
+        138,
+        158
+      ]
+    },
+    "wordmark": {
+      "text": "Tone",
+      "icon": "app_icon_1024.png"
+    },
+    "motif": "symbols/sun.svg",
+    "icon_color": [
+      202,
+      70,
+      54
+    ]
+  },
+  "overview": "OVERVIEW.md"
+}

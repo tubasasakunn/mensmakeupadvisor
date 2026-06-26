@@ -13,7 +13,6 @@
 - `/adr` ── 意思決定の記録を `docs/adr/` に起こす
 - `/release-assets` ── App Store 提出素材（`release/<version>/` のメタデータ .txt とストア画像）の用意・更新
 - `/release-version` ── バージョンアップ〜審査提出の運用ランブック（main で反映＋審査PR、production で審査自動提出）
-- `/sns-post` ── TikTok / Lemon8 のカルーセル画像投稿（`post/postN/`）を新規に1本作る
 
 ---
 
@@ -74,7 +73,6 @@ echo "RESULT=$(grep -E 'BUILD (SUCCEEDED|FAILED)' /tmp/log | tail -3)"
 appstore.config.json   ─ アプリ固有値の正本（scripts/Fastfile/post が読む）
 CLAUDE.md / SETUP.md    ─ 本ファイルと初回セットアップ手順
 .claude/rules/          ─ コーディング・並行性規約（Swift を触ると自動読み込み）
-.claude/skills/         ─ /verify-build /audit-conventions /adr /release-assets /sns-post
 docs/adr/               ─ 意思決定の記録（template.md / README.md）
 scripts/                ─ check_release_metadata / sync_fastlane_metadata / make_store_images
 fastlane/Fastfile       ─ App Store Connect へメタデータ反映（deliver）
